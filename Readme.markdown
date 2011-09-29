@@ -17,3 +17,8 @@ To create a grid define
 * columns to be displayed
 
 ### More to come...
+
+
+### License
+
+TracksGrid is released under the MIT license
