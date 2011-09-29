@@ -213,6 +213,22 @@ module TracksGrid
       end
     end
 
+    # adds a column to be display
+    # Example:
+    #
+    # column(:order_date)
+    # displays :order_date of the model 
+    # 
+    # A header may be specified by :header:
+    #
+    # column(:order_date, :header => 'Order Date'
+    #
+    # Supply a block to computed the column's data
+    #
+    # column(:year, :header => 'Year') do |model|
+    #   model.order_date.strftime("%Y") 
+    # end
+    # 
     def column( name, *opts = {} )
 
     end
@@ -252,7 +268,7 @@ module TracksGrid
   module InstanceMethods
 
     # attrs: <filter_name> => <value>, ...
-    #        <order> => <filter_name>, :desc => true 
+    #        :order => <filter_name>, :desc => true 
     #
     # Example:
     #
@@ -276,9 +292,13 @@ module TracksGrid
     # OrderGrid.new :from_order_date => '2011/9/2', :to_order_date => '2011/10/3'
     #
     def initialize( params = {} )
-      @order = params.delete(:order)
       @desc = params.delete(:desc)
-      raise ArgumentError, ':desc given but no :order' if @desc and not @order
+      if order = params.delete(:order)
+        @order_col = columns[order] or raise ArgumentError, "unknown order column #{order}"
+      else
+        @order_col = nil
+        raise ArgumentError, ':desc given but no :order' if @desc 
+      end
 
       # find filters by name
       @filter_params = {}
@@ -296,8 +316,8 @@ module TracksGrid
       @filter_params.each do |filter, value| 
         scope = filter.apply scope, value, @params
       end
-      if @order
-        scope.order "#{@order} #{@desc ? 'DESC' : 'ASC'}" 
+      if @order_col
+        scope.order @order_col.order(@desc) 
       else
         scope
       end
