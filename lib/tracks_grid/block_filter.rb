@@ -16,12 +16,8 @@ module TracksGrid
        super name, options
      end
 
-     def apply( scope, value = nil )
-       if value
-         @block.call scope, value
-       else
-         @block.call scope
-       end
+     def apply( scope, *args )
+       @block.call scope, *args
      end
 
      def counts( scope )

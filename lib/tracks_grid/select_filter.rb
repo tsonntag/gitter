@@ -9,8 +9,8 @@ module TracksGrid
       super name, options
     end
 
-    def apply( scope, value )
-      if filter = @filters[value]
+    def apply( scope, *args )
+      if filter = @filters[args.first]
         filter.apply scope
       else
         scope
@@ -18,11 +18,10 @@ module TracksGrid
     end
 
     def counts( scope )
-      res = {}
-      @filters.values.each do |filter|
-        res[filter.label] = filter.apply(scope).count
+      @filters.values.inject({}) do |memo,filter|
+        memo[filter.label] = filter.apply(scope).count
+        memo
       end
-      res
     end
   end
 

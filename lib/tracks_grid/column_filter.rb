@@ -5,12 +5,12 @@ module TracksGrid
     attr_reader :column
 
     def initialize( name, options)
-      @column = options[:column] || name
+      @column = options.delete(:column){name}
       super
     end
 
-    def apply( scope, value )
-      scope.where column => value
+    def apply( scope, *args )
+      scope.where column => args.first
     end
 
     def counts( scope )

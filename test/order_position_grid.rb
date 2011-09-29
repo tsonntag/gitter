@@ -1,4 +1,5 @@
-require File.expand_path( '../../lib/tracks_grid', __FILE__ )
+load File.expand_path( '../../lib/tracks_grid.rb', __FILE__ )
+
 class OrderPositionGrid
   include TracksGrid
 
@@ -20,7 +21,9 @@ class OrderPositionGrid
 
   filter :customer, :label => 'Customer', :facet => true
 
+  search :search_text, :term, :columns => [ :order_no, :customer ]
+
+  search :search_exact, :columns => :customer, :exact => true
 end
 
 
-g = OrderGrid.new

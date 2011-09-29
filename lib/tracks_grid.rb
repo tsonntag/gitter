@@ -2,6 +2,7 @@ require 'active_support/all'
 require 'active_record'
 
 dir = File.expand_path '../tracks_grid', __FILE__
+puts dir
 $:.unshift(dir) unless $:.include? dir
 require 'abstract_filter.rb'
 require 'block_filter.rb'
@@ -15,10 +16,11 @@ module TracksGrid
   class ConfigurationError < StandardError; end
 
   included do
-    mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
+    mattr_accessor :filters, :facets, :columns, :instance_reader => false, :instance_writer => false
 
     self.filters = {} 
     self.facets = {} 
+    self.columns = {}
   end
 
   module ClassMethods
@@ -138,8 +140,8 @@ module TracksGrid
     #
     def filter( name, options = {}, &block )
       if options.delete(:range)
-         raise ArgumentError, "no block allowed for range" if block
-         return range_filter name, options
+        raise ArgumentError, "no block allowed for range" if block
+        return range_filter name, options
       end
 
       facet = options.delete :facet
@@ -148,6 +150,71 @@ module TracksGrid
 
       facets[name] = filter if facet
       filters[name] = filter
+    end
+
+    # class SearchGrid
+    #   include TracksGrid
+    #   search :search_text, :term, :columns => [ :order_no, :customer ]
+    # end
+    #
+    # creates identical filter :search_text and :term which search a given value in columns
+    # :order_no, :customer
+    # 
+    # g = SearchGrid.new :search_text => 'foo'
+    # searches %foo% in :order_no and :customer  
+    #
+    # Options:
+    #   :exact
+    #     if true makes exact match
+    #     if false uses LIKE '%<value>%'  (default)
+    #               
+    #  :ignore_case 
+    #     if true ignores case (default)
+    #
+    # These options may by overwritten for each instance.
+    # Example:
+    #
+    # class SearchGrid
+    #   include TracksGrid
+    #   search :search, :column => :order_no, :exact => false
+    # end
+    #
+    # SearchGrid.new :search => 'foo'
+    # performs non exact search but
+    # SearchGrid.new :search => 'foo', :exact => true
+    # performs exact search 
+    #
+    def search( *args )
+      opts = args.extract_options!
+      names = args
+      exact = opts.delete(:exact){false}
+      cols = opts.delete(:columns) or raise ArgumentError, 'search requires :column'
+      cols = [cols].flatten
+      ignore = opts.delete(:ignore_case){true}
+      names.each do |name|
+        filter name, opts do |scope, *args|
+          opts = args.extract_options!
+          exact = opts.delete(:exact){exact}
+          ignore = opts.delete(:ignore_case){ignore}
+          raise ArgumentError, "too many arguments #{args.inspect} if args.size != 1
+          value = args.first
+          conditions = cols.map do |col| 
+            if ignore
+              col = "upper(#{col})"
+              token = "upper(:text)"
+            else
+              token = ':text'
+            end
+            "#{col} #{exact ? '=' : 'LIKE'} #{token}"
+          end
+          text = exact ? value : "%#{value}%"
+          scope.where "( #{conditions * ') OR ('} )", :text => text 
+        end
+      end
+    end
+
+    def column( name, *opts = {} )
+
     end
 
     private
@@ -216,15 +283,18 @@ module TracksGrid
       # find filters by name
       @filter_params = {}
       params.each do |name, value|
-        filter = self.class.filters[name] or raise ArgumentError, "undefined filter #{name}" 
-        @filter_params[filter] = value
+        if filter = self.class.filters[name] #or raise ArgumentError, "undefined filter #{name}" 
+          @filter_params[filter] = value
+          params.delete name
+        end
       end
+      @params = params
     end
 
     def scope
       scope = self.class.scope  
       @filter_params.each do |filter, value| 
-        scope = filter.apply scope, value
+        scope = filter.apply scope, value, @params
       end
       if @order
         scope.order "#{@order} #{@desc ? 'DESC' : 'ASC'}" 
@@ -237,6 +307,10 @@ module TracksGrid
       self.class.facets.values.map do |filter|
         Facet.new filter, scope
       end
+    end
+
+    def paginate
+      scope.paginate @params
     end
 
   end
