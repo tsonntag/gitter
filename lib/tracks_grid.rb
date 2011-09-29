@@ -230,7 +230,7 @@ module TracksGrid
     # end
     # 
     def column( name, *opts = {} )
-
+      columns[name] = Column.new name, opts
     end
 
     private
@@ -333,6 +333,18 @@ module TracksGrid
       scope.paginate @params
     end
 
+    def headers
+      self.class.columns.values.map{ |column| column.header }
+    end
+
+    def rows
+      columns = self.class.columns.values
+      paginate.map do |model|
+        columns.map do |column|
+          column.apply model
+        end
+      end
+    end
   end
 
 end
