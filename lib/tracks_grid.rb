@@ -4,11 +4,11 @@ require 'active_record'
 dir = File.expand_path '../tracks_grid', __FILE__
 puts dir
 $:.unshift(dir) unless $:.include? dir
-require 'abstract_filter.rb'
-require 'block_filter.rb'
-require 'column_filter.rb'
-require 'select_filter.rb'
-require 'facet.rb'
+require 'abstract_filter'
+require 'block_filter'
+require 'column_filter'
+require 'select_filter'
+require 'facet'
 
 module TracksGrid
   extend ActiveSupport::Concern
