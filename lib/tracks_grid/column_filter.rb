@@ -4,7 +4,7 @@ module TracksGrid
 
     attr_reader :column
 
-    def initialize( name, options)
+    def initialize( name, options )
       @column = options.delete(:column){name}
       super
     end
