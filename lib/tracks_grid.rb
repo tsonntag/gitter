@@ -188,7 +188,7 @@ module TracksGrid
       opts = args.extract_options!
       names = args
       exact = opts.delete(:exact){false}
-      cols = opts.delete(:columns) or raise ArgumentError, 'search requires :column'
+      cols = opts.delete(:columns) or raise ArgumentError, 'search requires :columns'
       cols = [cols].flatten
       ignore = opts.delete(:ignore_case){true}
       names.each do |name|
