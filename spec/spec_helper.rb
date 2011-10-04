@@ -8,5 +8,4 @@ $:.unshift File.expand_path('../lib', __FILE__)
 require 'rspec'
 require 'tracks_grid'
 
-require 'database'
-require 'person_grid'
+Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| require f}

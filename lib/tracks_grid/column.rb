@@ -2,13 +2,13 @@ module TracksGrid
 
   class Column
 
-    attr_reader, :name, :header, :order_desc
+    attr_reader :name, :header, :order_desc
 
-    def initialize( name, *opts = {}, &block )
+    def initialize( name, opts = {}, &block )
       @name = name
-      @header = opts[header] || name
-      @order = opts[:order]
-      @order_desc = opts[:order_desc]{"#{@order} desc"}
+      @header = opts.delete(:header){name}
+      @order = opts.delete(:order)
+      @order_desc = opts.delete(:order_desc){"#{@order} desc"}
       @block = block
     end
 
@@ -18,7 +18,7 @@ module TracksGrid
 
     def apply( model )
       if @block
-        block.call model
+        @block.call model
       else
         model.send :name
       end

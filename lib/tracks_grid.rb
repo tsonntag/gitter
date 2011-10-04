@@ -1,14 +1,9 @@
 require 'active_support/all'
 require 'active_record'
+require 'will_paginate'
+require 'require_all'
 
-dir = File.expand_path '../tracks_grid', __FILE__
-puts dir
-$:.unshift(dir) unless $:.include? dir
-require 'abstract_filter'
-require 'block_filter'
-require 'column_filter'
-require 'select_filter'
-require 'facet'
+require_all 'lib'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -186,20 +181,23 @@ module TracksGrid
     #
     def search( *args )
       opts = args.extract_options!
-      names = args
       exact = opts.delete(:exact){false}
       cols = opts.delete(:columns) or raise ArgumentError, 'search requires :columns'
       cols = [cols].flatten
-      ignore = opts.delete(:ignore_case){true}
-      names.each do |name|
-        filter name, opts do |scope, *args|
+      ignore_case = opts.delete(:ignore_case){true}
+      check_opts opts
+      args.each do |name|
+        filter name do |scope, *args|
+          # instance options may overwrite class options
           opts = args.extract_options!
           exact = opts.delete(:exact){exact}
-          ignore = opts.delete(:ignore_case){ignore}
-          raise ArgumentError, "too many arguments #{args.inspect} if args.size != 1
+          ignore_case = opts.delete(:ignore_case){ignore_case}
+
+          raise ArgumentError, "too many arguments #{args.inspect}" if args.size != 1
           value = args.first
+
           conditions = cols.map do |col| 
-            if ignore
+            if ignore_case
               col = "upper(#{col})"
               token = "upper(:text)"
             else
@@ -229,7 +227,7 @@ module TracksGrid
     #   model.order_date.strftime("%Y") 
     # end
     # 
-    def column( name, *opts = {} )
+    def column( name, opts = {} )
       columns[name] = Column.new name, opts
     end
 
@@ -263,6 +261,9 @@ module TracksGrid
       end
     end
 
+    def check_opts( opts )
+      raise ArgumentError, "invalid opts #{opts.inspect}" unless opts.empty?
+    end
   end
 
   module InstanceMethods
@@ -321,6 +322,10 @@ module TracksGrid
       else
         scope
       end
+    end
+
+    def method_missing( *args )
+     scope.send *args
     end
 
     def facets
