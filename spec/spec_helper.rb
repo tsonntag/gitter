@@ -9,3 +9,11 @@ require 'rspec'
 require 'tracks_grid'
 
 Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| require f}
+
+def check_include(*args)
+  params = args.extract_options!
+  all = Set.new PersonGrid.new(params).all
+  expected = Set.new [args].flatten
+  specify { all.should == expected }
+end
+

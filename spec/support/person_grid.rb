@@ -9,8 +9,11 @@ class PersonGrid
 
   filter :name, :facet => true
   filter :surname, :label => 'Surname'
+  filter :profession
 
   filter :birthday, :range => true
+
+  filter :sex, :facet => true
 
   filter :teen do |scope|
     scope.where :birthday => (today - 19.years...today - 10.years)
@@ -25,7 +28,11 @@ class PersonGrid
   end 
 
   filter :other do |scope|
-    scope.where(':birthday >= ?', today - 18.years )
+    scope.where [ 'birthday <= ?', today - 29.years ] 
+  end 
+
+  filter :adult do |scope|
+    scope.where [ 'birthday <= ?', today - 18.years ] 
   end 
 
   filter :age, :select => [:child, :teen, :twen, :other], :facet => true
