@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'activerecord', '~> 3.0'
-gem 'activesupport', '~> 3.0'
+gem 'rails'
 gem 'will_paginate', '~> 3.0'
 gem 'require_all'
 

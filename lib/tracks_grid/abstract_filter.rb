@@ -6,7 +6,7 @@ module TracksGrid
 
      def initialize( name, options ={} )
        @name, @options = name, options
-       @label = options.delete(:label){"#{name}"}
+       @label = options.delete(:label){name.to_s.humanize}
      end
 
   end

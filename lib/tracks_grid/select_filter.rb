@@ -19,7 +19,7 @@ module TracksGrid
 
     def counts( scope )
       @filters.values.inject({}) do |memo,filter|
-        memo[filter.label] = filter.apply(scope).count
+        memo[filter.name] = filter.apply(scope).count
         memo
       end
     end

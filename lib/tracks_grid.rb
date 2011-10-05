@@ -1,6 +1,9 @@
+require 'rails'
 require 'active_support/all'
 require 'active_record'
+require 'action_controller'
 require 'will_paginate'
+require 'will_paginate/active_record'
 require 'require_all'
 
 require_all 'lib'
@@ -135,7 +138,7 @@ module TracksGrid
     #
     def filter( name, options = {}, &block )
       if options.delete(:range)
-        raise ArgumentError, "no block allowed for range" if block
+        raise ConfigurationError, "no block allowed for range" if block
         return range_filter name, options
       end
 
@@ -182,7 +185,7 @@ module TracksGrid
     def search( *args )
       opts = args.extract_options!
       exact = opts.delete(:exact){false}
-      cols = opts.delete(:columns) or raise ArgumentError, 'search requires :columns'
+      cols = opts.delete(:columns) or raise ConfigurationError, 'search requires :columns'
       cols = [cols].flatten
       ignore_case = opts.delete(:ignore_case){true}
       check_opts opts
@@ -227,16 +230,29 @@ module TracksGrid
     #   model.order_date.strftime("%Y") 
     # end
     # 
-    def column( name, opts = {} )
-      columns[name] = Column.new name, opts
+    def column( name, opts = {}, &block )
+      columns[name] = Column.new name, opts, block
+    end
+
+    def helpers
+      @helpers ||= begin
+        h = ActionController::Base.helpers
+        #h.instance_eval do
+        #  def _routes
+        #    Rails.application.routes
+        #  end
+        #end
+        #h.extend Rails.application.routes.named_routes.module
+        h
+      end
     end
 
     private
 
     def new_filter( name, options, block )
       if select = options.delete(:select)
-        raise ArgumentError, "no block allowed for select" if block
-        select_filters = select.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
+        raise ConfigurationError, "no block allowed for select" if block
+        select_filters = [select].flatten.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
         SelectFilter.new name, select_filters, options
       elsif block
         BlockFilter.new name, options, &block
@@ -262,7 +278,7 @@ module TracksGrid
     end
 
     def check_opts( opts )
-      raise ArgumentError, "invalid opts #{opts.inspect}" unless opts.empty?
+      raise ConfigurationError, "invalid opts #{opts.inspect}" unless opts.empty?
     end
   end
 
@@ -295,7 +311,7 @@ module TracksGrid
     def initialize( params = {} )
       @desc = params.delete(:desc)
       if order = params.delete(:order)
-        @order_col = columns[order] or raise ArgumentError, "unknown order column #{order}"
+        @order_col = self.class.columns[order] or raise ArgumentError, "unknown order column #{order}"
       else
         @order_col = nil
         raise ArgumentError, ':desc given but no :order' if @desc 
@@ -314,19 +330,22 @@ module TracksGrid
 
     def scope
       scope = self.class.scope  
+
       @filter_params.each do |filter, value| 
         scope = filter.apply scope, value, @params
       end
+
       if @order_col
-        scope.order @order_col.order(@desc) 
+        @order_col.ordered scope, @desc
       else
         scope
       end
+
     end
 
-    def method_missing( *args )
-     scope.send *args
-    end
+    #def method_missing( *args )
+    #  scope.send *args
+    #end
 
     def facets
       self.class.facets.values.map do |filter|
@@ -335,20 +354,32 @@ module TracksGrid
     end
 
     def paginate
-      scope.paginate @params
+      scope.paginate @params.merge( :page => 1 )
     end
 
     def headers
-      self.class.columns.values.map{ |column| column.header }
+      columns.map(&:header)
     end
 
-    def rows
-      columns = self.class.columns.values
-      paginate.map do |model|
-        columns.map do |column|
-          column.apply model
-        end
+    def row_for(model)
+      #puts "row_for(#{model.inspect})"
+      columns.map do |column|
+        column.apply model
       end
+    end
+
+    def rows( scope = self.scope )
+      scope.map do |model|
+        row_for model
+      end
+    end
+
+    def columns
+      @columns ||= self.class.columns.values
+    end
+
+    def helpers
+      self.class.helpers
     end
   end
 

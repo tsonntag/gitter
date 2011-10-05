@@ -6,10 +6,9 @@ module TracksGrid
 
     def initialize( facet, value, count )
       @facet, @value, @count = facet, value, count 
-      puts to_s
     end
 
-    def params
+    def filter_params
       { name => value }
     end
 
@@ -30,13 +29,9 @@ module TracksGrid
       @filter, @scope = filter, scope
     end
 
-    def count
-      filter.counts scope
-    end
-
     def values
       values = [] 
-      count.each do |value, count|
+      filter.counts(scope).each do |value, count|
         values << FacetValue.new(self, value, count)
       end
       values
@@ -51,7 +46,7 @@ module TracksGrid
     end
 
     def to_s
-      "#{self.class}(#{name},#{label})"
+      "#{self.class}(#{name},label=#{label})"
     end
 
   end
