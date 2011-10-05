@@ -47,9 +47,10 @@ class PersonGrid
 
   column :name
 
-  column :full_name do |model|
+  column :full_name, :order => 'name, surname', :order_desc => 'name DESC, surname DESC' do |model|
     "#{model.name} #{model.surname}"
   end
 
   column :profession, :header => 'Job Title'
+
 end

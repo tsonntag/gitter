@@ -45,6 +45,48 @@ describe TracksGrid::Column do
     ]
   end
 
+  it 'should order columns descending' do
+    g = PersonGrid.new :order => :profession, :desc => true
+    g.rows.size.should == 7
+    g.rows.map{|r|r.last}.should == [
+       "teacher",
+       "teacher",
+       "student",
+       "student",
+       "student",
+       "student",
+       "dentist"
+    ]
+  end
+
+  it 'should order complex columns' do
+    g = PersonGrid.new :order => :full_name
+    g.rows.size.should == 7
+    g.rows.should == [
+       ["Dana", "Dana Twen",  "teacher"],
+       ["Dick", "Dick Teeny", "student"],
+       ["Joe",  "Joe Teen",   "student"],
+       ["John", "John Twen",  "teacher"],
+       ["Lisa", "Lisa Adult", "dentist"],
+       ["Max",  "Max Kid",    "student"],
+       ["Tina", "Tina Child", "student"]
+    ]
+  end
+
+  it 'should order complex columns descending' do
+    g = PersonGrid.new :order => :full_name, :desc => true
+    g.rows.size.should == 7
+    g.rows.should == [
+       ["Tina", "Tina Child", "student"],
+       ["Max",  "Max Kid",    "student"],
+       ["Lisa", "Lisa Adult", "dentist"],
+       ["John", "John Twen",  "teacher"],
+       ["Joe",  "Joe Teen",   "student"],
+       ["Dick", "Dick Teeny", "student"],
+       ["Dana", "Dana Twen",  "teacher"]
+    ]
+  end
+
   it 'should raise error for unknown order column' do
     expect { 
       PersonGrid.new :order => :bla 

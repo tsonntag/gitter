@@ -12,7 +12,7 @@ Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| require f}
 
 def check_include(*args)
   params = args.extract_options!
-  all = Set.new PersonGrid.new(params).all
+  all = Set.new PersonGrid.new(params).scope.all
   expected = Set.new [args].flatten
   specify { all.should == expected }
 end
