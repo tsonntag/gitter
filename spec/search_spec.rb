@@ -4,6 +4,30 @@ include Persons
 
 describe TracksGrid do
 
+  context 'search' do
+    it 'should complain for missing :columns' do
+      expect {
+        class SearchErr
+          include TracksGrid
+          search :bla
+        end
+      }.to raise_error(
+        TracksGrid::ConfigurationError, /columns/
+      )
+    end
+
+    it 'should complain for invalid opts' do
+      expect {
+        class SearchErr2
+          include TracksGrid
+          search :bla, :columns => :name, :invalid => 'bla'
+        end
+      }.to raise_error(
+        TracksGrid::ConfigurationError, /invalid opt/
+      )
+    end
+  end
+
   context 'search with many columns' do
     check_include Max, Tina, Dick, Lisa,         :search => 'i' 
     check_include Joe, Dick,                     :search => 'teen' 

@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 def check_facet( facets, name, label, size )
+  #puts "facets=#{facets.inspect}"
   f = facets.detect{|f|f.name == name}
+  #puts "f=#{f.inspect}"
+  #puts "values=#{f.values.inspect}"
   f.should_not == nil
   f.name.should == name 
   f.label.should == label 
@@ -31,7 +34,7 @@ describe TracksGrid do
     it 'should manage column facets' do
       facets = PersonGrid.new.facets
 
-      f = check_facet facets, :sex, 'sex', 2
+      f = check_facet facets, :sex, 'Sex', 2
       check_facet_value f, 'f', 3
       check_facet_value f, 'm', 4
     end
@@ -39,22 +42,22 @@ describe TracksGrid do
     it 'should manage select facets' do
       facets = PersonGrid.new.facets
 
-      f = check_facet facets, :age, 'age', 4
-      check_facet_value f, 'child', 2
-      check_facet_value f, 'teen',  2
-      check_facet_value f, 'twen',  2
-      check_facet_value f, 'other', 1
+      f = check_facet facets, :age, 'Age', 4
+      check_facet_value f, :child, 2
+      check_facet_value f, :teen,  2
+      check_facet_value f, :twen,  2
+      check_facet_value f, :other, 1
     end
 
     it 'should manage select facets with scope' do
       g = PersonGrid.new(:profession => 'student')
       facets = g.facets
 
-      f = check_facet facets, :age, 'age', 4
-      check_facet_value f, 'child', 2
-      check_facet_value f, 'teen',  2
-      check_facet_value f, 'twen',  0
-      check_facet_value f, 'other', 0
+      f = check_facet facets, :age, 'Age', 4
+      check_facet_value f, :child, 2
+      check_facet_value f, :teen,  2
+      check_facet_value f, :twen,  0
+      check_facet_value f, :other, 0
     end
   end
 end

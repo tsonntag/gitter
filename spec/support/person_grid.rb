@@ -45,4 +45,11 @@ class PersonGrid
   search :search_name_exact_ignore,    :columns => :name, :exact => true, :ignore_case => true
   search :search_name_exact_no_ignore, :columns => :name, :exact => true, :ignore_case => false
 
+  column :name
+
+  column :full_name do |model|
+    "#{model.name} #{model.surname}"
+  end
+
+  column :profession, :header => 'Job Title'
 end

@@ -15,26 +15,58 @@ describe TracksGrid do
 
     Foo.scope.should == 'bla'
   end
+  
+  it 'should complain for unset scope' do
+    class Bar
+      include TracksGrid
+    end
+
+    expect {
+      Bar.scope
+    }.to raise_error(
+      TracksGrid::ConfigurationError, /undefined/
+    )
+  end
 
   it 'should handle filters' do
-    class Foo
+    class Foo2
       include TracksGrid
       filter :foo
       filter :bar
     end
 
-    Foo.filters.count.should == 2
-    Foo.filters[:foo].should_not == nil
+    Foo2.filters.count.should == 2
+    Foo2.filters[:foo].should_not == nil
   end
 
   it 'should handle facets ' do
-    class Foo
+    class Foo3
       include TracksGrid
       filter :foo, :facet => true
       filter :bar
     end
-    Foo.facets.count.should == 1
-    Foo.facets[:foo].should_not == nil
+    Foo3.facets.count.should == 1
+    Foo3.facets[:foo].should_not == nil
+  end
+
+  it 'should handle columns ' do
+    class Foo4
+      include TracksGrid
+      column :foo
+      column :bar
+    end
+    Foo4.columns.count.should == 2
+    Foo4.columns[:foo].should_not == nil
+  end
+
+  context 'column filter' do 
+    check_include Max,          :name => 'Max'
+    check_include Lisa,         :surname => 'Adult' 
+  end
+
+  context 'block filter' do 
+    check_include  Joe, Dick,       :teen => true 
+    check_include  Dana, John,      :twen => true 
   end
 
   context 'column filter' do 
