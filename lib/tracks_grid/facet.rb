@@ -3,6 +3,7 @@ module TracksGrid
   class FacetValue
 
     attr_reader :facet, :value, :count
+    delegate :name, :to => :facet
 
     def initialize( facet, value, count )
       @facet, @value, @count = facet, value, count 
@@ -10,10 +11,6 @@ module TracksGrid
 
     def filter_params
       { name => value }
-    end
-
-    def name
-      facet.name
     end
 
     def to_s
@@ -24,6 +21,7 @@ module TracksGrid
   class Facet
 
     attr_reader :filter, :scope
+    delegate :name, :label, :to => :filter
 
     def initialize( filter, scope )
       @filter, @scope = filter, scope
@@ -35,14 +33,6 @@ module TracksGrid
         values << FacetValue.new(self, value, count)
       end
       values
-    end
-
-    def name
-      filter.name
-    end
-
-    def label
-      filter.label
     end
 
     def to_s

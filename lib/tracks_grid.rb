@@ -307,11 +307,12 @@ module TracksGrid
     # OrderGrid.new :from_order_date => '2011/9/2', :to_order_date => '2011/10/3'
     #
     def initialize( params = {} )
+      params = params.symbolize_keys
       @desc = params.delete(:desc)
       if order = params.delete(:order)
-        @order_col = self.class.columns[order] or raise ArgumentError, "unknown order column #{order}"
+        @order_column = self.class.columns[:"#{order}"] or raise ArgumentError, "unknown order column #{order}"
       else
-        @order_col = nil
+        @order_column = nil
         raise ArgumentError, ':desc given but no :order' if @desc 
       end
 
@@ -333,8 +334,8 @@ module TracksGrid
         scope = filter.apply scope, value, @params
       end
 
-      if @order_col
-        @order_col.ordered scope, @desc
+      if @order_column
+        @order_column.ordered scope, @desc
       else
         scope
       end
