@@ -4,6 +4,7 @@ require 'active_record'
 require 'action_controller'
 require 'will_paginate'
 require 'will_paginate/active_record'
+require 'draper/all_helpers'
 
 lib_dir = File.expand_path( '../tracks_grid', __FILE__)
 $:.unshift(lib_dir) unless $:.include?(lib_dir)
@@ -24,6 +25,8 @@ module TracksGrid
     self.filters = {} 
     self.facets = {} 
     self.columns = {}
+
+    ActionController::Base.send :extend, Draper::AllHelpers
   end
 
   module ClassMethods
@@ -238,17 +241,9 @@ module TracksGrid
     end
 
     def helpers
-      @helpers ||= begin
-        h = ActionController::Base.helpers
-        #h.instance_eval do
-        #  def _routes
-        #    Rails.application.routes
-        #  end
-        #end
-        #h.extend Rails.application.routes.named_routes.module
-        h
-      end
+      @helpers ||= ApplicationController::all_helpers
     end
+    alias_method :h, :helpers
 
     private
 
@@ -357,7 +352,7 @@ module TracksGrid
     end
 
     def paginate
-      scope.paginate @params.merge( :page => 1 )
+      scope.paginate :page => (@params[:page]||1), :per_page => (@params[:per_page]||30)
     end
 
     def headers

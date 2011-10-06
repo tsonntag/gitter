@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
     Helps you to define searches with filters and facets 
     and data tables with sortable columns and filters.
   EOS
+  s.add_dependency 'draper'
 
   s.rubyforge_project = "tracks_grid"
 
