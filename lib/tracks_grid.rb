@@ -4,9 +4,14 @@ require 'active_record'
 require 'action_controller'
 require 'will_paginate'
 require 'will_paginate/active_record'
-require 'require_all'
 
-require_all 'lib'
+lib_dir = File.expand_path( '../tracks_grid', __FILE__)
+$:.unshift(lib_dir) unless $:.include?(lib_dir)
+
+require 'version'
+require 'filters'
+require 'column'
+require 'facet'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -142,11 +147,9 @@ module TracksGrid
         return range_filter name, options
       end
 
-      facet = options.delete :facet
-
       filter = new_filter name, options, block
 
-      facets[name] = filter if facet
+      facets[name] = filter if options.delete(:facet)
       filters[name] = filter
     end
 
