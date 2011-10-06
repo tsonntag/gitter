@@ -2,7 +2,7 @@ module TracksGrid
 
   class Column
 
-    attr_reader :name, :header, :order_desc
+    attr_reader :name, :header
 
     def initialize( name, opts = {}, block )
       @name = name
@@ -30,7 +30,6 @@ module TracksGrid
     def order( desc = false )
       desc ? order_desc : @order 
     end
-
 
   end
 
