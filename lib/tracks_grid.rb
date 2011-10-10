@@ -12,7 +12,6 @@ require 'version'
 require 'filters'
 require 'column'
 require 'facet'
-require 'helpers'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -37,6 +36,16 @@ module TracksGrid
       else
         raise ConfigurationError, 'scope undefined' unless @scope
         @scope
+      end 
+    end
+
+    # order :name
+    # order 'name DESC'
+    def order( order = nil )
+      if order
+        @order = order 
+      else
+        @order
       end 
     end
 
@@ -240,11 +249,6 @@ module TracksGrid
       columns[name] = Column.new name, opts, block
     end
 
-    #def helpers
-    #  @helpers ||= ApplicationController::all_helpers
-    #end
-    #alias_method :h, :helpers
-
     private
 
     def new_filter( name, options, block )
@@ -338,12 +342,15 @@ module TracksGrid
         scope = filter.apply scope, value, @params
       end
 
+      scope
+    end
+
+    def scope_with_order
       if @order_column
         @order_column.ordered scope, @desc
       else
-        scope
+        self.class.order ? scope.order(self.class.order) : scope
       end
-
     end
 
     def method_missing( *args )
@@ -362,7 +369,7 @@ module TracksGrid
     end
 
     def paginate
-      scope.paginate @paginate_hash
+      scope_with_order.paginate @paginate_hash
     end
 
     def headers
@@ -376,7 +383,7 @@ module TracksGrid
       end
     end
 
-    def rows( scope = self.scope )
+    def rows( scope = self.scope_with_order )
       scope.map do |model|
         row_for model
       end

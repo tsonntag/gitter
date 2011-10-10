@@ -28,11 +28,13 @@ module TracksGrid
     end
 
     def data
-      data = [] 
-      filter.counts(scope).each do |value, count|
-        data << FacetData.new(self, value, count)
+      @data ||= begin
+        data = [] 
+        filter.counts(scope).each do |value, count|
+          data << FacetData.new(self, value, count)
+        end
+        data
       end
-      data
     end
 
     def to_s

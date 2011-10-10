@@ -1,17 +1,5 @@
 module TracksGrid
 
-  class Context
-    attr_reader :model, :view_context
-
-    def initialize( model, view_context )
-      @model, @view_context = model, view_context
-    end
-
-    def method_missing( *args )
-      @view_context.send *args
-    end
-  end
-
   class Column
 
     attr_reader :name, :header
@@ -30,7 +18,7 @@ module TracksGrid
 
     def apply( model, view_context )
       if @block
-        Context.new(model,view_context).instance_eval &@block
+        Decorator.create(model,view_context).instance_eval &@block
       else
         model.send name
       end
