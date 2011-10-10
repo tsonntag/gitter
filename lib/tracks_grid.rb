@@ -203,9 +203,10 @@ module TracksGrid
       cols = opts.delete(:columns) or raise ConfigurationError, 'search requires :columns'
       cols = [cols].flatten
       ignore_case = opts.delete(:ignore_case){true}
+      input = opts.delete(:input)
       check_opts opts
       args.each do |name|
-        filter name do |scope, *args|
+        filter name, :input => input do |scope, *args|
           # instance options may overwrite class options
           opts = args.extract_options!
           exact = opts.delete(:exact){exact}
@@ -336,17 +337,19 @@ module TracksGrid
     end
 
     def scope
-      scope = @view_context.instance_eval &self.class.scope
+      @scope ||= begin
+        scope = @view_context.instance_eval &self.class.scope
 
-      @filter_params.each do |filter, value| 
-        scope = filter.apply scope, value, @params
+        @filter_params.each do |filter, value| 
+          scope = filter.apply scope, value, @params
+        end
+
+        scope
       end
-
-      scope
     end
 
     def scope_with_order
-      if @order_column
+      @scope_with_order ||= if @order_column
         @order_column.ordered scope, @desc
       else
         self.class.order ? scope.order(self.class.order) : scope
@@ -363,17 +366,21 @@ module TracksGrid
     end
 
     def facets
-      self.class.facets.values.map do |filter|
+      @facets ||= self.class.facets.values.map do |filter|
         Facet.new filter, scope
       end
     end
 
     def paginate
-      scope_with_order.paginate @paginate_hash
+      @paginate ||= scope_with_order.paginate @paginate_hash
+    end
+
+    def total_entries
+      @total_entries.total_entries
     end
 
     def headers
-      columns.map(&:header)
+      @header ||= columns.map(&:header)
     end
 
     def row_for(model)
