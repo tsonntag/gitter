@@ -4,7 +4,6 @@ require 'active_record'
 require 'action_controller'
 require 'will_paginate'
 require 'will_paginate/active_record'
-require 'draper/all_helpers'
 
 lib_dir = File.expand_path( '../tracks_grid', __FILE__)
 $:.unshift(lib_dir) unless $:.include?(lib_dir)
@@ -13,6 +12,7 @@ require 'version'
 require 'filters'
 require 'column'
 require 'facet'
+require 'helpers'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -26,7 +26,7 @@ module TracksGrid
     self.facets = {} 
     self.columns = {}
 
-    ActionController::Base.send :extend, Draper::AllHelpers
+    #ActionController::Base.send :extend, AllHelpers
   end
 
   module ClassMethods
@@ -36,7 +36,7 @@ module TracksGrid
         @scope = scope
       else
         raise ConfigurationError, 'scope undefined' unless @scope
-        @scope.call         
+        @scope
       end 
     end
 
@@ -150,9 +150,9 @@ module TracksGrid
         return range_filter name, options
       end
 
+      is_facet = options.delete(:facet) # delete option before creating a new filter
       filter = new_filter name, options, block
-
-      facets[name] = filter if options.delete(:facet)
+      facets[name] = filter if is_facet
       filters[name] = filter
     end
 
@@ -240,10 +240,10 @@ module TracksGrid
       columns[name] = Column.new name, opts, block
     end
 
-    def helpers
-      @helpers ||= ApplicationController::all_helpers
-    end
-    alias_method :h, :helpers
+    #def helpers
+    #  @helpers ||= ApplicationController::all_helpers
+    #end
+    #alias_method :h, :helpers
 
     private
 
@@ -306,7 +306,8 @@ module TracksGrid
     #
     # OrderGrid.new :from_order_date => '2011/9/2', :to_order_date => '2011/10/3'
     #
-    def initialize( params = {} )
+    def initialize( view_context, params = {} )
+      @view_context = view_context
       params = params.symbolize_keys
       @desc = params.delete(:desc)
       if order = params.delete(:order)
@@ -324,11 +325,14 @@ module TracksGrid
           params.delete name
         end
       end
+
+      @paginate_hash = { :per_page => params.delete(:per_page){30}, :page => params.delete(:page){1} }
+
       @params = params
     end
 
     def scope
-      scope = self.class.scope  
+      scope = @view_context.instance_eval &self.class.scope
 
       @filter_params.each do |filter, value| 
         scope = filter.apply scope, value, @params
@@ -342,9 +346,14 @@ module TracksGrid
 
     end
 
-    #def method_missing( *args )
-    #  scope.send *args
-    #end
+    def method_missing( *args )
+      #scope.send *args
+      if p = @params[args.first]
+        p
+      else
+        super
+      end
+    end
 
     def facets
       self.class.facets.values.map do |filter|
@@ -353,7 +362,7 @@ module TracksGrid
     end
 
     def paginate
-      scope.paginate :page => (@params[:page]||1), :per_page => (@params[:per_page]||30)
+      scope.paginate @paginate_hash
     end
 
     def headers
@@ -363,7 +372,7 @@ module TracksGrid
     def row_for(model)
       #puts "row_for(#{model.inspect})"
       columns.map do |column|
-        column.apply model
+        column.apply model, @view_context
       end
     end
 
@@ -377,9 +386,6 @@ module TracksGrid
       @columns ||= self.class.columns.values
     end
 
-    def helpers
-      self.class.helpers
-    end
   end
 
 end

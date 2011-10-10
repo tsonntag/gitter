@@ -2,7 +2,6 @@ source 'http://rubygems.org'
 
 gem 'rails'
 gem 'will_paginate', '~> 3.0'
-gem 'draper'
 
 group :development, :test do
   gem 'rake', '= 0.8.7'

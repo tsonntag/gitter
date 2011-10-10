@@ -1,22 +1,19 @@
 require 'spec_helper'
 
 def check_facet( facets, name, label, size )
-  #puts "facets=#{facets.inspect}"
   f = facets.detect{|f|f.name == name}
-  #puts "f=#{f.inspect}"
-  #puts "values=#{f.values.inspect}"
   f.should_not == nil
   f.name.should == name 
   f.label.should == label 
-  f.values.size.should == size
-  f.values.each do |v|
+  f.data.size.should == size
+  f.data.each do |v|
     v.name.should == name
   end
   f
 end
 
 def check_facet_value( facet, value, count )
-  v = facet.values.detect{|v|v.value == value}
+  v = facet.data.detect{|v|v.value == value}
   v.should_not == nil
   v.value.should == value 
   v.count.should == count 

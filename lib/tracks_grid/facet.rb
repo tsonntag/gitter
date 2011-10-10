@@ -1,6 +1,6 @@
 module TracksGrid
 
-  class FacetValue
+  class FacetData
 
     attr_reader :facet, :value, :count
     delegate :name, :to => :facet
@@ -27,12 +27,12 @@ module TracksGrid
       @filter, @scope = filter, scope
     end
 
-    def values
-      values = [] 
+    def data
+      data = [] 
       filter.counts(scope).each do |value, count|
-        values << FacetValue.new(self, value, count)
+        data << FacetData.new(self, value, count)
       end
-      values
+      data
     end
 
     def to_s

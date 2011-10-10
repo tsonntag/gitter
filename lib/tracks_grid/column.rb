@@ -1,5 +1,17 @@
 module TracksGrid
 
+  class Context
+    attr_reader :model, :view_context
+
+    def initialize( model, view_context )
+      @model, @view_context = model, view_context
+    end
+
+    def method_missing( *args )
+      @view_context.send *args
+    end
+  end
+
   class Column
 
     attr_reader :name, :header
@@ -9,17 +21,16 @@ module TracksGrid
       @header = opts.delete(:header){name.to_s.humanize}
       @order = opts.delete(:order){name.to_s}
       @order_desc = opts.delete(:order_desc){"#{@order} DESC"}
-      @block = block
+      @block = block 
     end
 
     def ordered( scope, desc = false )
       scope.order order(desc)
     end
 
-    def apply( model )
-      #puts "apply #{self.inspect}"
+    def apply( model, view_context )
       if @block
-        @block.call model
+        Context.new(model,view_context).instance_eval &@block
       else
         model.send name
       end
@@ -30,13 +41,11 @@ module TracksGrid
     # else add order_params for this column to current params
     def order_params(params={})
       p = params.symbolize_keys
-      puts "AAAAAAAAAAAAAAAA #{p.inspect}"
       if ordered?(p)
         p[:desc] = !desc?(p)
       else
         p = p.merge :order => name, :desc => false 
       end
-      puts "ZZZZZZZZZZZZZZZ #{p.inspect}"
       p
     end
 
@@ -52,10 +61,6 @@ module TracksGrid
 
     def order( desc = false )
       desc ? @order_desc : @order 
-    end
-
-    def true?(s)
-      s && (s.downcase == 'true' || s == '1')
     end
 
     def to_boolean(s)
