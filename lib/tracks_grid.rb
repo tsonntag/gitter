@@ -12,6 +12,7 @@ require 'version'
 require 'filters'
 require 'column'
 require 'facet'
+require 'decorator'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -311,9 +312,9 @@ module TracksGrid
     #
     # OrderGrid.new :from_order_date => '2011/9/2', :to_order_date => '2011/10/3'
     #
-    def initialize( view_context, params = {} )
-      @view_context = view_context
+    def initialize( params = {} )
       params = params.symbolize_keys
+      @view_context = params.delete(:view_context)
       @desc = params.delete(:desc)
       if order = params.delete(:order)
         @order_column = self.class.columns[:"#{order}"] or raise ArgumentError, "unknown order column #{order}"
@@ -338,7 +339,11 @@ module TracksGrid
 
     def scope
       @scope ||= begin
-        scope = @view_context.instance_eval &self.class.scope
+        scope = if @view_context 
+          @view_context.instance_eval &self.class.scope
+        else
+          self.class.scope.call
+        end
 
         @filter_params.each do |filter, value| 
           scope = filter.apply scope, value, @params

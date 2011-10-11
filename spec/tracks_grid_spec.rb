@@ -13,7 +13,7 @@ describe TracksGrid do
       end
     end
 
-    Foo.scope.should == 'bla'
+    Foo.scope.call.should == 'bla'
   end
   
   it 'should complain for unset scope' do
@@ -80,11 +80,11 @@ describe TracksGrid do
   end
 
   context 'filter with range' do 
-    check_include Joe, Dick,     :birthday => (Time.utc(1995,1,1)...Time.utc(1997,1,1))
+    check_include Joe, Dick,     :birthday => (Date.new(1995,1,1)...Date.new(1997,1,1))
   end
 
   context 'filter with from ...to range' do 
-    check_include Joe, Dick,    :from_birthday => Time.utc(1995,1,1), :to_birthday => Time.utc(1997,1,1) 
+    check_include Joe, Dick,    :from_birthday => Date.new(1995,1,1), :to_birthday => Date.new(1997,1,1) 
   end
 
   context 'filter with select' do

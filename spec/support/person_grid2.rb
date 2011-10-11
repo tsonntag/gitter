@@ -5,9 +5,8 @@ class PersonGrid2
     Person.scoped
   end
 
-  column :name do |model|
-    #helpers.link_to model.name, "/person/#{model.id}"
-    helpers.content_tag 'foo'
+  column :name do 
+    model.name 
   end
 
 end
