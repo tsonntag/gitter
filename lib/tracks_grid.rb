@@ -13,6 +13,7 @@ require 'filters'
 require 'column'
 require 'facet'
 require 'decorator'
+require 'controller'
 
 module TracksGrid
   extend ActiveSupport::Concern
@@ -190,7 +191,7 @@ module TracksGrid
     #
     # class SearchGrid
     #   include TracksGrid
-    #   search :search, :column => :order_no, :exact => false
+    #   search :search, :columns => :order_no, :exact => false
     # end
     #
     # SearchGrid.new :search => 'foo'
@@ -213,7 +214,7 @@ module TracksGrid
           exact = opts.delete(:exact){exact}
           ignore_case = opts.delete(:ignore_case){ignore_case}
 
-          raise ArgumentError, "too many arguments #{args.inspect}" if args.size != 1
+          raise ArgumentError, "too many arguments #{args.inspect}" unless args.size == 1
           value = args.first
 
           conditions = cols.map do |col| 
@@ -323,7 +324,7 @@ module TracksGrid
         raise ArgumentError, ':desc given but no :order' if @desc 
       end
 
-      # find filters by name
+      # create map name => filter
       @filter_params = {}
       params.each do |name, value|
         if filter = self.class.filters[name] #or raise ArgumentError, "undefined filter #{name}" 
@@ -405,6 +406,15 @@ module TracksGrid
       @columns ||= self.class.columns.values
     end
 
+    def inputs( form )
+      res = []
+      self.class.filters.each do |name, filter|
+        if filter.input?
+          res << form.input(name, filter.input_options(@view_context))
+        end
+      end 
+      res
+    end
   end
 
 end
