@@ -27,12 +27,8 @@ module TracksGrid
          else
            value
          end
-       end
+       end if @input_options.respond_to? :each
        res
-     end
-
-     def inputs( context )
-
      end
 
   end
