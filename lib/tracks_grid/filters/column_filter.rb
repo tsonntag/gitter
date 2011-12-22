@@ -10,7 +10,11 @@ module TracksGrid
     end
 
     def apply( scope, *args )
-      scope.where column => args.first
+      if args.first.blank?
+        scope
+      else
+        scope.where column => args.first
+      end
     end
 
     def counts( scope )

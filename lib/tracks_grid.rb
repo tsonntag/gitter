@@ -363,12 +363,7 @@ module TracksGrid
     end
 
     def method_missing( *args )
-      #scope.send *args
-      if p = @params[args.first]
-        p
-      else
-        super
-      end
+      @params[args.first] or super
     end
 
     def facets
@@ -406,15 +401,31 @@ module TracksGrid
       @columns ||= self.class.columns.values
     end
 
-    def inputs( form )
-      res = []
+    def input_options
+      res = {} 
       self.class.filters.each do |name, filter|
         if filter.input?
-          res << form.input(name, filter.input_options(@view_context))
+          res[name] = filter.input_options(@view_context)
         end
       end 
       res
     end
+
+    def inputs
+      res = {} 
+      self.class.filters.each do |name, filter|
+        if filter.input?
+          opts = filter.input_options(@view_context)
+          if col = opts[:collection]
+             res[name] = @view_context.select_tag name, @view_context.options_for_select(col, @view_context.params[name])
+          else
+             res[name] = @view_context.text_field_tag name, @view_context.params[name]
+          end
+        end
+      end 
+      res
+    end
+
   end
 
 end

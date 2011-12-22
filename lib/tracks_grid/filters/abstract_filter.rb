@@ -16,7 +16,7 @@ module TracksGrid
      end
 
      def input_options( context = nil )
-       res = { :input_html => { :name => name }}
+       res = {}
        @input_options.each do |key, value|
          res[key] = if value.is_a? Proc
            if context 
@@ -29,6 +29,10 @@ module TracksGrid
          end
        end
        res
+     end
+
+     def inputs( context )
+
      end
 
   end
