@@ -4,11 +4,11 @@ module TracksGrid
 
     attr_reader :name, :header
 
-    def initialize( name, opts = {}, block )
+    def initialize( name, opts = {}, &block )
       @name = name
-      @header = opts.delete(:header){name.to_s.humanize}
-      @order = opts.delete(:order){name.to_s}
-      @order_desc = opts.delete(:order_desc){"#{@order} DESC"}
+      @header = opts[:header] || name.to_s.humanize
+      @order = opts[:order] || name.to_s
+      @order_desc = opts[:order_desc] || "#{@order} DESC"
       @block = block 
     end
 
@@ -16,15 +16,15 @@ module TracksGrid
       scope.order order(desc)
     end
 
-    def apply( model, view_context )
+    def render( model, view_context )
       if @block
-        Decorator.create(model,view_context).instance_eval &@block
+        Decorator.render model, view_context, @block
       else
         model.send name
       end
     end
 
-    # Argument: params  of current request
+    # Argument: params of current request
     # if current params contain order for this column then revert direction 
     # else add order_params for this column to current params
     def order_params(params={})
@@ -52,7 +52,7 @@ module TracksGrid
     end
 
     def to_boolean(s)
-      (s && s.match(/true|t|1$/i)) != nil
+      not (s && s.match(/true|t|1$/i)).nil?
     end
   end
 

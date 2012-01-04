@@ -4,11 +4,10 @@ module TracksGrid
 
      attr_reader :name, :label
 
-     def initialize( name, options ={} )
+     def initialize( name, opts ={} )
        @name = name
-       @label = options.delete(:label){name.to_s.humanize}
-       @input_options = options.delete(:input)
-       raise ArgumentError, "invalid options #{options.inspect}" unless options.empty?
+       @label = opts.fetch(:label){name.to_s.humanize}
+       @input_options = opts[:input]
      end
 
      def input?
@@ -31,5 +30,22 @@ module TracksGrid
        res
      end
 
+     def input( context = nil )
+       return nil unless input? 
+
+       if col = input_options(context)[:collection]
+          select_tag context, col
+       else
+          text_field_tag context
+       end
+     end
+
+     def text_field_tag( context )
+       context.text_field_tag name, context.params[name]
+     end
+
+     def select_tag( context, collection )
+       context.select_tag name, context.options_for_select(collection, context.params[name])
+     end
   end
 end

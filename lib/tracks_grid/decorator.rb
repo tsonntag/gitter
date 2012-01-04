@@ -8,6 +8,10 @@ module TracksGrid
         decorator_class(model).new model, view_context 
       end
 
+      def render( model, view_context, block )
+        create( model, view_context ).instance_eval &block
+      end
+
       private
       def decorator_class( model )
         clazz = model.class.name + 'Decorator'
