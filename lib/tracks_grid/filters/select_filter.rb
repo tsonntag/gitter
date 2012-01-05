@@ -10,7 +10,7 @@ module TracksGrid
     end
 
     def apply( scope, *args )
-      if filter = @filters[args.first]
+      if filter = @filters[:"#{args.first}"]
         filter.apply scope
       else
         scope
