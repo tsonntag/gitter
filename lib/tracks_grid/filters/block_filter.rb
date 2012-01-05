@@ -20,9 +20,5 @@ module TracksGrid
        @block.call scope, *args
      end
 
-     def counts( scope )
-       apply(scope).count
-     end
-
   end
 end

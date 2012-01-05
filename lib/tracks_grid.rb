@@ -5,9 +5,6 @@ require 'action_controller'
 require 'will_paginate'
 require 'will_paginate/active_record'
 
-#lib_dir = File.expand_path( '../tracks_grid', __FILE__)
-#$:.unshift(lib_dir) unless $:.include?(lib_dir)
-
 require 'tracks_grid/version'
 require 'tracks_grid/filters'
 require 'tracks_grid/columns'
@@ -16,14 +13,12 @@ require 'tracks_grid/decorator'
 require 'tracks_grid/controller'
 
 module TracksGrid
-
   extend ActiveSupport::Concern
   
   class ConfigurationError < StandardError; end
 
   included do
     mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
-
     self.filters = {}
     self.facets= {}
   end
@@ -162,29 +157,75 @@ module TracksGrid
     # Then UserGrid.new.facets returns
     # { 'Generation' => { 'Teenager' => 25, 'Twen' => 100 } }
     #
-    def filter( name, options = {}, &block )
-      if options.delete(:range)
-        raise ConfigurationError, "no block allowed for range" if block
-        return range_filter name, options
-      end
+    #
+    # Use :scope to filter by a given scope
+    #
+    # class User < ActiveRecord::Base
+    #   scope :children, lambda{ where "birthday > :date", :date => 10.years.ago} 
+    # end
+    #
+    # class UserGrid
+    #  include TracksGrid
+    #
+    #  filter :scope => :children
+    # end
+    # 
+    # Use :scopes to select scopes
+    #
+    # class User < ActiveRecord::Base
+    #   scope :teen, lambda{ where :birthday => (10.years.ago..20.years.ago)} 
+    #   scope :twen, lambda{ where :birthday => (20.years.ago..29.years.ago)} 
+    # end
+    #    
+    # class UserGrid
+    #  include TracksGrid
+    #
+    #  filter :generation, :scopes => [:teen, :twen]
+    # end
+    # 
+    # Use :scopes to select scopes
+    #
+    def filter( *args, &block )
+      options = args.extract_options!
+      raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
+      name = args.first
 
-      is_facet = options.delete(:facet) # delete option before creating a new filter
-
-      filter = if (select = options.delete(:select))
-        raise ConfigurationError, "no block allowed for select" if block
-        select_filters = [select].flatten.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
-        SelectFilter.new name, select_filters, options
-      elsif block
+      filter = case
+      when block 
         BlockFilter.new name, options, &block
+
+      when options[:range]
+        return range_filter(name, options) # return is required
+
+      when s = options[:select]
+        f = [s].flatten.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
+        SelectFilter.new name, f, options
+
+      when s = options[:scope]
+        scope_filter( name || s, options )
+
+      when s = options[:scopes]
+        f = [s].flatten.map{|name| scope_filter name}
+        SelectFilter.new name, f, options
+
       else 
         ColumnFilter.new name, options
+
       end
 
-      facets[name] = filter if is_facet
+      facets[name] = filter if options[:facet]
       filters[name] = filter
     end
 
+    def search( name, options = {} )
+      filter name, { :exact => false, :ignore_case => true }.merge(options)
+    end
+
     private
+
+    def scope_filter( name, options = {} )
+      BlockFilter.new(name, options){|scope| scope.send name}
+    end
 
     def range_filter( name, options )
       column = options.delete(:column){name}
@@ -266,10 +307,6 @@ module TracksGrid
 
         scope
       end
-    end
-
-    def method_missing( *args )
-      @params[args.first] or super
     end
 
     def facets

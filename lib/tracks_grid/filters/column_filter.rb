@@ -37,7 +37,11 @@ module TracksGrid
     end
 
     def counts( scope )
-      scope.group(column).count
+      if columns.size == 1
+        scope.group(columns.first).count
+      else
+        scope.count
+      end
     end
    
   end

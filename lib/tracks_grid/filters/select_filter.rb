@@ -5,8 +5,13 @@ module TracksGrid
     attr_reader :filters
 
     def initialize( name, filters, options )
-      @filters = filters.inject({}){|memo,filter| memo[filter.name] = filter; memo}
       super name, options
+      @filters = filters.inject({}){|memo,filter| memo[filter.name] = filter; memo}
+      case @input_options 
+      when true, :collection
+        @input_options = {}
+        @input_options[:collection] = [''] + @filters.keys 
+      end
     end
 
     def apply( scope, *args )

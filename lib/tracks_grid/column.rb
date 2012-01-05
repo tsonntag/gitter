@@ -18,7 +18,8 @@ module TracksGrid
 
     def render( model, view_context )
       if @block
-        Decorator.render model, view_context, @block
+        Decorator.decorate model, :h => view_context
+        model.instance_eval &@block
       else
         model.send name
       end
