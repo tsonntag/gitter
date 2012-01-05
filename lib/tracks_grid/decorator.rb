@@ -1,11 +1,11 @@
 module TracksGrid
 
   module DecoratorMethods
-    def decorate(model, clazz = nil)
+    def decorate(model, clazz = nil, opts = self.decorator_opts)
       clazz ||= "#{model.class.name}Decorator".constantize
       model.extend clazz
 
-      self.decorator_opts.each do |k,value|
+      opts.each do |k,value|
         model.class.send :attr_reader, k 
         model.send :instance_variable_set, "@#{k}", value
       end
