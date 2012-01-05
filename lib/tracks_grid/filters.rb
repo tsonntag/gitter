@@ -1,4 +1,4 @@
-require 'filters/abstract_filter'
-require 'filters/column_filter'
-require 'filters/block_filter'
-require 'filters/select_filter'
+require 'tracks_grid/filters/abstract_filter'
+require 'tracks_grid/filters/column_filter'
+require 'tracks_grid/filters/block_filter'
+require 'tracks_grid/filters/select_filter'
