@@ -11,7 +11,7 @@ module TracksGrid
     included do
       mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
       self.filters = {}
-      self.facets= {}
+      self.facets= [] 
     end
   
     module ClassMethods
@@ -24,7 +24,15 @@ module TracksGrid
           @scope
         end 
       end
-  
+
+      def order( order = nil )
+        if order
+          @order = order
+        else
+          @order
+        end
+      end
+
       # Examples:
       #
       # Simple column filter: 
@@ -127,15 +135,16 @@ module TracksGrid
       #  filter :priority, :facet => true
       # end
       #
-      # Then
-      # TaskGrid.new(params).facets 
-      # returns a hash 
-      #
-      # { 'Name' => 
-      #      { 'Baker' => 4, 'Miller' => 5 }, 
-      #   'priority' => 
-      #      { 'low' => 10, 'high' => 12 },
-      # }
+      # Then TaskGrid.new(params).facets returns a list of facets 
+      # where each facet has a name, a label and an array of data objects containing a value and count
+      # 
+      # e.g.
+      # f = TaskGrid.new(params).facets 
+      # f[0].name           # 'Name'
+      # f[0].data[0].value  # 'Baker'
+      # f[0].data[0].count  # 4 
+      # f[0].data[1].value  # 'Miller'
+      # f[0].data[1].count  # 5 
       #
       # Use :select to group your facets:
       #
@@ -145,9 +154,12 @@ module TracksGrid
       #   filter :generation, :label => 'Generation', :select => [ :teen, :twen ], :facet => true
       # end
       #
-      # Then UserGrid.new.facets returns
-      # { 'Generation' => { 'Teenager' => 25, 'Twen' => 100 } }
-      #
+      # Then f = UserGrid.new.facets returns
+      # f[0].name           # 'Generation'
+      # f[0].data[0].value  # 'Teenager'
+      # f[0].data[0].count  # 25 
+      # f[0].data[1].value  # 'Twen'
+      # f[0].data[1].count  # 100 
       #
       # Use :scope to filter by a given scope
       #
@@ -203,7 +215,7 @@ module TracksGrid
           ColumnFilter.new name, options
         end
   
-        facets[name] = filter if options[:facet]
+        facets << filter if options[:facet]
         filters[name] = filter
       end
   
@@ -236,8 +248,11 @@ module TracksGrid
       def check_opts( opts )
         raise ConfigurationError, "invalid opts #{opts.inspect}" unless opts.empty?
       end
+
     end
-  
+
+    attr_reader :params, :view_context
+
     # attrs: <filter_name> => <value>, ...
     #        :order => <filter_name>, :desc => true 
     #
@@ -262,29 +277,26 @@ module TracksGrid
     #
     # UserGrid.new :from_birthday => '1980/9/2', :to_birthday => '1990/10/3'
     #
-    def initialize( params = {} )
-      params = params.symbolize_keys
-      @view_context = params.delete(:view_context)
+    #
+    # Args may be either the params hash of the request
+    # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
+    # If a view_context is given it will be accessible in various blocks by calling :h
+    def initialize( *args )
+      parse_args args
   
       # create map name => filter
       @filter_params = {}
-      params.each do |name, value|
+      @params.each do |name, value|
         if filter = self.class.filters[name] #or raise ArgumentError, "undefined filter #{name}" 
           @filter_params[filter] = value
-          params.delete name
+          @params.delete name
         end
       end
-  
-      @params = params
     end
   
     def scope
       @scope ||= begin
-        scope = if @view_context 
-          @view_context.instance_eval &self.class.scope
-        else
-          self.class.scope.call
-        end
+        scope = @view_context?  @view_context.instance_eval(&self.class.scope) : self.class.scope.call
   
         @filter_params.each do |filter, value| 
           scope = filter.apply scope, value, @params
@@ -293,11 +305,14 @@ module TracksGrid
         scope
       end
     end
-  
+
+    # returns scope which default order
+    def ordered
+      @ordered ||= self.class.order ? scope.order(self.class.order) : scope
+    end
+
     def facets
-      @facets ||= self.class.facets.values.map do |filter|
-        Facet.new filter, scope
-      end
+      @facets ||= self.class.facets.map{ |filter| Facet.new filter, scope }
     end
   
     def input_options
@@ -318,6 +333,28 @@ module TracksGrid
         end
       end 
       res
+    end
+  
+    private
+    def parse_args(args)
+      opt = args.extract_options!
+      case args.size
+      when 0
+        @params = opts.symbolize_keys
+        @view_context = params.delete(:view_context)
+      when 1
+        arg = args.first
+
+        @view_context = arg.respond_to?(:view_context) ? arg.view_context : nil
+
+        if arg.respond_to? :params
+          @params = arg.params.symbolize_keys
+        else
+          raise ArgumentError, 'argument must respond_to :params'
+        end
+      else
+        raise ArgumentError, 'too many arguments' if args.size > 1
+      end
     end
   
   end
