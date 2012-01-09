@@ -5,7 +5,7 @@ module TracksGrid
     attr_reader :spec, :grid
 
     delegate :name, :to => :spec
-    delegate :params, :view_context, :to => :grid
+    delegate :params, :to => :grid
 
     def initialize( spec, grid )
       @spec, @grid = spec, grid
@@ -13,18 +13,22 @@ module TracksGrid
 
     def cell( model )
       if spec.block
-        Decorator.decorate model, :h => view_context
-        model.instance_eval &block
+        Decorator.decorate model, :h => grid.view_context
+        model.instance_eval &spec.block
       else
         model.send name
       end
     end
 
+    def ordered( scope )
+      spec.ordered scope, params[:desc]
+    end
+
     def header
-      case spec.header
+      @header ||= case spec.header
       when Proc
-        if view_context 
-          Struct.new(:h).new(view_context).instance_eval &spec.header
+        if grid.view_context 
+          Struct.new(:h).new(grid.view_context).instance_exec &spec.header
         else
           spec.header.call
         end
@@ -36,21 +40,23 @@ module TracksGrid
     # if current params contain order for this column then revert direction 
     # else add order_params for this column to current params
     def order_params
-      p = params.dup
-      if ordered?
-        p[:desc] = !desc?
-      else
-        p = p.merge :order => name, :desc => false 
+      @order_params ||= begin
+        p = params.dup
+        if ordered?
+          p[:desc] = !desc?
+        else
+          p = p.merge :order => name, :desc => false 
+        end
+        p
       end
-      p
     end
 
     def desc?
-      to_boolean params[:desc]
+      @desc ||= to_boolean params[:desc]
     end
 
     def ordered?
-      params[:order] == name.to_s
+      @ordered ||= params[:order] == name.to_s
     end
 
     private

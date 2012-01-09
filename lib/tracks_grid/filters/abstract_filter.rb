@@ -41,11 +41,11 @@ module TracksGrid
      end
 
      def text_field_tag( context )
-       context.text_field_tag name, context.params[name]
+       context.text_field_tag name, context.params[name], :class => 'grid'
      end
 
      def select_tag( context, collection )
-       context.select_tag name, context.options_for_select(collection, context.params[name])
+       context.select_tag name, context.options_for_select(collection, context.params[name]), :class => 'grid'
      end
   end
 end

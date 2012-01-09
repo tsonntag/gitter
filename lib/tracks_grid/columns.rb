@@ -1,5 +1,6 @@
-require 'tracks_grid/column'
-require 'tracks_grid/column_spec'
+require 'active_support/concern'
+require 'tracks_grid/columns/column'
+require 'tracks_grid/columns/column_spec'
 require 'will_paginate'
 require 'will_paginate/active_record'
   
@@ -37,28 +38,26 @@ module TracksGrid
     def initialize( *args )
        super 
 
-       @desc = @params.delete(:desc)
-
-       if order = @params.delete(:order)
-         @order_column = self.class.column_specs[:"#{order}"] or raise ArgumentError, "unknown order column #{order}"
+       if order = @params[:order]
+         if order_column_spec = self.class.column_specs[:"#{order}"] 
+           @order_column = Column.new order_column_spec, self
+         else
+           raise ArgumentError, "invalid order column #{order}"
+         end 
        else
          @order_column = nil
-         raise ArgumentError, ':desc given but no :order' if @desc
+         raise ArgumentError, ':desc given but no :order' if @params[:desc] 
        end
 
        @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
      end
  
-     def scope_with_order
-       @scope_with_order ||= if @order_column
-         @order_column.ordered scope, @desc
-       else
-         ordered
-       end
+     def ordered
+       @ordered ||= @order_column ? @order_column.ordered(scope) : super.ordered
      end
  
      def paginate
-       @paginate ||= scope_with_order.paginate @paginate_hash
+       @paginate ||= ordered.paginate @paginate_hash
      end
  
      def headers
@@ -69,11 +68,12 @@ module TracksGrid
        columns.map{|c| c.cell model }
      end
  
-     def rows( scope = self.scope_with_order )
+     def rows( scope = self.ordered )
        scope.map{|model| row_for model}
      end
  
      def columns
+       puts "BBBBBBBBBB params=#{params}"
        @columns ||= column_specs.map{|spec|Column.new spec, self}
      end
 
