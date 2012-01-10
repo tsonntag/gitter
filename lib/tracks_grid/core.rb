@@ -337,7 +337,7 @@ module TracksGrid
   
     private
     def parse_args(args)
-      opt = args.extract_options!
+      opts = args.extract_options!
       case args.size
       when 0
         @params = opts.symbolize_keys
@@ -348,7 +348,7 @@ module TracksGrid
         @view_context = arg.respond_to?(:view_context) ? arg.view_context : nil
 
         if arg.respond_to? :params
-          @params = arg.params.symbolize_keys
+          @params = arg.params.symbolize_keys.merge(opts)
         else
           raise ArgumentError, 'argument must respond_to :params'
         end

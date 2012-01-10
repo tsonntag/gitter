@@ -1,8 +1,10 @@
 module TracksGrid
 
+  class DecoratorError < StandardError; end
+
   module DecoratorMethods
     def decorate(model, clazz = nil, opts = self.decorator_opts)
-      clazz ||= "#{model.class.name}Decorator".constantize
+      clazz ||= decorator_class(model)
       model.extend clazz
 
       opts.each do |k,value|
@@ -10,6 +12,22 @@ module TracksGrid
         model.send :instance_variable_set, "@#{k}", value
       end
 
+      model
+    end
+
+    private
+    def decorator_class(model)
+      c = model.class
+      begin 
+        d = "#{c}Decorator"
+        d.constantize 
+      rescue
+        if c = c.superclass
+          retry
+        else
+          raise DecoratorError, "no decorator class for model #{model} with class #{model.class}"
+        end
+      end
     end
   end
 
@@ -18,11 +36,12 @@ module TracksGrid
       def decorate( model, *args )
         opts = args.extract_options!
         raise ArgumentError, 'no or one decorator module required' unless args.size <= 1 
+        decorator_class = args.first
 
         model.class.send :attr_accessor, :decorator_opts
         model.decorator_opts = opts
         model.extend DecoratorMethods
-        model.decorate model, args.first
+        model.decorate model, decorator_class
       end
     end
   end

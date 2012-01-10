@@ -39,8 +39,8 @@ module TracksGrid
        super 
 
        if order = @params[:order]
-         if order_column_spec = self.class.column_specs[:"#{order}"] 
-           @order_column = Column.new order_column_spec, self
+         if spec = self.class.column_specs[:"#{order}"] 
+           @order_column = Column.new spec, self
          else
            raise ArgumentError, "invalid order column #{order}"
          end 
@@ -48,6 +48,8 @@ module TracksGrid
          @order_column = nil
          raise ArgumentError, ':desc given but no :order' if @params[:desc] 
        end
+
+       @decorator_class = @params[:decorator]
 
        @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
      end
@@ -65,7 +67,7 @@ module TracksGrid
      end
  
      def row_for(model)
-       columns.map{|c| c.cell model }
+       columns.map{|c| c.cell model, @decorator_class }
      end
  
      def rows( scope = self.ordered )
@@ -73,7 +75,6 @@ module TracksGrid
      end
  
      def columns
-       puts "BBBBBBBBBB params=#{params}"
        @columns ||= column_specs.map{|spec|Column.new spec, self}
      end
 

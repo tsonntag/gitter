@@ -17,11 +17,12 @@ module TracksGrid
      def input_options( context = nil )
        res = {}
        @input_options.each do |key, value|
-         res[key] = if value.is_a? Proc
+         res[key] = case value 
+         when Proc
            if context 
-              context.instance_exec(&value)
+              Struct.new(:h).new(context).instance_exec &value
            else
-              yield value
+              value.call
            end
          else
            value

@@ -1,7 +1,6 @@
 module TracksGrid
 
   class Column
-
     attr_reader :spec, :grid
 
     delegate :name, :to => :spec
@@ -11,9 +10,9 @@ module TracksGrid
       @spec, @grid = spec, grid
     end
 
-    def cell( model )
+    def cell( model, decorator_class = nil )
       if spec.block
-        Decorator.decorate model, :h => grid.view_context
+        Decorator.decorate model, decorator_class, :h => grid.view_context
         model.instance_eval &spec.block
       else
         model.send name
