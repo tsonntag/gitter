@@ -252,6 +252,7 @@ module TracksGrid
     end
 
     attr_reader :params, :view_context
+    alias_method :h, :view_context
 
     # attrs: <filter_name> => <value>, ...
     #        :order => <filter_name>, :desc => true 
@@ -289,14 +290,14 @@ module TracksGrid
       @params.each do |name, value|
         if filter = self.class.filters[name] #or raise ArgumentError, "undefined filter #{name}" 
           @filter_params[filter] = value
-          @params.delete name
+          #@params.delete name
         end
       end
     end
   
     def scope
       @scope ||= begin
-        scope = @view_context?  @view_context.instance_eval(&self.class.scope) : self.class.scope.call
+        scope = eval self.class.scope
   
         @filter_params.each do |filter, value| 
           scope = filter.apply scope, value, @params
@@ -306,29 +307,54 @@ module TracksGrid
       end
     end
 
+    def breadcrumbs( join = '>' )
+      @breadcrumbs ||= begin
+        p = {} 
+        text = @filter_params.map do |filter, value|
+          s =  h.content_tag :span, "#{filter.label} : ", :class => 'search_key' 
+          s += h.content_tag :span, value,                :class => 'search_value'
+          p[filter.name] = value
+          h.link_to s, url_for(p)
+        end.join(join)
+        h.content_tag :span, text, {:class => 'search_titles'}, false
+      end
+    end
+
     # returns scope which default order
     def ordered
       @ordered ||= self.class.order ? scope.order(self.class.order) : scope
     end
 
     def facets
-      @facets ||= self.class.facets.map{ |filter| Facet.new filter, scope }
+      @facets ||= self.class.facets.map{ |filter| Facet.new self, filter }
     end
   
-    def input_options
-      res = {} 
-      self.class.filters.each do |name, filter|
-        if filter.input?
-          res[name] = filter.input_options(@view_context)
+    # evaluate data (string or proc) in context of grid
+    def eval( data )
+      case data
+      when Proc
+        if h
+          instance_exec &data
+        else
+          data.call
         end
-      end 
-      res
+      else
+         data
+      end
     end
-  
+
+    # dirty hack to avoid rails' sorted query in url
+    def url_for( params )
+      p = params.dup 
+      #url = h.url_for {} #:action => p.delete(:action), :controller => p.delete(:controller)
+      query = p.map{|key, value| value.to_query(key) } * '&'
+      "#{h.url_for({})}?#{query}"
+    end
+
     def inputs
       res = {} 
       self.class.filters.each do |name, filter|
-        if i = filter.input(@view_context)
+        if i = filter.input(self)
           res[name] = i
         end
       end 

@@ -24,16 +24,7 @@ module TracksGrid
     end
 
     def header
-      @header ||= case spec.header
-      when Proc
-        if grid.view_context 
-          Struct.new(:h).new(grid.view_context).instance_exec &spec.header
-        else
-          spec.header.call
-        end
-      else
-        spec.header
-      end
+      @header ||= grid.eval spec.header
     end
 
     # if current params contain order for this column then revert direction 

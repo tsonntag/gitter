@@ -8,36 +8,24 @@ module TracksGrid
        @name = name
        @label = opts.fetch(:label){name.to_s.humanize}
        @input_options = opts[:input]
+
+       # replace shortcut
+       if coll = opts[:input_collection]
+         (@input_options||={})[:collection] = coll
+       end
      end
 
      def input?
        @input_options
      end
 
-     def input_options( context = nil )
-       res = {}
-       @input_options.each do |key, value|
-         res[key] = case value 
-         when Proc
-           if context 
-              Struct.new(:h).new(context).instance_exec &value
-           else
-              value.call
-           end
-         else
-           value
-         end
-       end if @input_options.respond_to? :each
-       res
-     end
-
-     def input( context = nil )
+     def input( grid )
        return nil unless input? 
 
-       if col = input_options(context)[:collection]
-          select_tag context, col
+       if col = collection 
+          select_tag grid.view_context, [''] + grid.eval(col)
        else
-          text_field_tag context
+          text_field_tag grid.view_context
        end
      end
 
@@ -47,6 +35,11 @@ module TracksGrid
 
      def select_tag( context, collection )
        context.select_tag name, context.options_for_select(collection, context.params[name]), :class => 'grid'
+     end
+  
+     private
+     def collection
+       @input_options.respond_to?(:[]) && @input_options[:collection]
      end
   end
 end

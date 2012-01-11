@@ -10,7 +10,7 @@ module TracksGrid
       case @input_options 
       when true, :collection
         @input_options = {}
-        @input_options[:collection] = [''] + @filters.keys 
+        @input_options[:collection] = @filters.keys 
       end
     end
 
@@ -24,7 +24,8 @@ module TracksGrid
 
     def counts( scope )
       @filters.values.inject({}) do |memo,filter|
-        memo[filter.name] = filter.apply(scope).count
+        count = filter.apply(scope).count
+        memo[filter.name] = count if count > 0
         memo
       end
     end

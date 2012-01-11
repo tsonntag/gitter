@@ -2,7 +2,7 @@ module TracksGrid
 
   class FacetData
     attr_reader :facet, :value, :count
-    delegate :name, :to => :facet
+    delegate :grid, :name, :to => :facet
 
     def initialize( facet, value, count )
       @facet, @value, @count = facet, value, count 
@@ -12,25 +12,42 @@ module TracksGrid
       { name => value }
     end
 
+    def link
+      p = grid.params.dup
+      p.delete(:show)
+      p[name] = value.nil? ? '' : value
+      p[:page] = 1
+
+      option_tag = h.content_tag :span, (value.nil? ? '-' : value), :class => 'facet_value'
+      option_link = h.link_to option_tag, grid.url_for(p)
+
+      count_tag = h.content_tag :span, "(#{count})", :class => 'facet_count'
+      count_link  = h.link_to count_tag,  grid.url_for(p.merge(:show=>true))
+
+      h.content_tag :span, (option_link + count_link), {:class => 'facet_entry'}, false
+    end
+
     def to_s
       "#{name}:#{value}=#{count}"
     end
+
+    private
+    def h
+      grid.h
+    end
+
   end
 
   class Facet
-    attr_reader :filter, :scope
+    attr_reader :filter, :grid
     delegate :name, :label, :to => :filter
 
-    def initialize( filter, scope )
-      @filter, @scope = filter, scope
+    def initialize( grid, filter )
+      @grid, @filter = grid, filter
     end
 
     def data
-      @data ||= begin
-        filter.counts(scope).map do |value, count|
-          FacetData.new(self, value, count)
-        end
-      end
+      @data ||= filter.counts(grid.scope).map{|value, count| FacetData.new self, value, count}
     end
 
     def to_s
