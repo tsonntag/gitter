@@ -13,7 +13,7 @@ module TracksGrid
     end
 
     def link
-      p = grid.params.dup
+      p = grid.h.request.query_parameters
       p.delete(:show)
       p[name] = value.nil? ? '' : value
       p[:page] = 1

@@ -19,8 +19,8 @@ module TracksGrid
       end
     end
 
-    def ordered( scope )
-      spec.ordered scope, params[:desc]
+    def ordered
+      spec.ordered grid.scope, params[:desc]
     end
 
     def header
@@ -47,6 +47,15 @@ module TracksGrid
 
     def ordered?
       @ordered ||= params[:order] == name.to_s
+    end
+
+    def link( opts = {} )
+      if spec.ordered?
+        direction = ordered? ? (col.desc? ? '^' : 'v') : ''
+        grid.h.link_to "#{direction} #{header}" , order_params.merge(opts)
+      else
+        header 
+      end 
     end
 
     private

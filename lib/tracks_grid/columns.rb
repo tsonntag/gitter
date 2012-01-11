@@ -11,6 +11,8 @@ module TracksGrid
     included do
       mattr_accessor :column_specs, :instance_reader => false, :instance_writer => false
       self.column_specs = {}
+
+      after_initialize :init_columns
     end
   
     module ClassMethods
@@ -35,9 +37,7 @@ module TracksGrid
       end
     end
   
-    def initialize( *args )
-       super 
-
+    def init_columns
        if order = @params[:order]
          if spec = self.class.column_specs[:"#{order}"] 
            @order_column = Column.new spec, self
@@ -55,7 +55,7 @@ module TracksGrid
      end
  
      def ordered
-       @ordered ||= @order_column ? @order_column.ordered(scope) : super.ordered
+       @ordered ||= @order_column ? @order_column.ordered : super.ordered
      end
  
      def paginate

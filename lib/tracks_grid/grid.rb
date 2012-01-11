@@ -1,20 +1,25 @@
 require 'active_support/concern'
+require 'active_model/callbacks'
 require 'active_record'
   
+require 'tracks_grid/columns'
 require 'tracks_grid/filters'
 require 'tracks_grid/facet'
   
 module TracksGrid
-  module Core
-    extend ActiveSupport::Concern
- 
-    included do
-      mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
-      self.filters = {}
-      self.facets= [] 
-    end
+  class ConfigurationError < StandardError; end
+
+  class Grid
+    extend ActiveModel::Callbacks
+    define_model_callbacks :initialize
+
+    include Columns
+
+    mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
+    self.filters = {}
+    self.facets= [] 
   
-    module ClassMethods
+    class << self
   
       def scope( &scope )
         if scope
@@ -283,14 +288,15 @@ module TracksGrid
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     # If a view_context is given it will be accessible in various blocks by calling :h
     def initialize( *args )
-      parse_args args
+      run_callbacks :initialize do
+        parse_args args
   
-      # create map name => filter
-      @filter_params = {}
-      @params.each do |name, value|
-        if filter = self.class.filters[name] #or raise ArgumentError, "undefined filter #{name}" 
-          @filter_params[filter] = value
-          #@params.delete name
+        # create map name => filter
+        @filter_params = {}
+        @params.each do |name, value|
+          if filter = self.class.filters[name] 
+            @filter_params[filter] = value
+          end
         end
       end
     end
@@ -346,7 +352,6 @@ module TracksGrid
     # dirty hack to avoid rails' sorted query in url
     def url_for( params )
       p = params.dup 
-      #url = h.url_for {} #:action => p.delete(:action), :controller => p.delete(:controller)
       query = p.map{|key, value| value.to_query(key) } * '&'
       "#{h.url_for({})}?#{query}"
     end

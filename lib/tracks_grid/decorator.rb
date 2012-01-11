@@ -5,7 +5,7 @@ module TracksGrid
   module DecoratorMethods
     def decorate(model, clazz = nil, opts = self.decorator_opts)
       clazz ||= decorator_class(model)
-      model.extend clazz
+      model.extend clazz if clazz
 
       opts.each do |k,value|
         model.class.send :attr_reader, k 
@@ -23,9 +23,9 @@ module TracksGrid
         d.constantize 
       rescue
         if c = c.superclass
-          retry
+          retry 
         else
-          raise DecoratorError, "no decorator class for model #{model} with class #{model.class}"
+          return nil
         end
       end
     end

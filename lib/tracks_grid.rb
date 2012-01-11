@@ -1,17 +1,10 @@
-require 'active_support/concern'
-
-require 'tracks_grid/version'
-require 'tracks_grid/core'
-require 'tracks_grid/columns'
-
 module TracksGrid
-  extend ActiveSupport::Concern
-
-  included do
-    include Core
-    include Columns
-  end
   
-  class ConfigurationError < StandardError; end
+  autoload :Version,   'tracks_grid/version'
+  autoload :Grid,      'tracks_grid/grid'
+  autoload :Decorator, 'tracks_grid/decorator'
+
+  class ConfigurationError < StandardError
+  end
 
 end
