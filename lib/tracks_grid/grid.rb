@@ -3,24 +3,24 @@ require 'active_model/callbacks'
 require 'active_record'
   
 require 'tracks_grid/columns'
+require 'tracks_grid/breadcrumbs'
 require 'tracks_grid/filters'
-require 'tracks_grid/facet'
   
 module TracksGrid
-  class ConfigurationError < StandardError; end
 
   class Grid
     extend ActiveModel::Callbacks
     define_model_callbacks :initialize
 
     include Columns
+    include Breadcrumbs
 
     mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
     self.filters = {}
-    self.facets= [] 
+    self.facets = []
   
     class << self
-  
+
       def scope( &scope )
         if scope
           @scope = scope
@@ -42,52 +42,41 @@ module TracksGrid
       #
       # Simple column filter: 
       #
-      # class UserGrid
-      #   include TracksGrid 
+      # class UserGrid << TracksGrid::Grid
       #
       #   filter :name
       # end
       #
-      # Then UserGrid.new( :name => 'Thomas' ) 
-      # uses scope.where( :name => 'Thomas' )  
+      # Then UserGrid.new( :name => 'Thomas' ) uses scope.where( :name => 'Thomas' )  
       #
-      # You may choose the column as follows:
-      #
-      # class UserGrid
-      #   include TracksGrid 
+      # The column name may be set explicetly:
       #
       #   filter :author, :column => :name
-      # end
       #
-      # Then UserGrid.new( :author => 'Thomas' )
-      # uses scope.where( :name => 'Thomas' )  
+      # Then UserGrid.new( :author => 'Thomas' ) uses scope.where( :name => 'Thomas' )  
       #
       # Multply columns are allowed:
       #
-      # class UserGrid
-      #   include TracksGrid 
-      #
       #   filter :author, :columns => [:name, :surname]
-      # end
       #
       # Use :ignore_case => true to ignore case
-      #
       # Use :exact => false to search which wildcard (%<term>%)
       # 
       # These options may be overwritten per instance:
       #
-      # UserGrid.new :search => 'foo'
+      # UserGrid.new :author => 'foo'
       # performs exact search but
-      # UserGrid.new :search => 'foo', :exact => true
-      # performs exact search 
+      #
+      # UserGrid.new :author => 'foo', :exact => false
+      # uses wildcards
+      #
+      # search :foo, opts
+      # is a shortcut for 
+      # filter :foo, { :exact => false, :ignore_case => true }.merge(opts)
       #
       # A range filter for a given column:
       #
-      # class UserGrid
-      #   include TracksGrid 
-      #
       #   filter :birthday, :range => true, :column => :born_on
-      # end
       #
       # Then UserGrid.new( :birthday_from => '8/2/2011', :birthday_to => '9/1/2011' )
       # or
@@ -97,19 +86,12 @@ module TracksGrid
       #
       # You can choose different keywords for the params
       #
-      # class UserGrid
-      #   include TracksGrid 
-      #
       #   filter :birthday, :range => true, :from => 'between', :to => 'and', :column => :born_on
-      # end
       #
       # UserGrid.new( :between => '8/2/2011', :and => '9/1/2011' )
       # 
       #
       # You can select from other filters:  
-      #
-      # class UserGrid
-      #   include TracksGrid 
       #
       #   filter :twen, :label => 'Twen' do |scope|
       #     now = Time.now
@@ -123,8 +105,6 @@ module TracksGrid
       #
       #   filter :generation, :select => [ :teen, :twen ]
       #
-      # end
-      #
       # Then
       # UserGrid.new( :teen => <any> )
       # and
@@ -133,23 +113,19 @@ module TracksGrid
       #
       # Use the :facet => true option to add the filter to the list of facets
       #
-      # class TaskGrid
-      #  include TracksGrid
-      #
       #  filter :customer, :label => 'Name', :facet => true
       #  filter :priority, :facet => true
-      # end
       #
       # Then TaskGrid.new(params).facets returns a list of facets 
       # where each facet has a name, a label and an array of data objects containing a value and count
       # 
       # e.g.
-      # f = TaskGrid.new(params).facets 
-      # f[0].name           # 'Name'
-      # f[0].data[0].value  # 'Baker'
-      # f[0].data[0].count  # 4 
-      # f[0].data[1].value  # 'Miller'
-      # f[0].data[1].count  # 5 
+      # f = TaskGrid.new(params).facets.first
+      # f.name           # 'Name'
+      # f.data[0].value  # 'Baker'
+      # f.data[0].count  # 4 
+      # f.data[1].value  # 'Miller'
+      # f.data[1].count  # 5 
       #
       # Use :select to group your facets:
       #
@@ -159,12 +135,12 @@ module TracksGrid
       #   filter :generation, :label => 'Generation', :select => [ :teen, :twen ], :facet => true
       # end
       #
-      # Then f = UserGrid.new.facets returns
-      # f[0].name           # 'Generation'
-      # f[0].data[0].value  # 'Teenager'
-      # f[0].data[0].count  # 25 
-      # f[0].data[1].value  # 'Twen'
-      # f[0].data[1].count  # 100 
+      # Then f = UserGrid.new.facets.forst
+      # f.name           # 'Generation'
+      # f.data[0].value  # 'Teenager'
+      # f.data[0].count  # 25 
+      # f.data[1].value  # 'Twen'
+      # f.data[1].count  # 100 
       #
       # Use :scope to filter by a given scope
       #
@@ -172,11 +148,7 @@ module TracksGrid
       #   scope :children, lambda{ where "birthday > :date", :date => 10.years.ago} 
       # end
       #
-      # class UserGrid
-      #  include TracksGrid
-      #
       #  filter :scope => :children
-      # end
       # 
       # Use :scopes to select scopes
       #
@@ -185,14 +157,8 @@ module TracksGrid
       #   scope :twen, lambda{ where :birthday => (20.years.ago..29.years.ago)} 
       # end
       #    
-      # class UserGrid
-      #  include TracksGrid
-      #
       #  filter :generation, :scopes => [:teen, :twen]
-      # end
       # 
-      # Use :scopes to select scopes
-      #
       def filter( *args, &block )
         options = args.extract_options!
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
@@ -201,21 +167,16 @@ module TracksGrid
         filter = case
         when block 
           BlockFilter.new name, options, &block
-  
         when options[:range]
           return range_filter(name, options) # return is required
-  
         when s = options[:select]
           f = [s].flatten.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
           SelectFilter.new name, f, options
-  
         when s = options[:scope]
           scope_filter( name || s, options )
-  
         when s = options[:scopes]
           f = [s].flatten.map{|name| scope_filter name}
           SelectFilter.new name, f, options
-  
         else 
           ColumnFilter.new name, options
         end
@@ -224,6 +185,7 @@ module TracksGrid
         filters[name] = filter
       end
   
+      # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
       def search( name, options = {} )
         filter name, { :exact => false, :ignore_case => true }.merge(options)
       end
@@ -291,7 +253,6 @@ module TracksGrid
       run_callbacks :initialize do
         parse_args args
   
-        # create map name => filter
         @filter_params = {}
         @params.each do |name, value|
           if filter = self.class.filters[name] 
@@ -304,25 +265,8 @@ module TracksGrid
     def scope
       @scope ||= begin
         scope = eval self.class.scope
-  
-        @filter_params.each do |filter, value| 
-          scope = filter.apply scope, value, @params
-        end
-  
+        @filter_params.each{|filter, value| scope = filter.apply(scope, value, @params) }
         scope
-      end
-    end
-
-    def breadcrumbs( join = '>' )
-      @breadcrumbs ||= begin
-        p = {} 
-        text = @filter_params.map do |filter, value|
-          s =  h.content_tag :span, "#{filter.label} : ", :class => 'search_key' 
-          s += h.content_tag :span, value,                :class => 'search_value'
-          p[filter.name] = value
-          h.link_to s, url_for(p)
-        end.join(join)
-        h.content_tag :span, text, {:class => 'search_titles'}, false
       end
     end
 
@@ -357,13 +301,15 @@ module TracksGrid
     end
 
     def inputs
-      res = {} 
-      self.class.filters.each do |name, filter|
-        if i = filter.input(self)
-          res[name] = i
-        end
-      end 
-      res
+      @inputs ||= begin
+        res = {} 
+        self.class.filters.each do |name, filter|
+          if i = filter.input(self)
+            res[name] = i
+          end
+        end 
+        res
+      end
     end
   
     private
@@ -389,5 +335,4 @@ module TracksGrid
     end
   
   end
-
 end

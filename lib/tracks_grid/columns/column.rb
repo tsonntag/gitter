@@ -10,9 +10,8 @@ module TracksGrid
       @spec, @grid = spec, grid
     end
 
-    def cell( model, decorator_class = nil )
+    def cell( model )
       if spec.block
-        Decorator.decorate model, decorator_class, :h => grid.view_context
         model.instance_eval &spec.block
       else
         model.send name

@@ -3,16 +3,18 @@ require 'tracks_grid/columns/column'
 require 'tracks_grid/columns/column_spec'
 require 'will_paginate'
 require 'will_paginate/active_record'
+require 'benchmark'
   
 module TracksGrid
   module Columns
+    include Benchmark
     extend ActiveSupport::Concern
   
     included do
       mattr_accessor :column_specs, :instance_reader => false, :instance_writer => false
       self.column_specs = {}
 
-      after_initialize :init_columns
+      after_initialize :initialize_columns
     end
   
     module ClassMethods
@@ -37,50 +39,61 @@ module TracksGrid
       end
     end
   
-    def init_columns
-       if order = @params[:order]
-         if spec = self.class.column_specs[:"#{order}"] 
-           @order_column = Column.new spec, self
-         else
-           raise ArgumentError, "invalid order column #{order}"
-         end 
-       else
-         @order_column = nil
-         raise ArgumentError, ':desc given but no :order' if @params[:desc] 
-       end
+    def ordered
+      @ordered ||= @order_column ? @order_column.ordered : super.ordered
+    end
+ 
+    def paginate
+      @paginate ||= ordered.paginate @paginate_hash
+    end
+ 
+    def headers
+      @headers ||= column.map &:header
+    end
+ 
+    def row_for(model)
+      r = nil
+      bm(10) do |bm|
+        bm.report 'decorate' do
+          Decorator.decorate model, @decorator_class, :h => view_context
+        end
+        bm.report 'row' do
+          r = columns.map{|c| c.cell model }
+        end
+      end
+      r
+    end
+ 
+    def rows( scope = self.ordered )
+      scope.map{|model| row_for model}
+    end
+ 
+    def columns
+      @columns ||= column_specs.map{|spec|Column.new spec, self}
+    end
 
-       @decorator_class = @params[:decorator]
+    def column_specs
+      @column_specs ||= self.class.column_specs.values
+    end
+ 
+    private
 
-       @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
-     end
- 
-     def ordered
-       @ordered ||= @order_column ? @order_column.ordered : super.ordered
-     end
- 
-     def paginate
-       @paginate ||= ordered.paginate @paginate_hash
-     end
- 
-     def headers
-       @headers ||= column.map &:header
-     end
- 
-     def row_for(model)
-       columns.map{|c| c.cell model, @decorator_class }
-     end
- 
-     def rows( scope = self.ordered )
-       scope.map{|model| row_for model}
-     end
- 
-     def columns
-       @columns ||= column_specs.map{|spec|Column.new spec, self}
-     end
+    def initialize_columns
+      if order = @params[:order]
+        if spec = self.class.column_specs[:"#{order}"] 
+          @order_column = Column.new spec, self
+        else
+          raise ArgumentError, "invalid order column #{order}"
+        end 
+      else
+        @order_column = nil
+        raise ArgumentError, ':desc given but no :order' if @params[:desc] 
+      end
 
-     def column_specs
-       @column_specs ||= self.class.column_specs.values
-     end
+      @decorator_class = @params[:decorator]
+
+      @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
+    end
  
    end
  
