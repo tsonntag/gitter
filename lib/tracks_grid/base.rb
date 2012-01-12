@@ -248,7 +248,10 @@ module TracksGrid
     # If a view_context is given it will be accessible in various blocks by calling :h
     def initialize( *args )
       run_callbacks :initialize do
-        parse_args args
+        set_view_context_and_params args
+
+        @scope = @params.delete :scope
+        @ordered = @params.delete :ordered
   
         @filter_params = {}
         @params.each do |name, value|
@@ -269,7 +272,11 @@ module TracksGrid
 
     # returns scope which default order
     def ordered
-      @ordered ||= self.class.order ? scope.order(self.class.order) : scope
+      @ordered ||= if self.class.order && scope.respond_to?(:order)
+        scope.order(self.class.order)
+      else
+        scope
+      end
     end
 
     def facets
@@ -310,7 +317,7 @@ module TracksGrid
     end
   
     private
-    def parse_args(args)
+    def set_view_context_and_params(args)
       opts = args.extract_options!
       case args.size
       when 0
