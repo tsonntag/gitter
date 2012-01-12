@@ -3,11 +3,9 @@ require 'tracks_grid/columns/column'
 require 'tracks_grid/columns/column_spec'
 require 'will_paginate'
 require 'will_paginate/active_record'
-require 'benchmark'
   
 module TracksGrid
   module Columns
-    include Benchmark
     extend ActiveSupport::Concern
   
     included do
@@ -52,16 +50,8 @@ module TracksGrid
     end
  
     def row_for(model)
-      r = nil
-      bm(10) do |bm|
-        bm.report 'decorate' do
-          Decorator.decorate model, @decorator_class, :h => view_context
-        end
-        bm.report 'row' do
-          r = columns.map{|c| c.cell model }
-        end
-      end
-      r
+      Decorator.decorate model, @decorator_class, :h => view_context
+      columns.map{|c| c.cell model }
     end
  
     def rows( scope = self.ordered )
