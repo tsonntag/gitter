@@ -82,7 +82,7 @@ module TracksGrid
         raise ArgumentError, ':desc given but no :order' if @params[:desc] 
       end
 
-      @decorator_class = @params[:decorator]
+      @decorator_class = @params.delete :decorator
 
       @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
     end

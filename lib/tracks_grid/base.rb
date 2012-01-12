@@ -315,7 +315,7 @@ module TracksGrid
       case args.size
       when 0
         @params = opts.symbolize_keys
-        @view_context = params.delete(:view_context)
+        @view_context = @params.delete(:view_context)
       when 1
         arg = args.first
 
