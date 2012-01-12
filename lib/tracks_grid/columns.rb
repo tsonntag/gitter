@@ -13,6 +13,8 @@ module TracksGrid
       self.column_specs = {}
 
       after_initialize :initialize_columns
+
+      alias_method_chain :ordered, :columns
     end
   
     module ClassMethods
@@ -37,8 +39,8 @@ module TracksGrid
       end
     end
   
-    def ordered
-      @ordered ||= @order_column ? @order_column.ordered : super.ordered
+    def ordered_with_columns
+      @ordered ||= @order_column ? @order_column.ordered : ordered_without_columns
     end
  
     def paginate

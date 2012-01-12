@@ -50,7 +50,7 @@ module TracksGrid
 
     def link( opts = {} )
       if spec.ordered?
-        direction = ordered? ? (col.desc? ? '^' : 'v') : ''
+        direction = ordered? ? (desc? ? '^' : 'v') : ''
         grid.h.link_to "#{direction} #{header}" , order_params.merge(opts)
       else
         header 
