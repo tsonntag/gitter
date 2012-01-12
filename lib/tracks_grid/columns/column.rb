@@ -51,13 +51,21 @@ module TracksGrid
     def link( opts = {} )
       if spec.ordered?
         direction = ordered? ? (desc? ? '^' : 'v') : ''
-        grid.h.link_to "#{direction} #{header}" , order_params.merge(opts)
+        grid.h.link_to (direction + header), order_params.merge(opts)
       else
         header 
       end 
     end
 
     private
+
+    def order_img
+      "#{TracksGrid::ASSETS}/images/sort_#{desc? ? 'asc' : 'desc'}.gif"
+    end
+
+    def order_img_tag
+      ordered ? grid.h.image_tag(order_img) : ''
+    end
 
     def to_boolean(s)
       not (s && s.match(/true|t|1$/i)).nil?
