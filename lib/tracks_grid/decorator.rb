@@ -8,6 +8,8 @@ module TracksGrid
     # Default for opts are self's opts.
     # In that way self is able to transfer its opts
     def decorate(model, clazz = nil, opts = self.decorator_opts)
+      return model if model.nil?
+
       model.extend DecoratorMethods unless model == self
       model.define_singleton_method(:decorator_opts){ opts } 
       clazz ||= model.decorator_class

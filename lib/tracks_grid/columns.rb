@@ -3,6 +3,7 @@ require 'tracks_grid/columns/column'
 require 'tracks_grid/columns/column_spec'
 require 'will_paginate'
 require 'will_paginate/active_record'
+require 'will_paginate/array'
   
 module TracksGrid
   module Columns
