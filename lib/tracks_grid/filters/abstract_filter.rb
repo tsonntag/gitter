@@ -19,22 +19,22 @@ module TracksGrid
        @input_options
      end
 
-     def input( grid )
+     def input( context )
        return nil unless input? 
 
        if col = collection 
-          select_tag grid.view_context, [''] + grid.eval(col)
+          select_tag context, [''] + context.eval(col)
        else
-          text_field_tag grid.view_context
+          text_field_tag grid
        end
      end
 
-     def text_field_tag( context )
-       context.text_field_tag name, context.params[name], :class => 'grid'
+     def text_field_tag( context  )
+       context.eval proc{ h.text_field_tag name, h.params[name], :class => 'grid'}
      end
 
      def select_tag( context, collection )
-       context.select_tag name, context.options_for_select(collection, context.params[name]), :class => 'grid'
+       context.eval proc{ h.select_tag name, context.options_for_select(collection, h.params[name]), :class => 'grid'}
      end
   
      private

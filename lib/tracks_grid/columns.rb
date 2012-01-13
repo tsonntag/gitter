@@ -14,7 +14,6 @@ module TracksGrid
       self.column_specs = {}
 
       after_initialize :initialize_columns
-
       alias_method_chain :ordered, :columns
     end
   
@@ -53,7 +52,6 @@ module TracksGrid
     end
  
     def row_for(model)
-      Decorator.decorate model, @decorator_class, :h => view_context
       columns.map{|c| c.cell model }
     end
  
@@ -82,8 +80,6 @@ module TracksGrid
         @order_column = nil
         raise ArgumentError, ':desc given but no :order' if @params[:desc] 
       end
-
-      @decorator_class = @params.delete :decorator
 
       @paginate_hash = { :per_page => @params.delete(:per_page){30}, :page => @params.delete(:page){1} }
     end

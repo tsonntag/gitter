@@ -12,7 +12,7 @@ module TracksGrid
 
     def cell( model )
       if spec.block
-        grid.instance_eval &spec.block, model
+        grid.eval &spec.block, model
       else
         model.send name
       end

@@ -28,11 +28,7 @@ module TracksGrid
       end
 
       def order( order = nil )
-        if order  
-          @order = order
-        else
-          @order
-        end
+        order ? (@order = order) : @order
       end
 
       # Examples:
@@ -215,8 +211,7 @@ module TracksGrid
 
     end
 
-    attr_reader :params, :view_context
-    alias_method :h, :view_context
+    attr_reader :params
 
     # attrs: <filter_name> => <value>, ...
     #        :order => <filter_name>, :desc => true 
@@ -245,10 +240,10 @@ module TracksGrid
     #
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
-    # If a view_context is given it will be accessible in various blocks by calling :h
     def initialize( *args )
       run_callbacks :initialize do
-        set_view_context_and_params args
+        @decorator = Decorator.new args
+        @params = @decorator.params
 
         @scope = @params.delete :scope
         @ordered = @params.delete :ordered
@@ -273,7 +268,7 @@ module TracksGrid
     # returns scope which default order
     def ordered
       @ordered ||= if self.class.order && scope.respond_to?(:order)
-        scope.order(self.class.order)
+        scope.order self.class.order
       else
         scope
       end
@@ -285,19 +280,7 @@ module TracksGrid
   
     # evaluate data (string or proc) in context of grid
     def eval( data, model = nil )
-      @model = model
-      res = case data
-      when Proc
-        if h
-          instance_exec &data
-        else
-          data.call
-        end
-      else
-         data
-      end
-      @model = nil
-      res
+      @decorator.eval data, model
     end
 
     # dirty hack to avoid rails' sorted query in url
@@ -311,47 +294,12 @@ module TracksGrid
       @inputs ||= begin
         res = {} 
         self.class.filters.each do |name, filter|
-          if i = filter.input(self)
+          if i = filter.input(@decorator)
             res[name] = i
           end
         end 
         res
       end
-    end
-  
-    def method_missing( *args )
-      if model
-        model.send args
-      else
-        super
-      end
-    end
-    
-    private
-    def model
-      @model
-    end
-    
-    def set_view_context_and_params(args)
-      opts = args.extract_options!
-      case args.size
-      when 0
-        @params = opts.symbolize_keys
-        @view_context = @params.delete(:view_context)
-      when 1
-        arg = args.first
-
-        @view_context = arg.respond_to?(:view_context) ? arg.view_context : nil
-
-        if arg.respond_to? :params
-          @params = arg.params.symbolize_keys.merge(opts)
-        else
-          raise ArgumentError, 'argument must respond_to :params'
-        end
-      else
-        raise ArgumentError, 'too many arguments' if args.size > 1
-      end
-    end
-  
+    end 
   end
 end
