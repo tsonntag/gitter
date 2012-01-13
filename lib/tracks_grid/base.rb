@@ -284,8 +284,9 @@ module TracksGrid
     end
   
     # evaluate data (string or proc) in context of grid
-    def eval( data )
-      case data
+    def eval( data, model = nil )
+      @model = model
+      res = case data
       when Proc
         if h
           instance_exec &data
@@ -295,6 +296,8 @@ module TracksGrid
       else
          data
       end
+      @model = nil
+      res
     end
 
     # dirty hack to avoid rails' sorted query in url
@@ -316,7 +319,19 @@ module TracksGrid
       end
     end
   
+    def method_missing( *args )
+      if model
+        model.send args
+      else
+        super
+      end
+    end
+    
     private
+    def model
+      @model
+    end
+    
     def set_view_context_and_params(args)
       opts = args.extract_options!
       case args.size
