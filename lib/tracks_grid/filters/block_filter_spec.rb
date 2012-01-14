@@ -8,7 +8,7 @@ module TracksGrid
   # 
   # f.apply( scope ) => scope.where( :status => 'active' )
   #
-  class BlockFilter < AbstractFilter
+  class BlockFilterSpec < AbstractFilterSpec
 
      def initialize( name, options ={}, &block )
        raise ArgumentError, "no block given" unless block
@@ -18,6 +18,10 @@ module TracksGrid
 
      def apply( scope, *args )
        @block.call scope, *args
+     end
+     
+     def count( scope )
+       scope.count
      end
 
   end

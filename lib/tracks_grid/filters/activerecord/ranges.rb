@@ -1,4 +1,4 @@
-module RangeFilter
+module Ranges
 
   def range_filter( name, options )
     column = options.delete(:column){name}

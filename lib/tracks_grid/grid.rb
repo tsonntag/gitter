@@ -10,7 +10,7 @@ module TracksGrid
     include Base
     include Columns
     include Breadcrumbs
-    include RangeFilter
+    include Ranges
   end
 
 end

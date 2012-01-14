@@ -1,11 +1,11 @@
 module TracksGrid
 
-  class ColumnFilter < AbstractFilter
+  class ColumnFilterSpec < AbstractFilterSpec
 
     attr_reader :columns, :exact, :ignore_case
 
     def initialize( name, opts = {} )
-      @columns = [opts[:column]||opts[:columns]|| name].flatten
+      @columns = [opts[:column]||opts[:columns]||name].flatten
       @exact = opts.fetch(:exact){true}
       @ignore_case = opts.fetch(:ignore_case){false}
       super

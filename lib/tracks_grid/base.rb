@@ -9,9 +9,9 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      self.mattr_accessor :filters, :facets, :instance_reader => false, :instance_writer => false
-      self.filters = {}
-      self.facets = []
+      self.mattr_accessor :filter_specs, :facet_names, :instance_reader => false, :instance_writer => false
+      self.filter_specs = {}
+      self.facet_names = []
     end
   
     module ClassMethods 
@@ -154,25 +154,25 @@ module TracksGrid
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
         name = args.first
   
-        filter = case
+        filter_spec = case
         when block 
-          BlockFilter.new name, options, &block
+          BlockFilterSpec.new name, options, &block
         when options[:range]
-          return range_filter(name, options) # return is required
+          return range_filter_spec(name, options) # return is required
         when s = options[:select]
-          f = [s].flatten.map{|name| filters[name] or raise ConfigurationError, "no filter for :select => #{name}"}
-          SelectFilter.new name, f, options
+          f = [s].flatten.map{|name| filter_specs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
+          SelectFilterSpec.new name, f, options
         when s = options[:scope]
           scope_filter( name || s, options )
         when s = options[:scopes]
           f = [s].flatten.map{|name| scope_filter name}
-          SelectFilter.new name, f, options
+          SelectFilterSpec.new self,name, f, options
         else 
-          ColumnFilter.new name, options
+          ColumnFilterSpec.new self, name, options
         end
   
-        facets << filter if options[:facet]
-        filters[name] = filter
+        facet_names << name if options[:facet]
+        filter_specs[name] = filter_spec
       end
   
       # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
@@ -183,7 +183,7 @@ module TracksGrid
       private
   
       def scope_filter( name, options = {} )
-        BlockFilter.new(name, options){|scope| scope.send name}
+        BlockFilterSpec.new(self, name, options){|scope| scope.send name}
       end
   
   
@@ -226,23 +226,26 @@ module TracksGrid
       run_callbacks :initialize do
         @presenter = Presenter.new args
         @params = @presenter.params
-
         @scope = @params.delete :scope
         @ordered = @params.delete :ordered
   
-        @filter_params = {}
+        @filters= {}
         @params.each do |name, value|
-          if filter = self.class.filters[name] 
-            @filter_params[filter] = value
+          if filter_spec = self.class.filter_spec[name] 
+            @filters[File.new(self,filter_spec)] = value
           end
         end
       end
+    end
+    
+    def name
+      @name || self.class.name.underscore
     end
   
     def scope
       @scope ||= begin
         scope = eval self.class.scope
-        @filter_params.each{|filter, value| scope = filter.apply(scope, value, @params) }
+        @filters.each{|filter, value| scope = filter.apply(value, @params) }
         scope
       end
     end
@@ -257,7 +260,7 @@ module TracksGrid
     end
 
     def facets
-      @facets ||= self.class.facets.map{ |filter| Facet.new self, filter }
+      @facets ||= self.class.facet_names.map{|name| Facet.new self, filters[name] }
     end
   
     # evaluate data (string or proc) in context of grid
@@ -275,8 +278,8 @@ module TracksGrid
     def inputs
       @inputs ||= begin
         res = {} 
-        self.class.filters.each do |name, filter|
-          if i = filter.input(@presenter)
+        @filters.each do |name, filter|
+          if i = filter.input
             res[name] = i
           end
         end 

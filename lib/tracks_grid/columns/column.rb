@@ -23,7 +23,13 @@ module TracksGrid
     end
 
     def header
-      @header ||= grid.eval spec.header
+      @header ||= case spec.header
+      when false then ''
+      when nil then
+        I18n.translate "tracksgrid.#{grid.name}.headers.#{name}", :default => spec.header.humanize
+      else
+        grid.eval spec.header
+      end
     end
 
     # if current params contain order for this column then revert direction 

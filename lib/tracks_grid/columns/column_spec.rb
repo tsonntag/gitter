@@ -6,11 +6,7 @@ module TracksGrid
 
     def initialize( name, opts = {}, &block )
       @name = name
-      @header = case opts[:header] 
-        when false then ''
-        when nil then  name.to_s.humanize
-        else opts[:header] 
-      end
+      @header = opts[:header] 
       @order = case opts[:order] 
       when true then name.to_s
       when String, Symbol then opts[:order]
