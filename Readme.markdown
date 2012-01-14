@@ -1,8 +1,8 @@
 # Tracksgrid
 
-Ruby library for Rails which helps you to build
+Ruby library for Rails which enables you to create
 
-* decorators for your models
+* Decorators or presenters for your models
 * Data grids, i.e table like data with customizable
   * Filters
   * Sortables columns
@@ -12,6 +12,7 @@ Ruby library for Rails which helps you to build
 ## Decorators
 
 A Decorator
+
 * Extends an object with given classes (default is <object.class>Decorator, if it is defined)
 * Makes helpers accessible in object via :h
 
@@ -40,6 +41,7 @@ end
 You may provide arbritary modules:
 
 ```ruby
+# in your controller
 def buy
   user = User.find(params[:id])
   @buyer = Decorator.decorate(user, UserView, Buyer)
@@ -55,6 +57,7 @@ module UserViews
 end
 ```
 and
+
 ```ruby
 module UserViews
   def buy(item)
@@ -69,8 +72,8 @@ end
 
 In order to define a grid you need to provide:
 
-* scope of objects to look through
-* filters that will be used to filter data
+* scope which returns the objects for the grid's rows
+* filters that will be used to filter the rows
 * columns to be displayed
 
 Example:
@@ -79,6 +82,7 @@ Example:
 class ArticleGrid << TracksGrid::Grid
    
   ### First define the source for your data
+  # helpers are accessible by #h
   scope do
     Article.where(:owner => h.current_user)
   end
@@ -91,14 +95,21 @@ class ArticleGrid << TracksGrid::Grid
   # filter by multiple columns: filters by :name OR :description
   filter :search, :columns => [:name, :description]
 
-  # customized filter 
-  filter :on_stock, :facet => true do |scope|
-    scope.where(:stock > 0)
-  end
-  
   # filter by named scope
   filter :topsellers, :scope => :topsellers
-     
+
+  # customized filter 
+  filter :on_stock, do |scope|
+    scope.where(:stock > 0)
+  end
+
+ filter :out_of_stock do |scope|
+    scope.where(:stock = 0)
+  end
+  
+  # select from given filters
+  filter :availability, :select => [:on_stock, :out_of_stock]
+    
   # add to facets
   filter :category, :facet => true              
   
@@ -191,7 +202,6 @@ Render your breadcrumbs:
 ```haml
 @grid.breadcrumbs
 ```
-
 
 
 [More about inputs](https://github.com/tracksun/tracksgrid/wiki/Inputs)
