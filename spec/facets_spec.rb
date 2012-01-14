@@ -17,7 +17,7 @@ def check_facet_value( facet, value, count )
   v.should_not == nil
   v.value.should == value 
   v.count.should == count 
-  v.filter_params.should == { v.name => value }
+  v.params.should == { v.name => value }
 end
 
 describe TracksGrid do

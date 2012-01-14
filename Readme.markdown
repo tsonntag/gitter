@@ -9,18 +9,24 @@ Ruby library for Rails which helps you to build
   * Faceted search
   * Localization
 
-### decorator
+## Decorators
+
+A Decorator
+* Extends an object with given classes (default is <object.class>Decorator, if it is defined)
+* Makes helpers accessible in object via :h
+
+Example:
+
+Decorate a model in your controller:
 
 ```ruby
-# in your controller
   def show
     article = Article.find(params[:id])
-    @article = decorator.decorate(article, self)
+    @article = Decorator.decorate(article, self)
   end
 ```
 
-* Makes helpers accessible via @article.h
-* Extends @article with a module ArticleDecorator if defined
+Then @article will be extended by
 
 ```ruby
 module ArticleDecorator
@@ -30,18 +36,36 @@ module ArticleDecorator
 end
 ```
 
+
 You may provide arbritary modules:
 
 ```ruby
 def buy
   user = User.find(params[:id])
-  @buyer = decorator.decorate(user, UserView, BuyerView)
+  @buyer = Decorator.decorate(user, UserView, Buyer)
+end
+```
+with
+
+```ruby
+module UserViews
+  def view
+    "#{name} #{surname}"
+  end
+end
+```
+and
+```ruby
+module UserViews
+  def buy(item)
+    #.....
+  end
 end
 ```
 
 [More about decorators](https://github.com/tracksun/tracksgrid/wiki/Decorators)
 
-### Data Grids
+## Data Grids
 
 In order to define a grid you need to provide:
 
@@ -59,9 +83,9 @@ class ArticleGrid << TracksGrid::Grid
     Article.where(:owner => h.current_user)
   end
      
-  ### You may define filters 
+  ### Then you may define filters 
 
-  # filter by attribute:
+  # filter by attribute
   filter :name
   
   # filter by multiple columns: filters by :name OR :description
@@ -81,16 +105,22 @@ class ArticleGrid << TracksGrid::Grid
   # select among named scopes
   filter :price_range, :scopes => [:niceprice, :regular] 
 
+  # you can provide 'search' like attributes
+  filter :search, :ignore_case => true, :exact => false
+  
+  # The former can be abbreviated by
+  search :search
 
-  ### Define your data  grid
+  ### Define your data grid
 
   # show an attribute
+  # The header of this columns is looked in  from 'tracksgrid.article_grid.headers.acticle_no'
   column :article_no
   
-  # provide a explicite header
+  # provide a hardcoded header
   column :description, :header => 'Details'
 
-  # make column sortable
+  # make the column sortable
   column :name, :sort => true     
 
   # customize your data cell
@@ -107,26 +137,17 @@ end
 ```
 
 [More about filters](https://github.com/tracksun/tracksgrid/wiki/Filters)
-[More about columns](https://github.com/tracksun/tracksgrid/wiki/Filters)
+[More about columns](https://github.com/tracksun/tracksgrid/wiki/Columns)
 
 
-Using your grid:
+#Using your grid
 
-Using your filters:
-
-@grid = Article.new(:params => {:name => 'VW Beetle'})
-
-In order to get access to the helpers, you must provide an object
-that quacks like Rails' view_context:
-
-@grid = Article.new(:params => {:name => 'VW Beetle'}, :view_context => view_context)
-
-For the most common use case -- in your controller -- things get simple:
+For the most common use case -- your controller -- you simply do:
 
 ```ruby
-  def index
-    @grid = ArticleGrid.new(self)
-  end
+def index
+  @grid = ArticleGrid.new(self)
+end
 ```
 
 In your views (haml for readabilty)
@@ -146,6 +167,8 @@ Render you grid:
 ```
 [More about grids](https://github.com/tracksun/tracksgrid/wiki/Grids)
 
+# Facets
+
 Render your facets:
 
 ```haml
@@ -161,6 +184,14 @@ Render your facets:
 ```
 [More about facets](https://github.com/tracksun/tracksgrid/wiki/Facets)
 
+# Breadcrumbs
+
+Render your breadcrumbs:
+
+```haml
+@grid.breadcrumbs
+```
+
 
 
 [More about inputs](https://github.com/tracksun/tracksgrid/wiki/Inputs)
@@ -175,7 +206,7 @@ Render your facets:
 
 ### Credits
 
-[API inspired by](https://github.com/bogdan/datagrid)
+[API inspired by datagrid](https://github.com/bogdan/datagrid)
 
 ### License
 

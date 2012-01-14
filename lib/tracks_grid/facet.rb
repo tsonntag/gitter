@@ -8,7 +8,7 @@ module TracksGrid
       @facet, @value, @count = facet, value, count 
     end
 
-    def filter_params
+    def params
       { name => value }
     end
 
