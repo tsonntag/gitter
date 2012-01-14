@@ -1,8 +1,5 @@
 require 'active_support/concern'
 require 'active_model/callbacks'
-require 'active_record'
-  
-require 'tracks_grid/filters'
   
 module TracksGrid
 
@@ -189,21 +186,6 @@ module TracksGrid
         BlockFilter.new(name, options){|scope| scope.send name}
       end
   
-      def range_filter( name, options )
-        column = options.delete(:column){name}
-  
-        filter options.delete(:from){:"from_#{name}"}, options do |scope, value|
-          scope.where "#{column} >= ?", value
-        end
-  
-        filter options.delete(:to){:"to_#{name}"}, options do |scope, value|
-          scope.where "#{column} <= ?", value
-        end
-  
-        filter name, options do |scope, value|
-          scope.where column => value
-        end
-      end
   
       def check_opts( opts )
         raise ConfigurationError, "invalid opts #{opts.inspect}" unless opts.empty?
@@ -236,14 +218,14 @@ module TracksGrid
     # end
     #
     # UserGrid.new :from_birthday => '1980/9/2', :to_birthday => '1990/10/3'
-    #
+    #presenter
     #
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
       run_callbacks :initialize do
-        @decorator = Decorator.new args
-        @params = @decorator.params
+        @presenter = Presenter.new args
+        @params = @presenter.params
 
         @scope = @params.delete :scope
         @ordered = @params.delete :ordered
@@ -280,7 +262,7 @@ module TracksGrid
   
     # evaluate data (string or proc) in context of grid
     def eval( data, model = nil )
-      @decorator.eval data, model
+      @presenter.eval data, model
     end
 
     # dirty hack to avoid rails' sorted query in url
@@ -294,7 +276,7 @@ module TracksGrid
       @inputs ||= begin
         res = {} 
         self.class.filters.each do |name, filter|
-          if i = filter.input(@decorator)
+          if i = filter.input(@presenter)
             res[name] = i
           end
         end 

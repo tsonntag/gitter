@@ -1,191 +1,177 @@
 # Tracksgrid
 
-Ruby library that helps you to build and represent table-like data with:
+Ruby library for Rails which helps you to build
 
-* Customizable filtering
-* Columns
-* Sort order
-* Localization
-* Export to CSV
+* Presenters for your models
+* Data grids, i.e table like data with customizable
+  * Filters
+  * Sortables columns
+  * Faceted search
+  * Localization
 
+### Presenter
 
-### Grid DSL
+```ruby
+# in your controller
+  def show
+    article = Article.find(params[:id])
+    @article = Presenter.decorate(article, self)
+  end
+```
 
-In order to create a report, you need to define:
+* Makes helpers accessible via@article.h
+* Extends @article with a module ArticlePresenter if defined
+
+```ruby
+module ArticlePresenter
+  def image
+    h.image_tag('article')
+  end
+end
+```
+
+You may provide arbritary modules:
+
+```ruby
+def buy
+  user = User.find(params[:id])
+  @buyer = Presenter.decorate(user, UserView, BuyerView)
+end
+```
+
+[More about decorators](https://github.com/tracksun/tracksgrid/wiki/Decorators)
+
+### Data Grids
+
+In order to define a grid you need to provide:
 
 * scope of objects to look through
 * filters that will be used to filter data
-* columns that should be displayed and sortable (if possible)
+* columns to be displayed
+
+Example:
+
+```ruby
+class ArticleGrid << TracksGrid::Grid
+   
+  ### First define the source for your data
+  scope do
+    Article.where(:owner => h.current_user)
+  end
+     
+  ### You may define filters 
+
+  # filter by attribute:
+  filter :name
+  
+  # filter by multiple columns: filters by :name OR :description
+  filter :search, :columns => [:name, :description]
+
+  # customized filter 
+  filter :on_stock, :facet => true do |scope|
+    scope.where(:stock > 0)
+  end
+  
+  # filter by named scope
+  filter :topsellers, :scope => :topsellers
+     
+  # add to facets
+  filter :category, :facet => true              
+  
+  # select among named scopes
+  filter :price_range, :scopes => [:niceprice, :regular] 
+
+
+  ### Define your data  grid
+
+  # show an attribute
+  column :article_no
+  
+  # provide a explicite header
+  column :description, :header => 'Details'
+
+  # make column sortable
+  column :name, :sort => true     
+
+  # customize your data cell
+  column :price, :sort => true do
+    "#{price/100.floor},#{price%100} USD"
+  end
+  
+  # helpers are accessible via #h
+  column :details, :header => false do
+    h.link_to 'details', h.edit_article_path(self)
+  end
+  
+end
+```
+
+[More about filters](https://github.com/tracksun/tracksgrid/wiki/Filters)
+[More about columns](https://github.com/tracksun/tracksgrid/wiki/Filters)
+
+
+Using your grid:
+
+Using your filters:
+
+@grid = Article.new(:params => {:name => 'VW Beetle'})
+
+In order to get access to the helpers, you must provide an object
+that quacks like Rails' view_context:
+
+@grid = Article.new(:params => {:name => 'VW Beetle'}, :view_context => view_context)
+
+For the most common use case -- in your controller -- things get simple:
+
+```ruby
+  def index
+    @grid = ArticleGrid.new(self)
+  end
+```
+
+In your views (haml for readabilty)
+
+Render you grid:
+
+```haml
+%table
+  %tr
+    - @grid.headers.each do |header|
+    %th = header
+
+  - @grid.rows.each do |row|
+    %tr
+      - row.each do |cell|
+      %th = cell 
+```
+[More about grids](https://github.com/tracksun/tracksgrid/wiki/Grids)
+
+Render your facets:
+
+```haml
+%ul
+  - @grid.facets do |facet|
+    %li
+      = facet.label
+      %ul
+        - facet.data.each do |data|
+          = data.value
+          = link_to "(#{data.count})", data.link
+
+```
+[More about facets](https://github.com/tracksun/tracksgrid/wiki/Facets)
+
+
+
+[More about inputs](https://github.com/tracksun/tracksgrid/wiki/Inputs)
+
 
 
 ### ORM Support
 
 * ActiveRecord
-* Mongoid (beta)
+* others: Help or suggestions are welcome
 
-[Create an issue](https://github.com/bogdan/datagrid/issues/new) if you want more.
-
-### Live Demo
-
-[Datagrid DEMO application](http://datagrid.heroku.com) is available live!
-[Demo source code](https://github.com/bogdan/datagrid-demo).
-
-### Example
-
-In order to create a grid:
-
-``` ruby
-class SimpleReport
-
-  include Datagrid
-
-  scope do
-    User.includes(:group)
-  end
-
-  filter(:category, :enum, :select => ["first", "second"])
-  filter(:disabled, :eboolean)
-  filter(:confirmed, :boolean)
-  filter(:group_id, :integer, :multiple => true)
-  integer_range_filter(:logins_count, :integer)
-  filter(:group_name, :string, :header => "Group") do |value|
-    self.joins(:group).where(:groups => {:name => value})
-  end
-
-  column(:name)
-  column(:group, :order => "groups.name") do |user|
-    user.name
-  end
-  column(:active, :header => "Activated") do |user|
-    !user.disabled
-  end
-
-end
-```
-
-Basic grid api:
-
-``` ruby
-report = SimpleReport.new(
-        :group_id => [1,2], :from_logins_count => 1, 
-        :category => "first",
-        :order => :group,
-        :descending => true
-)
-
-report.assets # => Array of User instances: 
-              # SELECT * FROM users WHERE users.group_id in (1,2) AND users.logins_count >= 1 AND users.category = 'first' ORDER BY groups.name DESC
-
-report.header # => ["Group", "Name", "Activated"]
-report.rows   # => [
-              #      ["Steve", "Spammers", true],
-              #      [ "John", "Spoilers", true],
-              #      ["Berry", "Good people", false]
-              #    ]
-report.data   # => [ header, *rows]
-
-report.to_csv # => Yes, it is
-```
-
-### Scope
-
-Default scope of objects to filter and display.
-In common case it is `ActiveRecord::Base` (or any other supported ORM) subclass with some generic scopes like in example above:
-
-``` ruby
-  scope do
-    User.includes(:group)
-  end
-```
-
-### Filters
-
-Each filter definition consists of:
-
-* name of the filter
-* type that will be used for value typecast
-* conditions block that applies to defined scope
-* additional options
-
-Datagrid supports different type of filters including:
-
-* text
-* integer
-* date
-* boolean
-* eboolean - the select of "yes", "no" and any
-* enum
-* string
-
-[More about filters](https://github.com/bogdan/datagrid/wiki/Filters)
-
-
-### Columns
-
-Each column is represented by name and code block to calculate the value.
-
-``` ruby
-column(:activated, :header => "Active", :order => "activated") do
-  self.activated?
-end
-```
-
-Some formatting options are also available. 
-Each column is sortable.
-
-[More about columns](https://github.com/bogdan/datagrid/wiki/Columns) 
-
-### Front end
-
-
-In order to create form for your report you can use all set of rails built-in tools.
-More over Datagrid provides you two additional form helpers:
-
-* datagrid\_label
-* datagrid\_filter
-
-
-The easiest way to create a report form:
-(haml for readablity)
-
-``` haml
-# Method `GET` is recommended for all report forms by default.
-- form_for @report, :html => {:method => :get} do |f|
-  - @report.filters.each do |filter|
-    %div
-      = f.datagrid_label filter
-      = f.datagrid_filter filter
-  = f.submit
-```
-
-Your controller:
-
-``` ruby
-map.resources :simple_reports, :only => [:index]
-
-class SimpleReportsController < ApplicationController
-  def index
-    @report = SimpleReport.new(params[:simple_report])
-  end
-end
-```
-
-There is a simple helper set of helpers that allows you display report:
-(require any pagination gem, will\_paginate is used as an example)
-
-``` haml
-- assets = @report.assets.paginate(:page => params[:page])
-
-%div== Total #{assets.total_entries}
-= datagrid_table(@report, assets)
-= will_paginate assets
-```
-
-If you need a custom interface for your report you should probably build it yourself with datagrid helpers.
-
-[More about frontend](https://github.com/bogdan/datagrid/wiki/Frontend)
-
-come...
 
 ### Credits
 
