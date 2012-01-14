@@ -1,6 +1,6 @@
 module TracksGrid
 
-  class Presenter
+  class Decorator
     attr_reader :params, :view_context, :model
     alias_method :h, :view_context
 
@@ -16,8 +16,8 @@ module TracksGrid
     def initialize(*args)
       opts = args.extract_options!
       
-      @presenter_classes = ([opts.delete(:presenters)] + [opts.delete(:presenter)]).flatten.compact
-      @presenter_classes = nil if @presenter_classes.empty? # required for #decorate
+      @decorator_classes = ([opts.delete(:decorators)] + [opts.delete(:decorator)]).flatten.compact
+      @decorator_classes = nil if @decorator_classes.empty? # required for #decorate
 
       case args.size
       when 0
@@ -53,18 +53,18 @@ module TracksGrid
       @model ? @model.send(args) : super
     end
     
-    def decorate( model, presenter_classes = nil)
+    def decorate( model, decorator_classes = nil)
       return nil if model.nil?
-      presenter_classes ||= @presenter_classes || default_presenter_class(model)
-      presenter_classes.each{|pc| model.extend pc}
+      decorator_classes ||= @decorator_classes || default_decorator_class(model)
+      decorator_classes.each{|pc| model.extend pc}
       model.define_singleton_method(:h){@view_context}
       model
     end
     
     private
-    def default_presenter_class(model)
+    def default_decorator_class(model)
       @_pc_cache ||= {} 
-      [@_pc_cache.fetch(model.class){"#{model.class}Presenter".constantize rescue nil}].compact
+      [@_pc_cache.fetch(model.class){"#{model.class}Decorator".constantize rescue nil}].compact
     end
       
   end

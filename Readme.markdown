@@ -2,28 +2,28 @@
 
 Ruby library for Rails which helps you to build
 
-* Presenters for your models
+* decorators for your models
 * Data grids, i.e table like data with customizable
   * Filters
   * Sortables columns
   * Faceted search
   * Localization
 
-### Presenter
+### decorator
 
 ```ruby
 # in your controller
   def show
     article = Article.find(params[:id])
-    @article = Presenter.decorate(article, self)
+    @article = decorator.decorate(article, self)
   end
 ```
 
-* Makes helpers accessible via@article.h
-* Extends @article with a module ArticlePresenter if defined
+* Makes helpers accessible via @article.h
+* Extends @article with a module ArticleDecorator if defined
 
 ```ruby
-module ArticlePresenter
+module ArticleDecorator
   def image
     h.image_tag('article')
   end
@@ -35,7 +35,7 @@ You may provide arbritary modules:
 ```ruby
 def buy
   user = User.find(params[:id])
-  @buyer = Presenter.decorate(user, UserView, BuyerView)
+  @buyer = decorator.decorate(user, UserView, BuyerView)
 end
 ```
 

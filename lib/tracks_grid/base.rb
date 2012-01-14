@@ -218,14 +218,14 @@ module TracksGrid
     # end
     #
     # UserGrid.new :from_birthday => '1980/9/2', :to_birthday => '1990/10/3'
-    #presenter
+    #decorator
     #
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
       run_callbacks :initialize do
-        @presenter = Presenter.new args
-        @params = @presenter.params
+        @decorator = Decorator.new args
+        @params = @decorator.params
         @scope = @params.delete :scope
         @ordered = @params.delete :ordered
   
@@ -265,7 +265,7 @@ module TracksGrid
   
     # evaluate data (string or proc) in context of grid
     def eval( data, model = nil )
-      @presenter.eval data, model
+      @decorator.eval data, model
     end
 
     # dirty hack to avoid rails' sorted query in url
