@@ -19,11 +19,11 @@ module TracksGrid
       @count ||= grid.driver.count
     end
     
-    def input
-      return nil unless input? 
+    def input_tag
+      return '' unless input? 
 
-      @input ||= if col = collection 
-        select_tag context, [''] + context.eval(col)
+      @input_tag ||= spec.input_tag || if col = collection 
+        select_tag [''] + grid.eval(col)
       else
         text_field_tag
       end
