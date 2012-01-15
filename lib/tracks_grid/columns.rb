@@ -55,8 +55,8 @@ module TracksGrid
       columns.map{|c| c.cell model }
     end
  
-    def rows( scope = self.ordered )
-      scope.map{|model| row_for model}
+    def rows( driver = self.ordered )
+      driver.map{|model| row_for model}
     end
  
     def columns
