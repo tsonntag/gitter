@@ -243,7 +243,7 @@ module TracksGrid
   
     def driver
       @driver ||= begin
-        driver = Driver.new eval(self.class.scope)
+        driver = driver_class.new eval(self.class.scope)
         @filters.each{|filter, value| driver = filter.apply(value, @params) }
         driver
       end

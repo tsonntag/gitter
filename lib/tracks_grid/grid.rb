@@ -9,6 +9,7 @@ module TracksGrid
 
   class Grid
     include Base
+    include Driver
     include Columns
     include Breadcrumbs
     include Ranges
