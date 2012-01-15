@@ -12,11 +12,11 @@ module TracksGrid
     end
     
     def apply( *args )
-      spec.apply grid.scope, *args
+      spec.apply grid.driver, *args
     end
      
     def count
-      @count ||= grid.scope.count
+      @count ||= grid.driver.count
     end
     
     def input

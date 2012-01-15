@@ -14,17 +14,17 @@ module TracksGrid
       end
     end
 
-    def apply( scope, *args )
+    def apply( driver, *args )
       if spec = @filter_specs[:"#{args.first}"]
-        spec.apply scope
+        spec.apply driver
       else
-        scope
+        driver
       end
     end
 
-    def counts( scope )
+    def counts( driver )
       @filter_specs.values.inject({}) do |memo,spec|
-        count = spec.apply(scope).count
+        count = spec.apply(driver).count
         memo[spec.name] = count if count > 0
         memo
       end

@@ -47,7 +47,7 @@ module TracksGrid
     end
 
     def data
-      @data ||= filter.counts(grid.scope).map{|value, count| FacetData.new self, value, count}
+      @data ||= filter.counts(grid.driver).map{|value, count| FacetData.new self, value, count}
     end
 
     def to_s

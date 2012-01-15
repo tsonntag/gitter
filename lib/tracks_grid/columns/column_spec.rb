@@ -11,15 +11,15 @@ module TracksGrid
       when true then name.to_s
       when String, Symbol then opts[:order]
       end
-      @order_desc = opts[:order_desc] || "#{@order} DESC"
+      @desc = opts[:order_desc]
       @block = block 
     end
 
-    def ordered( scope, desc = false )
+    def ordered( driver, desc = false )
       if ordered?
-        scope.order(desc ? @order_desc : @order)
+        driver.order @order, @desc
       else
-        scope
+        driver
       end
     end
 

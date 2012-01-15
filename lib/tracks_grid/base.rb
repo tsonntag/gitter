@@ -183,9 +183,8 @@ module TracksGrid
       private
   
       def scope_filter( name, options = {} )
-        BlockFilterSpec.new(self, name, options){|scope| scope.send name}
+        BlockFilterSpec.new(self, name, options){|scope| Driver.new(scope).send name}
       end
-  
   
       def check_opts( opts )
         raise ConfigurationError, "invalid opts #{opts.inspect}" unless opts.empty?
@@ -242,21 +241,21 @@ module TracksGrid
       @name || self.class.name.underscore
     end
   
-    def scope
-      @scope ||= begin
-        scope = eval self.class.scope
-        @filters.each{|filter, value| scope = filter.apply(value, @params) }
-        scope
+    def driver
+      @driver ||= begin
+        driver = Driver.new eval(self.class.scope)
+        @filters.each{|filter, value| driver = filter.apply(value, @params) }
+        driver
       end
     end
-
+    
+    def scope
+      driver.scope
+    end
+    
     # returns scope which default order
     def ordered
-      @ordered ||= if self.class.order && scope.respond_to?(:order)
-        scope.order self.class.order
-      else
-        scope
-      end
+      @ordered ||= driver.order self.class.order
     end
 
     def facets

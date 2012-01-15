@@ -1,3 +1,4 @@
+require 'tracks_grid/driver'
 require 'tracks_grid/base'
 require 'tracks_grid/columns'
 require 'tracks_grid/breadcrumbs'

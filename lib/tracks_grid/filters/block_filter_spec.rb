@@ -16,12 +16,12 @@ module TracksGrid
        super name, options
      end
 
-     def apply( scope, *args )
-       @block.call scope, *args
+     def apply( driver, *args )
+       @block.call driver.scope, *args
      end
      
-     def count( scope )
-       scope.count
+     def count( driver )
+       driver.count
      end
 
   end

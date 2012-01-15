@@ -19,7 +19,7 @@ module TracksGrid
     end
 
     def ordered
-      spec.ordered grid.scope, params[:desc]
+      spec.ordered grid.driver, params[:desc]
     end
 
     def header

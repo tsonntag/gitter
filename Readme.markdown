@@ -86,6 +86,7 @@ class ArticleGrid << TracksGrid::Grid
   scope do
     Article.where(:owner => h.current_user)
   end
+  
      
   ### Then you may define filters 
 
