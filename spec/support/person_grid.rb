@@ -43,16 +43,16 @@ class PersonGrid < TracksGrid::Grid
   filter :sex_scope, :scopes => [:male_scope, :female_scope]
 
   filter :any_name, :columns => [:name, :surname]
-  search :search_name_ignore,          :columns => :name, :ignore_case => true
-  search :search_name_no_ignore,       :columns => :name, :ignore_case => false
-  search :search_name_exact,           :columns => :name, :exact => true
-  search :search_name_exact_ignore,    :columns => :name, :exact => true, :ignore_case => true
-  search :search_name_exact_no_ignore, :columns => :name, :exact => true, :ignore_case => false
+  filter :search_name_ignore,          :columns => :name, :ignore_case => true
+  filter :search_name_no_ignore,       :columns => :name, :ignore_case => false
+  filter :search_name_exact,           :columns => :name, :exact => true
+  filter :search_name_exact_ignore,    :columns => :name, :exact => true, :ignore_case => true
+  filter :search_name_exact_no_ignore, :columns => :name, :exact => true, :ignore_case => false
 
   column :name
 
-  column :full_name, :order => 'name, surname', :order_desc => 'name DESC, surname DESC' do |model|
-    "#{model.name} #{model.surname}"
+  column :full_name, :order => 'name, surname', :order_desc => 'name DESC, surname DESC' do 
+    "#{name} #{surname}"
   end
 
   column :profession, :header => 'Job Title'

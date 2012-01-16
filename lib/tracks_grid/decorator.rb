@@ -21,7 +21,7 @@ module TracksGrid
 
       case args.size
       when 0
-        @params = opts.delete :params
+        @params = opts.delete  :params
         @view_context = opts.delete :view_context 
       when 1
         arg = args.first
@@ -42,29 +42,30 @@ module TracksGrid
     def eval( data, model = nil )
       @model = decorate model    
       res = case data
-      when Proc then @view_context ? self.instance_exec(&data) : data.call
-      else data
+      when Proc 
+        self.instance_exec(&data)
+      else 
+        data
       end
       @model = nil
       res
     end
 
     def method_missing( *args )
-      @model ? @model.send(args) : super
+      @model ? @model.send(*args) : super
     end
     
     def decorate( model, decorator_classes = nil)
       return nil if model.nil?
       decorator_classes ||= @decorator_classes || default_decorator_class(model)
-      decorator_classes.each{|pc| model.extend pc}
-      model.define_singleton_method(:h){@view_context}
+      decorator_classes.each{|dc| model.extend dc}
       model
     end
     
     private
     def default_decorator_class(model)
-      @_pc_cache ||= {} 
-      [@_pc_cache.fetch(model.class){"#{model.class}Decorator".constantize rescue nil}].compact
+      @_dc_cache ||= {} 
+      [@_dc_cache.fetch(model.class){"#{model.class}Decorator".constantize rescue nil}].compact
     end
       
   end

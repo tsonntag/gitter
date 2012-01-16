@@ -219,16 +219,13 @@ module TracksGrid
     # end
     #
     # UserGrid.new :from_birthday => '1980/9/2', :to_birthday => '1990/10/3'
-    #decorator
     #
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
       run_callbacks :initialize do
         @decorator = Decorator.new *args
-        @params = @decorator.params
-        @scope = @params.delete :scope
-        @ordered = @params.delete :ordered
+        @params = @decorator.params || {}
   
         @filters= {}
         @params.each do |name, value|
@@ -246,6 +243,7 @@ module TracksGrid
     def driver
       @driver ||= begin
         d = self.class.driver.new eval(self.class.scope)
+        pp '..................'
         pp "driver"
         pp d.scope.to_sql
         @filters.each{|filter, value| pp "filter=#{filter.name} value=#{value}"; d = filter.desc.apply(d, value, @params); pp d.scope.to_sql }
@@ -259,7 +257,7 @@ module TracksGrid
     
     # returns scope which default order
     def ordered
-      @ordered ||= driver.order self.class.order
+      @ordered ||= self.class.order ? driver.order(self.class.order) : driver
     end
 
     def facets

@@ -3,8 +3,8 @@ module TracksGrid
   class Column
     attr_reader :desc, :grid
 
-    def initialize( desc, grid )
-      @desc, @grid = desc, grid
+    def initialize( grid, desc )
+      @grid, @desc = grid, desc
     end
 
     def name
@@ -31,7 +31,7 @@ module TracksGrid
       @header ||= case desc.header
       when false then ''
       when nil then
-        I18n.translate "tracksgrid.#{grid.name}.headers.#{name}", :default => desc.header.humanize
+        I18n.translate "tracksgrid.#{grid.name}.headers.#{name}", :default => name.to_s.humanize
       else
         grid.eval desc.header
       end

@@ -40,11 +40,11 @@ module TracksGrid
     end
   
     def ordered_with_columns
-      @ordered ||= @order_column ? @order_column.ordered : ordered_without_columns
+      @ordered_with_columns ||= @order_column ? @order_column.ordered : ordered_without_columns
     end
  
     def paginate
-      @paginate ||= ordered.paginate @paginate_hash
+      @paginate ||= ordered.scope.paginate @paginate_hash
     end
  
     def headers
@@ -60,7 +60,7 @@ module TracksGrid
     end
  
     def columns
-      @columns ||= column_descs.map{|desc|Column.new desc, self}
+      @columns ||= self.column_descs.map{|desc| Column.new(self, desc) }
     end
 
     def column_descs
@@ -71,8 +71,8 @@ module TracksGrid
 
     def initialize_columns
       if order = @params[:order]
-        if desc = self.class.column_descs[:"#{order}"] 
-          @order_column = Column.new desc, self
+        if column_desc = self.class.column_descs[:"#{order}"] 
+          @order_column = Column.new(self, column_desc)
         else
           raise ArgumentError, "invalid order column #{order}"
         end 

@@ -1,14 +1,28 @@
 require 'spec_helper'
 
+class Array
+  def detect_name( name)
+    detect{|d| d.name == name }
+  end
+end
+
 describe TracksGrid::Column do
   it 'should have name and header' do
-    name_col = PersonGrid.column_descs[:name]
-    name_col.name.should == :name
-    name_col.header.should == 'Name'
+    g = PersonGrid.new
+    col_desc = g.column_descs.detect_name :name
+    col_desc.name.should == :name
 
-    full_name_col = PersonGrid.column_descs[:full_name]
-    full_name_col.name.should == :full_name
-    full_name_col.header.should == 'Full name'
+    col= g.columns.detect_name :name
+    col.name.should == :name
+    col.header.should == 'Name'
+
+    col_desc = g.column_descs.detect_name :full_name
+    col_desc.name.should == :full_name
+
+    g = PersonGrid.new
+    col = g.columns.detect_name :full_name
+    col.name.should == :full_name
+    col.header.should == 'Full name'
   end
 
   it 'should have headers' do
@@ -18,7 +32,10 @@ describe TracksGrid::Column do
   end
 
   it 'should have rows' do
-    g = PersonGrid.new :order => :name
+    g = PersonGrid.new 
+    g.rows.size.should == 7
+
+    g = PersonGrid.new :params => {:order => :name}
     g.rows.size.should == 7
     g.rows.should == [
        ["Dana", "Dana Twen", "teacher"],
@@ -32,7 +49,7 @@ describe TracksGrid::Column do
   end
 
   it 'should order columns' do
-    g = PersonGrid.new :order => :profession
+    g = PersonGrid.new :params => {:order => :profession}
     g.rows.size.should == 7
     g.rows.map{|r|r.last}.should == [
        "dentist",
