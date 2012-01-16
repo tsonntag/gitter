@@ -1,14 +1,14 @@
 module TracksGrid
 
   class Column
-    attr_reader :desc, :grid
+    attr_reader :spec, :grid
 
-    def initialize( grid, desc )
-      @grid, @desc = grid, desc
+    def initialize( grid, spec )
+      @grid, @spec = grid, spec
     end
 
     def name
-      desc.name
+      spec.name
     end
 
     def params
@@ -16,24 +16,24 @@ module TracksGrid
     end
 
     def cell( model )
-      if desc.block
-        grid.eval desc.block, model
+      if spec.block
+        grid.eval spec.block, model
       else
         model.send name
       end
     end
 
     def ordered
-      desc.ordered grid.driver, params[:desc]
+      spec.ordered grid.driver, params[:desc]
     end
 
     def header
-      @header ||= case desc.header
+      @header ||= case spec.header
       when false then ''
       when nil then
         I18n.translate "tracksgrid.#{grid.name}.headers.#{name}", :default => name.to_s.humanize
       else
-        grid.eval desc.header
+        grid.eval spec.header
       end
     end
 
@@ -60,7 +60,7 @@ module TracksGrid
     end
 
     def link( opts = {} )
-      if desc.ordered?
+      if spec.ordered?
         direction = ordered? ? (desc? ? '^' : 'v') : ''
         grid.h.link_to (direction + header), order_params.merge(opts)
       else

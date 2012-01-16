@@ -1,25 +1,25 @@
 module TracksGrid
   class Filter
     
-    attr_reader :grid, :desc
-    delegate :name, :to => :desc
+    attr_reader :grid, :spec
+    delegate :name, :to => :spec
     
-    def initialize( grid, desc )
-      @grid, @desc = grid, desc
+    def initialize( grid, spec )
+      @grid, @spec = grid, spec
     end
     
     def label
-      @label ||= desc.label or I18n.translate "tracksgrid.#{grid.name}.filters.#{name}", :default => name.humanize       
+      @label ||= spec.label or I18n.translate "tracksgrid.#{grid.name}.filters.#{name}", :default => name.humanize       
     end
     
     def counts
-      desc.counts grid
+      spec.counts grid
     end
 
     def input_tag
       return '' unless input? 
 
-      @input_tag ||= desc.input_tag || if col = collection 
+      @input_tag ||= spec.input_tag || if col = collection 
         select_tag [''] + grid.eval(col)
       else
         text_field_tag
@@ -36,7 +36,7 @@ module TracksGrid
  
     private
     def collection
-      desc.input_options.respond_to?(:[]) && desc.input_options[:collection]
+      spec.input_options.respond_to?(:[]) && spec.input_options[:collection]
     end
     
     

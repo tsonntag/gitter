@@ -49,12 +49,12 @@ class PersonGrid < TracksGrid::Grid
   filter :search_name_exact_ignore,    :columns => :name, :exact => true, :ignore_case => true
   filter :search_name_exact_no_ignore, :columns => :name, :exact => true, :ignore_case => false
 
-  column :name
+  column :name, :order => true
 
   column :full_name, :order => 'name, surname', :order_desc => 'name DESC, surname DESC' do 
     "#{name} #{surname}"
   end
 
-  column :profession, :header => 'Job Title'
+  column :profession, :header => 'Job Title', :order => true
 
 end

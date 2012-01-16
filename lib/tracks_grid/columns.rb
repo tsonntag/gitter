@@ -1,6 +1,6 @@
 require 'active_support/concern'
 require 'tracks_grid/columns/column'
-require 'tracks_grid/columns/column_desc'
+require 'tracks_grid/columns/column_spec'
 require 'will_paginate'
 require 'will_paginate/active_record'
 require 'will_paginate/array'
@@ -10,8 +10,8 @@ module TracksGrid
     extend ActiveSupport::Concern
   
     included do
-      self.class_attribute :column_descs, :instance_reader => false, :instance_writer => false
-      self.column_descs = {}
+      self.class_attribute :column_specs, :instance_reader => false, :instance_writer => false
+      self.column_specs = {}
 
       after_initialize :initialize_columns
       alias_method_chain :ordered, :columns
@@ -35,11 +35,15 @@ module TracksGrid
       # end
       #
       def column( name, opts = {}, &block )
-        self.column_descs = self.column_descs.merge name => ColumnDesc.new(name, opts, &block)
+        self.column_specs = self.column_specs.merge name => ColumnSpec.new(name, opts, &block)
       end
     end
   
     def ordered_with_columns
+      pp "AAAAAAAAAAAAAordered_with_columns"
+      pp @order_column
+      pp ordered_without_columns.scope.to_sql 
+      pp @order_column.ordered.scope.to_sql  if @order_column
       @ordered_with_columns ||= @order_column ? @order_column.ordered : ordered_without_columns
     end
  
@@ -60,19 +64,19 @@ module TracksGrid
     end
  
     def columns
-      @columns ||= self.column_descs.map{|desc| Column.new(self, desc) }
+      @columns ||= self.column_specs.map{|spec| Column.new(self, spec) }
     end
 
-    def column_descs
-      @column_descs ||= self.class.column_descs.values
+    def column_specs
+      @column_specs ||= self.class.column_specs.values
     end
  
     private
 
     def initialize_columns
       if order = @params[:order]
-        if column_desc = self.class.column_descs[:"#{order}"] 
-          @order_column = Column.new(self, column_desc)
+        if column_spec = self.class.column_specs[:"#{order}"] 
+          @order_column = Column.new(self, column_spec)
         else
           raise ArgumentError, "invalid order column #{order}"
         end 

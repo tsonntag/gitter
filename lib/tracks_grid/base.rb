@@ -10,8 +10,8 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      self.class_attribute :filter_descs, :facets, :instance_reader => false, :instance_writer => false
-      self.filter_descs = {}
+      self.class_attribute :filter_specs, :facets, :instance_reader => false, :instance_writer => false
+      self.filter_specs = {}
       self.facets = []
     end
   
@@ -155,26 +155,26 @@ module TracksGrid
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
         name = args.first
   
-        filter_desc = case
+        filter_spec = case
         when block 
-          BlockFilterDesc.new name, options, &block
+          BlockFilterSpec.new name, options, &block
         when options[:range]
           return range_filter(name, options) # return is required
         when s = options[:select]
-          f = [s].flatten.map{|name| filter_descs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
-          SelectFilterDesc.new name, f, options
+          f = [s].flatten.map{|name| filter_specs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
+          SelectFilterSpec.new name, f, options
         when s = options[:scope]
           scope_filter( name || s, options )
         when s = options[:scopes]
           f = [s].flatten.map{|name| scope_filter name}
-          SelectFilterDesc.new name, f, options
+          SelectFilterSpec.new name, f, options
         else 
-          ColumnFilterDesc.new name, options
+          ColumnFilterSpec.new name, options
         end
   
         self.facets += [name] if options[:facet]
-        self.filter_descs = self.filter_descs.merge(name => filter_desc)
-        filter_descs
+        self.filter_specs = self.filter_specs.merge(name => filter_spec)
+        filter_specs
       end
   
       # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
@@ -185,7 +185,7 @@ module TracksGrid
       private
   
       def scope_filter( name, options = {} )
-        BlockFilterDesc.new( name, options){|scope| Driver.new(scope).named_scope name}
+        BlockFilterSpec.new( name, options){|scope| Driver.new(scope).named_scope name}
       end
   
       def check_opts( opts )
@@ -229,8 +229,8 @@ module TracksGrid
   
         @filters= {}
         @params.each do |name, value|
-          if desc = self.class.filter_descs[name] 
-            @filters[Filter.new(self,desc)] = value
+          if spec = self.class.filter_specs[name] 
+            @filters[Filter.new(self,spec)] = value
           end
         end
       end
@@ -243,10 +243,7 @@ module TracksGrid
     def driver
       @driver ||= begin
         d = self.class.driver.new eval(self.class.scope)
-        pp '..................'
-        pp "driver"
-        pp d.scope.to_sql
-        @filters.each{|filter, value| pp "filter=#{filter.name} value=#{value}"; d = filter.desc.apply(d, value, @params); pp d.scope.to_sql }
+        @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
         d
       end
     end
