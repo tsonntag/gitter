@@ -12,7 +12,7 @@ module TracksGrid
     include Driver
     include Columns
     include Breadcrumbs
-    include Ranges
+    extend Ranges
   end
 
 end

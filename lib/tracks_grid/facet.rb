@@ -39,15 +39,15 @@ module TracksGrid
   end
 
   class Facet
-    attr_reader :filter, :grid
+    attr_reader :filter
     delegate :name, :label, :to => :filter
 
-    def initialize( grid, filter )
-      @grid, @filter = grid, filter
+    def initialize( filter )
+      @filter = filter
     end
 
     def data
-      @data ||= filter.counts(grid.driver).map{|value, count| FacetData.new self, value, count}
+      @data ||= filter.counts.map{|value, count| FacetData.new self, value, count}
     end
 
     def to_s

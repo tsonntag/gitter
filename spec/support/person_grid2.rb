@@ -1,12 +1,11 @@
-class PersonGrid2
-  include TracksGrid
+class PersonGrid2 < TracksGrid::Grid
 
   scope do
     Person.scoped
   end
 
   column :name do 
-    model.name 
+    name 
   end
 
 end

@@ -1,30 +1,30 @@
+require 'tracks_grid/drivers/abstract_driver'
 module TracksGrid
   
-  class ActiveRecordDriver
+  class ActiveRecordDriver < AbstractDriver
     
     delegate :group, :count, :to => :scope
-    
-    def initialize(scope)
-      @scope = scope
-    end
     
     def order( attr, desc = nil)
       desc ||= "#{attr} DESC"
       new scope.order(desc ? desc : attr)
     end
    
-    def where( attr_values, exact => true, ignore_case = true)
+    def where( attr_values, exact = true, ignore_case = true)
       tokens = {}
       conditions = attr_values.map do |attr,value| 
         text = exact ? value : "%#{value}%"
          
+        col = attr
+        token = ":#{attr}" 
+
         if ignore_case
-          col = "upper(#{attr})"
-          token = "upper(:text)"
-        else
-          col = attr
-          tokens[:"#{attr}"] = text 
+          col = upper col
+          token = upper token
         end
+
+        tokens[attr] = text 
+
         "#{col} #{exact ? '=' : 'LIKE'} #{token}"
       end
 
@@ -40,16 +40,17 @@ module TracksGrid
     end
 
     def each(&block)
-      new scope.each(block)
+      new scope.each(&block)
     end
     
-    def method_missing(*args)
-      new scope.send(*args)
+    def named_scope( name )
+      new scope.send(name)
     end
     
-    private
-    def new( scope )
-      self.class.new scope
+    private 
+
+    def upper(text)
+      "upper(#{text})"
     end
   end
 end

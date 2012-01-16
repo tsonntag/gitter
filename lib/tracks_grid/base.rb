@@ -1,4 +1,5 @@
 require 'active_support/concern'
+require 'active_support/core_ext'
 require 'active_model/callbacks'
   
 module TracksGrid
@@ -9,9 +10,9 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      self.mattr_accessor :filter_specs, :facet_names, :instance_reader => false, :instance_writer => false
-      self.filter_specs = {}
-      self.facet_names = []
+      self.class_attribute :filter_descs, :facets, :instance_reader => false, :instance_writer => false
+      self.filter_descs = {}
+      self.facets = []
     end
   
     module ClassMethods 
@@ -154,25 +155,26 @@ module TracksGrid
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
         name = args.first
   
-        filter_spec = case
+        filter_desc = case
         when block 
-          BlockFilterSpec.new name, options, &block
+          BlockFilterDesc.new name, options, &block
         when options[:range]
-          return range_filter_spec(name, options) # return is required
+          return range_filter(name, options) # return is required
         when s = options[:select]
-          f = [s].flatten.map{|name| filter_specs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
-          SelectFilterSpec.new name, f, options
+          f = [s].flatten.map{|name| filter_descs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
+          SelectFilterDesc.new name, f, options
         when s = options[:scope]
           scope_filter( name || s, options )
         when s = options[:scopes]
           f = [s].flatten.map{|name| scope_filter name}
-          SelectFilterSpec.new self,name, f, options
+          SelectFilterDesc.new name, f, options
         else 
-          ColumnFilterSpec.new self, name, options
+          ColumnFilterDesc.new name, options
         end
   
-        facet_names << name if options[:facet]
-        filter_specs[name] = filter_spec
+        self.facets += [name] if options[:facet]
+        self.filter_descs = self.filter_descs.merge(name => filter_desc)
+        filter_descs
       end
   
       # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
@@ -183,7 +185,7 @@ module TracksGrid
       private
   
       def scope_filter( name, options = {} )
-        BlockFilterSpec.new(self, name, options){|scope| Driver.new(scope).send name}
+        BlockFilterDesc.new( name, options){|scope| Driver.new(scope).named_scope name}
       end
   
       def check_opts( opts )
@@ -223,15 +225,15 @@ module TracksGrid
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
       run_callbacks :initialize do
-        @decorator = Decorator.new args
+        @decorator = Decorator.new *args
         @params = @decorator.params
         @scope = @params.delete :scope
         @ordered = @params.delete :ordered
   
         @filters= {}
         @params.each do |name, value|
-          if filter_spec = self.class.filter_spec[name] 
-            @filters[File.new(self,filter_spec)] = value
+          if desc = self.class.filter_descs[name] 
+            @filters[Filter.new(self,desc)] = value
           end
         end
       end
@@ -243,9 +245,11 @@ module TracksGrid
   
     def driver
       @driver ||= begin
-        driver = driver_class.new eval(self.class.scope)
-        @filters.each{|filter, value| driver = filter.apply(value, @params) }
-        driver
+        d = self.class.driver.new eval(self.class.scope)
+        pp "driver"
+        pp d.scope.to_sql
+        @filters.each{|filter, value| pp "filter=#{filter.name} value=#{value}"; d = filter.desc.apply(d, value, @params); pp d.scope.to_sql }
+        d
       end
     end
     
@@ -259,7 +263,7 @@ module TracksGrid
     end
 
     def facets
-      @facets ||= self.class.facet_names.map{|name| Facet.new self, filters[name] }
+      @facets ||= self.class.facets.map{|name| Facet.new self, filters[name] }
     end
   
     # evaluate data (string or proc) in context of grid

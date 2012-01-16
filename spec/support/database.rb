@@ -8,6 +8,8 @@ ActiveRecord::Schema.define do
 end
 
 class Person < ActiveRecord::Base
+   scope :male_scope,   where(:sex => 'm')
+   scope :female_scope, where(:sex => 'f')
 end
 
 module Persons

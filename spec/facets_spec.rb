@@ -28,6 +28,15 @@ describe TracksGrid do
       PersonGrid.facets.size.should == 3
     end
 
+    it 'should handle facets ' do
+      class Bla < TracksGrid::Grid
+        filter :foo, :facet => true
+        filter :bar
+      end
+      Bla.facets.count.should == 1
+      Bla.facets.should include(:foo)
+    end
+
     it 'should manage column facets' do
       facets = PersonGrid.new.facets
 

@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe TracksGrid::Column do
   it 'should have name and header' do
-    name_col = PersonGrid.columns[:name]
+    name_col = PersonGrid.column_descs[:name]
     name_col.name.should == :name
     name_col.header.should == 'Name'
 
-    full_name_col = PersonGrid.columns[:full_name]
+    full_name_col = PersonGrid.column_descs[:full_name]
     full_name_col.name.should == :full_name
     full_name_col.header.should == 'Full name'
   end

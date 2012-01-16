@@ -1,6 +1,6 @@
 require 'active_support/concern'
 require 'tracks_grid/columns/column'
-require 'tracks_grid/columns/column_spec'
+require 'tracks_grid/columns/column_desc'
 require 'will_paginate'
 require 'will_paginate/active_record'
 require 'will_paginate/array'
@@ -10,8 +10,8 @@ module TracksGrid
     extend ActiveSupport::Concern
   
     included do
-      mattr_accessor :column_specs, :instance_reader => false, :instance_writer => false
-      self.column_specs = {}
+      self.class_attribute :column_descs, :instance_reader => false, :instance_writer => false
+      self.column_descs = {}
 
       after_initialize :initialize_columns
       alias_method_chain :ordered, :columns
@@ -35,7 +35,7 @@ module TracksGrid
       # end
       #
       def column( name, opts = {}, &block )
-        column_specs[name] = ColumnSpec.new name, opts, &block
+        self.column_descs = self.column_descs.merge name => ColumnDesc.new(name, opts, &block)
       end
     end
   
@@ -48,7 +48,7 @@ module TracksGrid
     end
  
     def headers
-      @headers ||= column.map &:header
+      @headers ||= columns.map &:header
     end
  
     def row_for(model)
@@ -60,19 +60,19 @@ module TracksGrid
     end
  
     def columns
-      @columns ||= column_specs.map{|spec|Column.new spec, self}
+      @columns ||= column_descs.map{|desc|Column.new desc, self}
     end
 
-    def column_specs
-      @column_specs ||= self.class.column_specs.values
+    def column_descs
+      @column_descs ||= self.class.column_descs.values
     end
  
     private
 
     def initialize_columns
       if order = @params[:order]
-        if spec = self.class.column_specs[:"#{order}"] 
-          @order_column = Column.new spec, self
+        if desc = self.class.column_descs[:"#{order}"] 
+          @order_column = Column.new desc, self
         else
           raise ArgumentError, "invalid order column #{order}"
         end 

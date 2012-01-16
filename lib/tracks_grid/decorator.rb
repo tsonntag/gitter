@@ -3,12 +3,12 @@ module TracksGrid
   class Decorator
     attr_reader :params, :view_context, :model
     alias_method :h, :view_context
-
-   class << self
-     def decorate(model, *args)
-       self.new(args).decorate(model)
-     end
-   end
+    
+    class << self
+      def decorate(model, *args)
+        self.new(args).decorate(model)
+      end
+    end
     #
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
@@ -21,8 +21,8 @@ module TracksGrid
 
       case args.size
       when 0
-        @params = opts.symbolize_keys
-        @view_context = @params.delete(:view_context)
+        @params = opts.delete :params
+        @view_context = opts.delete :view_context 
       when 1
         arg = args.first
         @view_context = arg.respond_to?(:view_context) ? arg.view_context : nil
@@ -42,7 +42,7 @@ module TracksGrid
     def eval( data, model = nil )
       @model = decorate model    
       res = case data
-      when Proc then @view_context ? instance_exec(&data) : data.call
+      when Proc then @view_context ? self.instance_exec(&data) : data.call
       else data
       end
       @model = nil

@@ -1,5 +1,4 @@
-class PersonGrid
-  include TracksGrid
+class PersonGrid < TracksGrid::Grid
 
   scope do
     Person.scoped
@@ -8,6 +7,7 @@ class PersonGrid
   today = Time.utc(2011,01,01)
 
   filter :name, :facet => true
+  filter :name2, :column => :name
   filter :surname, :label => 'Surname'
   filter :profession
 
@@ -37,8 +37,12 @@ class PersonGrid
 
   filter :age, :select => [:child, :teen, :twen, :other], :facet => true
 
-  search :search, :columns => [:name, :surname]
-  search :search_name,                 :columns => :name
+  filter :male_scope, :scope => :male_scope
+  filter :female_scope, :scope => :female_scope
+
+  filter :sex_scope, :scopes => [:male_scope, :female_scope]
+
+  filter :any_name, :columns => [:name, :surname]
   search :search_name_ignore,          :columns => :name, :ignore_case => true
   search :search_name_no_ignore,       :columns => :name, :ignore_case => false
   search :search_name_exact,           :columns => :name, :exact => true
