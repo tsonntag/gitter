@@ -6,8 +6,12 @@ module TracksGrid
     delegate :group, :count, :to => :scope
     
     def order( attr, desc = nil)
-      desc ||= "#{attr} DESC"
-      new scope.order(desc ? desc : attr)
+      what = case desc
+        when nil, false then attr
+        when String then desc
+        else "#{attr} DESC"
+      end
+      new scope.order(what)
     end
    
     def where( attr_values, exact = true, ignore_case = true)

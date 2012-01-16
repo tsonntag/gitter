@@ -1,23 +1,17 @@
 require 'spec_helper'
 
-class Array
-  def detect_name( name)
-    detect{|d| d.name == name }
-  end
-end
-
 describe TracksGrid::Column do
   it 'should have name and header' do
     g = PersonGrid.new
-    col_desc = g.column_descs.detect_name :name
-    col_desc.name.should == :name
+    col_spec = g.column_specs.detect_name :name
+    col_spec.name.should == :name
 
     col= g.columns.detect_name :name
     col.name.should == :name
     col.header.should == 'Name'
 
-    col_desc = g.column_descs.detect_name :full_name
-    col_desc.name.should == :full_name
+    col_spec = g.column_specs.detect_name :full_name
+    col_spec.name.should == :full_name
 
     g = PersonGrid.new
     col = g.columns.detect_name :full_name

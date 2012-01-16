@@ -31,8 +31,8 @@ describe TracksGrid do
       filter :bar
     end
 
-    Foo2.filter_descs.count.should == 2
-    Foo2.filter_descs[:foo].should_not == nil
+    Foo2.filter_specs.count.should == 2
+    Foo2.filter_specs[:foo].should_not == nil
   end
 
   it 'should handle columns ' do
@@ -40,8 +40,8 @@ describe TracksGrid do
       column :foo
       column :bar
     end
-    Foo4.column_descs.count.should == 2
-    Foo4.column_descs[:foo].should_not == nil
+    Foo4.column_specs.count.should == 2
+    Foo4.column_specs[:foo].should_not == nil
   end
 
 end

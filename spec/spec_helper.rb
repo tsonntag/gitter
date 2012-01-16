@@ -16,3 +16,10 @@ def check_include(*args)
   expected = Set.new [args].flatten
   specify { all.should == expected }
 end
+
+class Array
+  def detect_name( name)
+    detect{|d| d.name == name }
+  end
+end
+
