@@ -17,7 +17,7 @@ module TracksGrid
      end
 
      def apply( driver, *args )
-       @block.call driver.scope
+       driver.new @block.call(driver.scope)
      end
      
   end

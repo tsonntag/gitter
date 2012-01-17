@@ -35,15 +35,18 @@ module TracksGrid
       new scope.where("( #{conditions * ') OR ('} )", tokens)
     end
 
-    def where_greater_or_equal( attr, value )
-      new scope.where("#{column} >= ?", value)
+    def greater_or_equal( attr, value )
+      pp "AAAAAAAAAAgreater_or_equal #{attr}, #{value}"
+      pp scope
+      pp scope.to_sql
+      new scope.where("#{attr} >= ?", value)
     end
 
-    def where_less_or_equal( attr, value)
-      new scope.where("#{column} <= ?", value)
+    def less_or_equal( attr, value)
+      new scope.where("#{attr} <= ?", value)
     end
 
-    def each(&block)
+    def each( &block )
       new scope.each(&block)
     end
     
