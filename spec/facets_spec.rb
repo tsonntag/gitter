@@ -38,8 +38,9 @@ describe TracksGrid do
     end
 
     it 'should manage column facets' do
+      pp "XXXXX"
       facets = PersonGrid.new.facets
-
+      pp "YYYYY"
       f = check_facet facets, :sex, 'Sex', 2
       check_facet_value f, 'f', 3
       check_facet_value f, 'm', 4

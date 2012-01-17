@@ -1,6 +1,8 @@
 require 'active_support/concern'
 require 'active_support/core_ext'
 require 'active_model/callbacks'
+require 'tracks_grid/filters.rb'
+require 'tracks_grid/facet.rb'
   
 module TracksGrid
 
@@ -227,10 +229,19 @@ module TracksGrid
         @decorator = Decorator.new *args
         @params = @decorator.params || {}
   
-        @filters= {}
+        @filters_values= {}
+        @filters = {}
+        pp "FACETS"
+        pp self.class.facets
+        pp "SPECS"
+        pp self.class.filter_specs
         @params.each do |name, value|
-          if spec = self.class.filter_specs[name] 
-            @filters[Filter.new(self,spec)] = value
+          if spec = self.class.filter_specs[name]
+            pp "FFFFFFFFF creating filter"
+            pp name
+            filter = Filter.new self, spec
+            @filters[name] = filter
+            @filters_values[filter] = value
           end
         end
       end
@@ -243,7 +254,7 @@ module TracksGrid
     def driver
       @driver ||= begin
         d = self.class.driver.new eval(self.class.scope)
-        @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
+        @filters_values.each{|filter, value| d = filter.spec.apply(d, value, @params) }
         d
       end
     end
@@ -258,7 +269,7 @@ module TracksGrid
     end
 
     def facets
-      @facets ||= self.class.facets.map{|name| Facet.new self, filters[name] }
+      @facets ||= self.class.facets.map{|name| pp "X"; pp name; pp @filters[name]; pp @filters; Facet.new self, @filters[name] }
     end
   
     # evaluate data (string or proc) in context of grid

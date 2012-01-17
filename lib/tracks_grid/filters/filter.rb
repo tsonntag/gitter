@@ -9,7 +9,10 @@ module TracksGrid
     end
     
     def label
-      @label ||= spec.label or I18n.translate "tracksgrid.#{grid.name}.filters.#{name}", :default => name.humanize       
+      @label ||= begin
+        pp "LLL"
+        spec.label or I18n.translate "tracksgrid.#{grid.name}.filters.#{name}", :default => name.humanize       
+      end
     end
     
     def counts

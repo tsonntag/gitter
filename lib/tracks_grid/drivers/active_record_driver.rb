@@ -7,9 +7,9 @@ module TracksGrid
     
     def order( attr, desc = nil)
       what = case desc
-        when nil, false then attr
+        when true then "#{attr} DESC"
         when String then desc
-        else "#{attr} DESC"
+        else attr
       end
       new scope.order(what)
     end

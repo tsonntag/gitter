@@ -12,13 +12,18 @@ module TracksGrid
         when String, Symbol then opts[:order]
         else nil
       end
-      @desc = opts[:order_desc]
+      @order_desc = opts[:order_desc]
       @block = block 
     end
 
     def ordered( driver, desc = false )
+      order_desc = case desc
+        when String then desc
+        when true then @order_desc || true
+        else false
+      end
       if ordered?
-        driver.order @order, @desc
+        driver.order @order, order_desc
       else
         driver
       end

@@ -21,8 +21,8 @@ module TracksGrid
 
       case args.size
       when 0
-        @params = opts.delete  :params
         @view_context = opts.delete :view_context 
+        @params = opts.delete(:params){opts}
       when 1
         arg = args.first
         @view_context = arg.respond_to?(:view_context) ? arg.view_context : nil

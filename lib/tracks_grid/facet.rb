@@ -39,11 +39,11 @@ module TracksGrid
   end
 
   class Facet
-    attr_reader :filter
+    attr_reader :grid, :filter
     delegate :name, :label, :to => :filter
 
-    def initialize( filter )
-      @filter = filter
+    def initialize( grid, filter )
+      @grid, @filter = grid, filter
     end
 
     def data

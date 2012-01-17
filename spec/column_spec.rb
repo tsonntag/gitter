@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe TracksGrid::Column do
+include TracksGrid
+
+describe Column do
   it 'should have name and header' do
     g = PersonGrid.new
     col_spec = g.column_specs.detect_name :name
@@ -29,7 +31,7 @@ describe TracksGrid::Column do
     g = PersonGrid.new 
     g.rows.size.should == 7
 
-    g = PersonGrid.new :params => {:order => :name}
+    g = PersonGrid.new :order => :name
     g.rows.size.should == 7
     g.rows.should == [
        ["Dana", "Dana Twen", "teacher"],
@@ -43,7 +45,21 @@ describe TracksGrid::Column do
   end
 
   it 'should order columns' do
-    g = PersonGrid.new :params => {:order => :profession}
+    g = PersonGrid.new :order => :profession
+    g.rows.size.should == 7
+    g.rows.map{|r|r.last}.should == [
+       "dentist",
+       "student",
+       "student",
+       "student",
+       "student",
+       "teacher",
+       "teacher"
+    ]
+  end
+
+  it 'should order columns ascending' do
+    g = PersonGrid.new :order => :profession, :desc => false
     g.rows.size.should == 7
     g.rows.map{|r|r.last}.should == [
        "dentist",
@@ -58,6 +74,20 @@ describe TracksGrid::Column do
 
   it 'should order columns descending' do
     g = PersonGrid.new :order => :profession, :desc => true
+    g.rows.size.should == 7
+    g.rows.map{|r|r.last}.should == [
+       "teacher",
+       "teacher",
+       "student",
+       "student",
+       "student",
+       "student",
+       "dentist"
+    ]
+  end
+
+  it 'should order columns descending with given descend' do
+    g = PersonGrid.new :order => :profession, :desc => 'profession DESC'
     g.rows.size.should == 7
     g.rows.map{|r|r.last}.should == [
        "teacher",

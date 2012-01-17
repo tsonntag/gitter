@@ -5,6 +5,7 @@ module TracksGrid
      attr_reader :name, :label, :input_options, :input_tag
 
      def initialize( name, opts ={} )
+       pp "AbstractFilterSpec #{name}"
        @name = name
        @label = opts[:label]
        @input_options = opts[:input]

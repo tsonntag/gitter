@@ -41,7 +41,6 @@ module TracksGrid
   
     def ordered_with_columns
       pp "AAAAAAAAAAAAAordered_with_columns"
-      pp @order_column
       pp ordered_without_columns.scope.to_sql 
       pp @order_column.ordered.scope.to_sql  if @order_column
       @ordered_with_columns ||= @order_column ? @order_column.ordered : ordered_without_columns
