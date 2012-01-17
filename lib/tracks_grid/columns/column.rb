@@ -29,9 +29,10 @@ module TracksGrid
 
     def header
       @header ||= case spec.header
-      when false then ''
-      when nil then
-        I18n.translate "tracksgrid.#{grid.name}.headers.#{name}", :default => name.to_s.humanize
+      when false 
+        ''
+      when nil 
+        grid.translate :headers, name
       else
         grid.eval spec.header
       end

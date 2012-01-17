@@ -5,8 +5,9 @@ def check_facet( facets, name, label, size )
   f.should_not == nil
   f.name.should == name 
   f.label.should == label 
-  f.data.size.should == size
-  f.data.each do |v|
+  data = f.data(:include_zeros => true)
+  data.size.should == size
+  data.each do |v|
     v.name.should == name
   end
   f
@@ -24,8 +25,8 @@ describe TracksGrid do
 
   context 'facets' do
     it 'should manage facets' do
-      PersonGrid.facets.count.should == 3
-      PersonGrid.facets.size.should == 3
+      PersonGrid.facets.count.should == 4
+      PersonGrid.facets.size.should == 4
     end
 
     it 'should handle facets ' do
@@ -38,12 +39,16 @@ describe TracksGrid do
     end
 
     it 'should manage column facets' do
-      pp "XXXXX"
       facets = PersonGrid.new.facets
-      pp "YYYYY"
       f = check_facet facets, :sex, 'Sex', 2
       check_facet_value f, 'f', 3
       check_facet_value f, 'm', 4
+    end
+
+    it 'should manage boolean column facets' do
+      facets = PersonGrid.new.facets
+      f = check_facet facets, :teen_with_facet, 'Teen', 2
+      check_facet_value f, true,  2
     end
 
     it 'should manage select facets' do

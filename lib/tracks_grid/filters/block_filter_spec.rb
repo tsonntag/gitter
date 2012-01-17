@@ -17,12 +17,8 @@ module TracksGrid
      end
 
      def apply( driver, *args )
-       @block.call driver.scope, *args
+       @block.call driver.scope
      end
      
-     def count( driver )
-       driver.count
-     end
-
   end
 end

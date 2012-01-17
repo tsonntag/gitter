@@ -29,10 +29,18 @@ module TracksGrid
       if columns.size == 1
         driver.group(columns.first).count
       else
-        driver.count
+        super
       end
     end
-   
+
+    def distinct_values( driver )
+      if columns.size == 1
+        driver.distinct_values(columns.first)
+      else
+        super
+      end
+    end
+
   end
 
 end 

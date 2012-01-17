@@ -9,12 +9,9 @@ module TracksGrid
     end
     
     def label
-      @label ||= begin
-        pp "LLL"
-        spec.label or I18n.translate "tracksgrid.#{grid.name}.filters.#{name}", :default => name.humanize       
-      end
+      @label ||=  spec.label or grid.translate(:filters, name)
     end
-    
+
     def counts
       spec.counts grid
     end
@@ -41,7 +38,6 @@ module TracksGrid
     def collection
       spec.input_options.respond_to?(:[]) && spec.input_options[:collection]
     end
-    
     
   end
 end

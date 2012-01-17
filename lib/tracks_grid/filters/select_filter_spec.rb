@@ -24,10 +24,14 @@ module TracksGrid
 
     def counts( driver )
       @filter_specs.values.inject({}) do |memo,spec|
-        count = spec.apply(driver).count
+        count = spec.counts(driver)[true]
         memo[spec.name] = count if count > 0
         memo
       end
+    end
+
+    def distinct_values( driver )
+      @distinct_values ||= @filter_specs.keys
     end
   end
 

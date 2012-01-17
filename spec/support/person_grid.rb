@@ -15,6 +15,10 @@ class PersonGrid < TracksGrid::Grid
 
   filter :sex, :facet => true
 
+  filter :teen_with_facet, :label => 'Teen', :facet => true do |scope|
+    scope.where :birthday => (today - 19.years...today - 10.years)
+  end 
+
   filter :teen do |scope|
     scope.where :birthday => (today - 19.years...today - 10.years)
   end 

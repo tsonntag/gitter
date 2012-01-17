@@ -229,19 +229,11 @@ module TracksGrid
         @decorator = Decorator.new *args
         @params = @decorator.params || {}
   
-        @filters_values= {}
         @filters = {}
-        pp "FACETS"
-        pp self.class.facets
-        pp "SPECS"
-        pp self.class.filter_specs
         @params.each do |name, value|
           if spec = self.class.filter_specs[name]
-            pp "FFFFFFFFF creating filter"
-            pp name
             filter = Filter.new self, spec
-            @filters[name] = filter
-            @filters_values[filter] = value
+            @filters[filter] = value
           end
         end
       end
@@ -252,24 +244,28 @@ module TracksGrid
     end
   
     def driver
-      @driver ||= begin
-        d = self.class.driver.new eval(self.class.scope)
-        @filters_values.each{|filter, value| d = filter.spec.apply(d, value, @params) }
+      @driver ||= self.class.driver.new eval(self.class.scope)
+    end
+
+    def filtered_driver
+      @filter_driver ||= begin
+        d = driver
+        @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
         d
       end
     end
     
     def scope
-      driver.scope
+      filtered_driver.scope
     end
     
     # returns scope which default order
     def ordered
-      @ordered ||= self.class.order ? driver.order(self.class.order) : driver
+      @ordered ||= self.class.order ? filtered_driver.order(self.class.order) : filtered_driver
     end
 
     def facets
-      @facets ||= self.class.facets.map{|name| pp "X"; pp name; pp @filters[name]; pp @filters; Facet.new self, @filters[name] }
+      @facets ||= self.class.facets.map{|name| Facet.new(self, self.class.filter_specs[name]) }
     end
   
     # evaluate data (string or proc) in context of grid
@@ -295,5 +291,9 @@ module TracksGrid
         res
       end
     end 
+
+    def translate( prefix, key )
+      I18n.translate "tracksgrid.#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
+    end
   end
 end

@@ -5,7 +5,6 @@ module TracksGrid
      attr_reader :name, :label, :input_options, :input_tag
 
      def initialize( name, opts ={} )
-       pp "AbstractFilterSpec #{name}"
        @name = name
        @label = opts[:label]
        @input_options = opts[:input]
@@ -19,6 +18,14 @@ module TracksGrid
 
      def input?
        @input_options
+     end
+
+     def counts( driver )
+       { true => driver.class.new(apply(driver)).count }
+     end
+
+     def distinct_values( driver )
+       [ true, false ]       
      end
 
   end

@@ -39,15 +39,35 @@ module TracksGrid
   end
 
   class Facet
-    attr_reader :grid, :filter
-    delegate :name, :label, :to => :filter
+    attr_reader :grid, :filter_spec
+    delegate :name, :to => :filter_spec
 
-    def initialize( grid, filter )
-      @grid, @filter = grid, filter
+    def initialize( grid, filter_spec )
+      @grid, @filter_spec = grid, filter_spec
     end
 
-    def data
-      @data ||= filter.counts.map{|value, count| FacetData.new self, value, count}
+    def label
+      @label ||= filter_spec.label or grid.translate(:facets, name)
+    end
+
+    def data( *args )
+      opts = args.extract_options!
+      raise ArgumentError, 'too many arguments' if args.size > 1
+      driver = args.first || grid.filtered_driver
+      @data ||= begin
+        value_to_count = filter_spec.counts(driver)
+        values = opts[:include_zeros] ? filter_spec.distinct_values(driver) : value_to_count.keys
+
+        puts "FFFFFFFFF facet #{name}, zero=#{opts[:include_zeros]}"
+        puts "          distict: #{filter_spec.distinct_values(driver)}"
+        puts "          value_to_count(#{value_to_count.class})=#{value_to_count.inspect}"
+        puts "          values=#{values.inspect}"
+
+        values.map do |value|
+          puts "          value=#{value.inspect} value_to_count[value] = #{value_to_count[value]}"
+          FacetData.new self, value, (value_to_count[value]||0)
+        end
+      end
     end
 
     def to_s
