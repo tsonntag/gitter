@@ -19,7 +19,7 @@ module TracksGrid
       if spec.block
         grid.eval spec.block, model
       else
-        model.send name
+        model.send(spec.attr||name)
       end
     end
 
@@ -28,7 +28,7 @@ module TracksGrid
     end
 
     def header
-      @header ||= case spec.header
+      case spec.header
       when false 
         ''
       when nil 

@@ -5,6 +5,10 @@ include TracksGrid
 
 describe Grid do
 
+  it 'should have a name' do
+    PersonGrid.new.name.should == 'person_grid'   
+  end
+
   it 'should handle a scope' do
     class Foo < Grid
       scope do 

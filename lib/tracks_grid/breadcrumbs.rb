@@ -7,7 +7,7 @@ module TracksGrid
     def breadcrumbs
       @breadcrumbs ||= begin
         p = {}
-        text = @filters.map do |filter, value|
+        text = @filters_values.map do |filter, value|
           p[filter.label] = value
         end
         p

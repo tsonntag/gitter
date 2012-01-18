@@ -25,8 +25,8 @@ describe TracksGrid do
 
   context 'facets' do
     it 'should manage facets' do
-      PersonGrid.facets.count.should == 4
-      PersonGrid.facets.size.should == 4
+      PersonGrid.facets.count.should == 5
+      PersonGrid.facets.size.should == 5
     end
 
     it 'should handle facets ' do

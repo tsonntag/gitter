@@ -9,6 +9,7 @@ class PersonGrid < TracksGrid::Grid
   filter :name, :facet => true
   filter :name2, :column => :name
   filter :name3, :column => :name, :label => 'Three'
+  filter :localname, :column => :name, :facet => true 
 
   filter :surname, :label => 'Surname'
   filter :profession
@@ -56,6 +57,8 @@ class PersonGrid < TracksGrid::Grid
   filter :name_inexact_ignore,    :columns => :name, :exact => false, :ignore_case => true
   filter :name_inexact_no_ignore, :columns => :name, :exact => false, :ignore_case => false
 
+  search :search_name, :column => :name
+
   column :name, :order => true
 
   column :full_name, :order => 'name, surname', :order_desc => 'name DESC, surname DESC' do 
@@ -63,5 +66,4 @@ class PersonGrid < TracksGrid::Grid
   end
 
   column :profession, :header => 'Job Title', :order => true
-
 end

@@ -11,19 +11,34 @@ describe Column do
     col= g.columns.detect_name :name
     col.name.should == :name
     col.header.should == 'Name'
+  end
 
+  it 'should have settable header' do
+    g = PersonGrid.new
     col_spec = g.column_specs.detect_name :full_name
     col_spec.name.should == :full_name
-
-    g = PersonGrid.new
+     
     col = g.columns.detect_name :full_name
     col.name.should == :full_name
     col.header.should == 'Full name'
   end
 
+  it 'should have settable attribute' do
+    class Foo < TracksGrid::Grid
+      scope do Person.scoped end
+      column :name1, :for => :name
+    end   
+    g = Foo.new
+    col_spec = g.column_specs.detect_name :name1
+    col_spec.name.should == :name1
+     
+    col = g.columns.detect_name :name1
+    col.name.should == :name1
+    col.header.should == 'Name1'
+  end
+
   it 'should have headers' do
     g = PersonGrid.new
-    g.headers.size.should == 3
     g.headers.should == [ 'Name', 'Full name', 'Job Title' ]
   end
 

@@ -2,11 +2,12 @@ module TracksGrid
 
   class ColumnSpec
 
-    attr_reader :name, :header, :block
+    attr_reader :name, :header, :attr, :block
 
     def initialize( name, opts = {}, &block )
       @name = name
       @header = opts[:header] 
+      @attr = opts[:for] 
       @order = case opts[:order] 
         when true then name
         when String, Symbol then opts[:order]

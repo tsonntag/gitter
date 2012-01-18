@@ -47,7 +47,7 @@ module TracksGrid
     end
 
     def label
-      @label ||= filter_spec.label or grid.translate(:facets, name)
+      filter_spec.label or grid.translate(:facets, name)
     end
 
     def data( *args )

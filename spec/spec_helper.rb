@@ -2,24 +2,23 @@
 #require 'bundler'
 #Bundler.setup :default, :development
 
-$:.unshift File.expand_path('..', __FILE__)
-$:.unshift File.expand_path('../lib', __FILE__)
-
 require 'rspec'
+require 'i18n'
 require 'tracks_grid'
 
-require 'support/database'
+I18n.load_path = Dir[File.dirname(__FILE__) + '/locales/*.yml']
+I18n.default_locale = :en
 
-Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| require f}
+Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| puts f; require f}
 
 def check_include(*args)
   params = args.extract_options!
   scope = PersonGrid.new(:params => params).scope
-  puts "SSSSSSSSSSS scope=#{scope.to_sql}"
   all = Set.new scope.all
-  puts "            all=#{all.inspect}"
   expected = Set.new [args].flatten
-  puts "            expected=#{expected.inspect}"
+  #puts "SSSSSSSSSSS scope=#{scope.to_sql}"
+  #puts "            all=#{all.inspect}"
+  #puts "            expected=#{expected.inspect}"
   specify { all.should == expected }
 end
 

@@ -9,7 +9,7 @@ module TracksGrid
     end
     
     def label
-      @label ||=  spec.label or grid.translate(:filters, name)
+      spec.label or grid.translate(:filters, name)
     end
 
     def counts

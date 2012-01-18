@@ -71,4 +71,10 @@ describe TracksGrid do
     check_include Max,         :name_inexact => 'Max', :exact => false
   end
 
+  context 'search'  do 
+    check_include Max,          :search_name => 'Max'
+    check_include Max,          :search_name => 'max'
+    check_include Max,          :search_name => 'ax'
+    check_include [],           :search_name => 'Kid'
+  end
 end

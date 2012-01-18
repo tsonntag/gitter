@@ -1,6 +1,7 @@
 require 'active_support/concern'
 require 'active_support/core_ext'
 require 'active_model/callbacks'
+require 'i18n'
 require 'tracks_grid/filters.rb'
 require 'tracks_grid/facet.rb'
   
@@ -199,16 +200,12 @@ module TracksGrid
   
       def scope_filter( name, options = {} )
         if driver.named_scope?(name) 
-          BlockFilterSpec.new( name, options){|scope| driver(scope).named_scope(name).scope}
+          BlockFilterSpec.new(name, options){|scope| driver(scope).named_scope(name).scope}
         else
           raise ConfigurationError, "invalid scope #{name}"
         end
       end
   
-      def check_opts( opts )
-        raise ConfigurationError, "invalid opts #{opts.inspect}" unless opts.empty?
-      end
-
     end
 
     attr_reader :params
@@ -245,19 +242,25 @@ module TracksGrid
         @params = @decorator.params || {}
   
         @filters = {}
+        @filters_values = {}
         @params.each do |name, value|
           if spec = self.class.filter_specs[name]
             filter = Filter.new self, spec
-            @filters[filter] = value
+            @filters[name] = filter
+            @filters_values[filter] = value
           end
         end
       end
     end
     
     def name
-      @name || self.class.name.underscore
+      @name ||= self.class.name.underscore
     end
   
+    def filters
+      @filters.values 
+    end
+
     def driver( scope = self.class.scope )
       self.class.driver(scope)
     end
@@ -267,7 +270,7 @@ module TracksGrid
         d = driver
         #puts "GRID params=#{params.inspect}"
         #puts "     before : #{d.scope.to_sql}"
-        @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
+        @filters_values.each{|filter, value| d = filter.spec.apply(d, value, @params) }
         #puts "     after : #{d.scope.to_sql}"
         d
       end
@@ -311,7 +314,7 @@ module TracksGrid
     end 
 
     def translate( prefix, key )
-      I18n.translate "tracksgrid.#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
+      I18n.translate "#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
     end
   end
 end
