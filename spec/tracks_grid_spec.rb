@@ -11,7 +11,7 @@ describe TracksGrid do
       end
     end
 
-    Foo.scope.call.should == 'bla'
+    Foo.scope.should == 'bla'
   end
   
   it 'should complain for unset scope' do

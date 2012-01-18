@@ -9,8 +9,4 @@ describe TracksGrid do
     check_include Max, Joe, Dick, John, :male_scope => true
   end
 
-  context 'filter with many scopes' do
-    check_include Tina, Dana, Lisa,     :sex_scope => :female_scope
-    check_include Max, Joe, Dick, John, :sex_scope => :male_scope
-  end
 end

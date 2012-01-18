@@ -23,7 +23,7 @@ module TracksGrid
           @scope = scope
         else
           raise ConfigurationError, 'scope undefined' unless @scope
-          @scope
+          Proc === @scope ? instance_exec(&@scope) : @scope
         end 
       end
 
@@ -135,7 +135,7 @@ module TracksGrid
       # f.data[1].value  # 'Twen'
       # f.data[1].count  # 100 
       #
-      # Use :scope to filter by a given scope
+      # Use :scope to filter by a named scope
       #
       # class User < ActiveRecord::Base
       #   scope :children, lambda{ where "birthday > :date", :date => 10.years.ago} 
@@ -143,7 +143,7 @@ module TracksGrid
       #
       #  filter :scope => :children
       # 
-      # Use :scopes to select scopes
+      # Use :select many also refer to named scopes
       #
       # class User < ActiveRecord::Base
       #   scope :teen, lambda{ where :birthday => (10.years.ago..20.years.ago)} 
@@ -158,23 +158,21 @@ module TracksGrid
         name = args.first
   
         filter_spec = case
+        when options.delete(:range)
+          raise ConfigurationError, "no block allowed for range filter #{name}" if block
+          return range_filter name, options # return is required
         when block 
           BlockFilterSpec.new name, options, &block
-        when options[:range]
-          return range_filter(name, options) # return is required
-        when s = options[:select]
-          f = [s].flatten.map{|name| filter_specs[name] or raise ConfigurationError, "no filter for :select => #{name}"}
-          SelectFilterSpec.new name, f, options
-        when s = options[:scope]
+        when select = options.delete(:select)
+          filters = [select].flatten.map{|name| filter_specs[name] || scope_filter(name)}
+          SelectFilterSpec.new name, filters, options
+        when s = options.delete(:scope)
           scope_filter( name || s, options )
-        when s = options[:scopes]
-          f = [s].flatten.map{|name| scope_filter name}
-          SelectFilterSpec.new name, f, options
         else 
           ColumnFilterSpec.new name, options
         end
   
-        self.facets += [name] if options[:facet]
+        self.facets += [name] if options.delete(:facet)
         self.filter_specs = self.filter_specs.merge(name => filter_spec)
         filter_specs
       end
@@ -185,9 +183,26 @@ module TracksGrid
       end
   
       private
+      def range_filter( name, options )
+        column = options.delete(:column){name}
+
+        filter options.delete(:from){:"from_#{name}"}, options do |scope, value|
+          driver(scope).greater_or_equal(column, value).scope
+        end
+
+        filter options.delete(:to){:"to_#{name}"}, options do |scope, value|
+          driver(scope).less_or_equal(column, value).scope
+        end
+
+        filter name, :column => column
+      end
   
       def scope_filter( name, options = {} )
-        BlockFilterSpec.new( name, options){|scope| Driver.new(scope).named_scope name}
+        if driver.named_scope?(name) 
+          BlockFilterSpec.new( name, options){|scope| driver(scope).named_scope(name).scope}
+        else
+          raise ConfigurationError, "invalid scope #{name}"
+        end
       end
   
       def check_opts( opts )
@@ -243,19 +258,22 @@ module TracksGrid
       @name || self.class.name.underscore
     end
   
-    def driver
-      @driver ||= self.class.driver.new eval(self.class.scope)
+    def driver( scope = self.class.scope )
+      self.class.driver(scope)
     end
 
     def filtered_driver
       @filter_driver ||= begin
         d = driver
+        puts "GRID params=#{params.inspect}"
+        puts "     before : #{d.scope.to_sql}"
         @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
+        puts "     after : #{d.scope.to_sql}"
         d
       end
     end
     
-    def scope
+    def scope( driver = self.filtered_driver )
       filtered_driver.scope
     end
     

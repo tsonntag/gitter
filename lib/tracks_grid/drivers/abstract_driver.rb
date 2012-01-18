@@ -22,10 +22,14 @@ module TracksGrid
     # each(&block)
 
     # named_scope( name )
-    
-    private
-    def new( scope )
+
+    # named_scope?( name )
+
+    # distict_values( attr )
+
+    def new(scope)
       self.class.new scope
     end
+
   end
 end

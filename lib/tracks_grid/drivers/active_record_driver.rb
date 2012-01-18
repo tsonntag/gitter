@@ -15,20 +15,17 @@ module TracksGrid
     end
    
     def where( attr_values, exact = true, ignore_case = true)
+      # has range?
+      return new scope.where(attr_values) if Range === attr_values.values.first
+
       tokens = {}
+
       conditions = attr_values.map do |attr,value| 
+        raise ArgumentError, "invalid range #{value} for #{attr}" if Range === value
         text = exact ? value : "%#{value}%"
-         
-        col = attr
-        token = ":#{attr}" 
-
-        if ignore_case
-          col = upper col
-          token = upper token
-        end
-
+        col, token = attr, ":#{attr}" 
+        col, token = upper(col), upper(token) if ignore_case
         tokens[attr] = text 
-
         "#{col} #{exact ? '=' : 'LIKE'} #{token}"
       end
 
@@ -36,9 +33,6 @@ module TracksGrid
     end
 
     def greater_or_equal( attr, value )
-      pp "AAAAAAAAAAgreater_or_equal #{attr}, #{value}"
-      pp scope
-      pp scope.to_sql
       new scope.where("#{attr} >= ?", value)
     end
 
@@ -52,6 +46,11 @@ module TracksGrid
     
     def named_scope( name )
       new scope.send(name)
+    end
+    
+    def named_scope?( name )
+      puts "AAAAAAAAAA #{name.class}, #{name},  scope.respond_to? name = #{ scope.respond_to? name}, scope=#{scope.to_sql}"
+      scope.respond_to? name 
     end
     
     def distinct_values( attr )
