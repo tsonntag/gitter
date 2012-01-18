@@ -265,10 +265,10 @@ module TracksGrid
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        puts "GRID params=#{params.inspect}"
-        puts "     before : #{d.scope.to_sql}"
+        #puts "GRID params=#{params.inspect}"
+        #puts "     before : #{d.scope.to_sql}"
         @filters.each{|filter, value| d = filter.spec.apply(d, value, @params) }
-        puts "     after : #{d.scope.to_sql}"
+        #puts "     after : #{d.scope.to_sql}"
         d
       end
     end

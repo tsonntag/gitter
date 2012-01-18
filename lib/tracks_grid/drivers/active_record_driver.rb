@@ -49,7 +49,6 @@ module TracksGrid
     end
     
     def named_scope?( name )
-      puts "AAAAAAAAAA #{name.class}, #{name},  scope.respond_to? name = #{ scope.respond_to? name}, scope=#{scope.to_sql}"
       scope.respond_to? name 
     end
     

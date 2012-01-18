@@ -26,4 +26,7 @@ describe TracksGrid do
     check_include Joe, Dick,    :from_birthday => Date.new(1995,1,1), :to_birthday => Date.new(1997,1,1) 
   end
 
+  context 'filter with range and given :from, :to' do 
+    check_include Joe, Dick,    :between => Date.new(1995,1,1), :and => Date.new(1997,1,1) 
+  end
 end

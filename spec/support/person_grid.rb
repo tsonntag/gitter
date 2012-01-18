@@ -8,10 +8,13 @@ class PersonGrid < TracksGrid::Grid
 
   filter :name, :facet => true
   filter :name2, :column => :name
+  filter :name3, :column => :name, :label => 'Three'
+
   filter :surname, :label => 'Surname'
   filter :profession
 
   filter :birthday, :range => true
+  filter :birthday, :from => :between, :to => :and, :range => true
 
   filter :sex, :facet => true
 
@@ -48,11 +51,10 @@ class PersonGrid < TracksGrid::Grid
   filter :mixed_select, :select => [:female_scope, :teen]
 
   filter :any_name, :columns => [:name, :surname]
-  filter :search_name_ignore,          :columns => :name, :ignore_case => true
-  filter :search_name_no_ignore,       :columns => :name, :ignore_case => false
-  filter :search_name_exact,           :columns => :name, :exact => true
-  filter :search_name_exact_ignore,    :columns => :name, :exact => true, :ignore_case => true
-  filter :search_name_exact_no_ignore, :columns => :name, :exact => true, :ignore_case => false
+  filter :name_ignore,            :columns => :name, :ignore_case => true
+  filter :name_inexact,           :columns => :name, :exact => false
+  filter :name_inexact_ignore,    :columns => :name, :exact => false, :ignore_case => true
+  filter :name_inexact_no_ignore, :columns => :name, :exact => false, :ignore_case => false
 
   column :name, :order => true
 

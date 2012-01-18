@@ -14,13 +14,13 @@ describe TracksGrid do
     check_include Max,          :name2 => 'Max'
   end
 
-  context 'column filter with ignore_case' do 
+  context 'column filter with instance ignore_case' do 
     check_include [],          :name => 'max'
     check_include [],          :name => 'max', :ignore_case => false
     check_include Max,         :name => 'max', :ignore_case => true
   end
 
-  context 'column filter with inexact' do 
+  context 'column filter with instance inexact' do 
     check_include [],          :name => 'ax'
     check_include [],          :name => 'ax', :exact => true
     check_include Max,         :name => 'ax', :exact => false
@@ -48,4 +48,27 @@ describe TracksGrid do
     check_include [],          :any_name => 'kid', :ignore_case => false
     check_include Max,         :any_name => 'kid', :ignore_case => true
   end
+
+  context 'column filter with ignore_case' do 
+    check_include Max,         :name_ignore => 'max'
+    check_include Max,         :name_ignore => 'Max'
+
+    check_include [],          :name_ignore => 'max', :ignore_case => false
+    check_include Max,         :name_ignore => 'Max', :ignore_case => false
+
+    check_include Max,         :name_ignore => 'max', :ignore_case => true
+    check_include Max,         :name_ignore => 'Max', :ignore_case => true
+  end
+
+  context 'column filter with instance inexact' do 
+    check_include Max,         :name_inexact => 'ax'
+    check_include Max,         :name_inexact => 'Max'
+
+    check_include [],          :name_inexact => 'ax',  :exact => true
+    check_include Max,         :name_inexact => 'Max', :exact => true
+
+    check_include Max,         :name_inexact => 'ax',  :exact => false
+    check_include Max,         :name_inexact => 'Max', :exact => false
+  end
+
 end
