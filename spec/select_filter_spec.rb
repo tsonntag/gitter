@@ -28,7 +28,7 @@ describe TracksGrid do
   end
 
   context 'filter with select for scopes and filters' do
-    check_include Tina, Dana, Lisa,  :mixed_select => :male_scope
+    check_include Tina, Dana, Lisa,  :mixed_select => :female_scope
     check_include Joe, Dick,         :mixed_select => :teen
   end
 end
