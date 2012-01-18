@@ -45,7 +45,7 @@ class PersonGrid < TracksGrid::Grid
   filter :female_scope, :scope => :female_scope
 
   filter :sex_scope, :select => [:male_scope, :female_scope]
-  filter :mixed_select, :select => [:male_scope, :teen]
+  filter :mixed_select, :select => [:female_scope, :teen]
 
   filter :any_name, :columns => [:name, :surname]
   filter :search_name_ignore,          :columns => :name, :ignore_case => true
