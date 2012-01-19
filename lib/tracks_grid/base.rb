@@ -13,7 +13,7 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      self.class_attribute :filter_specs, :facets, :instance_reader => false, :instance_writer => false
+      self.mattr_accessor :filter_specs, :facets, :instance_reader => false, :instance_writer => false
       self.filter_specs = {}
       self.facets = []
     end
@@ -289,11 +289,8 @@ module TracksGrid
       @decorator.eval data, model
     end
 
-    # dirty hack to avoid rails' sorted query in url
-    def url_for( params )
-      p = params.dup 
-      query = p.map{|key, value| value.to_query(key) } * '&'
-      "#{h.url_for({})}?#{query}"
+    def h
+      @decorator.h
     end
 
     def input_tags

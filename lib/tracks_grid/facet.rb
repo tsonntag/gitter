@@ -1,6 +1,8 @@
 module TracksGrid
 
   class FacetData
+    include Helper
+
     attr_reader :facet, :value, :count
     delegate :grid, :name, :to => :facet
 
@@ -13,16 +15,17 @@ module TracksGrid
     end
 
     def link
-      p = grid.h.request.query_parameters
+      h = grid.h
+      p = h.request.query_parameters
       p.delete(:show)
       p[name] = value.nil? ? '' : value
       p[:page] = 1
 
       option_tag = h.content_tag :span, (value.nil? ? '-' : value), :class => 'facet_value'
-      option_link = h.link_to option_tag, grid.url_for(p)
+      option_link = h.link_to option_tag, url_for(p)
 
       count_tag = h.content_tag :span, "(#{count})", :class => 'facet_count'
-      count_link  = h.link_to count_tag,  grid.url_for(p.merge(:show=>true))
+      count_link  = h.link_to count_tag,  url_for(p.merge(:show=>true))
 
       h.content_tag :span, (option_link + count_link), {:class => 'facet_entry'}, false
     end

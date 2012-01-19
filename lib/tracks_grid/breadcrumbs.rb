@@ -2,6 +2,8 @@ require 'active_support/concern'
   
 module TracksGrid
   module Breadcrumbs
+    include Helper
+
     extend ActiveSupport::Concern
 
     def breadcrumbs
@@ -17,9 +19,9 @@ module TracksGrid
     def render_breadcrumbs( join = '>' )
       @rendered_breadcrumbs ||= begin
         p = {}
-        text = breadcrumbs.map do |label, value|
-          s =  h.content_tag :span, "#{label} : ", :class => 'breadcrumb_key'
-          s += h.content_tag :span, value,         :class => 'breadcrumb_value'            
+        text = @filters_values.map do |filter, value|
+          s =  h.content_tag :span, "#{filter.label} : ", :class => 'breadcrumb_key'
+          s += h.content_tag :span, value,                :class => 'breadcrumb_value'            
           p[filter.name] = value
           h.link_to s, url_for(p)
         end.join(join)
