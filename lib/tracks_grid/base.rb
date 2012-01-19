@@ -1,5 +1,5 @@
 require 'active_support/concern'
-require 'active_support/core_ext'
+require 'active_support/core_ext/class/attribute'
 require 'active_model/callbacks'
 require 'i18n'
 require 'tracks_grid/filters.rb'
@@ -13,7 +13,7 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      self.mattr_accessor :filter_specs, :facets, :instance_reader => false, :instance_writer => false
+      class_attribute :filter_specs, :facets, :instance_reader => false, :instance_writer => false
       self.filter_specs = {}
       self.facets = []
     end
@@ -232,6 +232,7 @@ module TracksGrid
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
+      puts "FFFFFFFFFFFFFFF initialize #{facets.inspect}"
       run_callbacks :initialize do
         @decorator = Decorator.new *args
         @params = @decorator.params || {}
@@ -252,9 +253,9 @@ module TracksGrid
       @name ||= self.class.name.underscore
     end
   
-    #def filters
-    #  @selected_filters.values 
-    #end
+    def filters
+      @filters = self.class.filter_specs.map{|name,spec| Filter.new(self,spec)}
+    end
 
     def driver
       @driver ||= self.class.create_driver eval(self.class.scope) 
@@ -263,21 +264,14 @@ module TracksGrid
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        #puts "GRID params=#{params.inspect}"
-        #puts "     before : #{d.scope.to_sql}"
         @filters_values.each{|filter, value| d = filter.spec.apply(d, value, @params) }
-        #puts "     after : #{d.scope.to_sql}"
         d
       end
     end
     
-    def scope( driver = self.filtered_driver )
-      driver.scope
-    end
-    
     # returns scope which default order
-    def ordered
-      @ordered ||= self.class.order ? filtered_driver.order(self.class.order) : filtered_driver
+    def scope( ordered = self.class.order )
+      @scope ||= (ordered ? filtered_driver.order(self.class.order) : filtered_driver).scope
     end
 
     def facets
@@ -296,9 +290,9 @@ module TracksGrid
     def input_tags
       @input_tags ||= begin
         res = {} 
-        self.class.filter_specs.each do |name, spec|
-          if i = Filter.new(self,spec).input_tag
-            res[name] = i
+        self.class.filters.each do |filter|
+          if i = filter.input_tag
+            res[filter.name] = i
           end
         end 
         res

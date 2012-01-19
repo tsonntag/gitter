@@ -5,7 +5,7 @@ include TracksGrid
 describe Column do
   it 'should have name and header' do
     g = PersonGrid.new
-    col_spec = g.column_specs.detect_name :name
+    col_spec = g.columns.detect_name :name
     col_spec.name.should == :name
 
     col= g.columns.detect_name :name
@@ -15,7 +15,7 @@ describe Column do
 
   it 'should have settable header' do
     g = PersonGrid.new
-    col_spec = g.column_specs.detect_name :full_name
+    col_spec = g.columns.detect_name :full_name
     col_spec.name.should == :full_name
      
     col = g.columns.detect_name :full_name
@@ -35,7 +35,7 @@ describe Column do
       column :name1, :for => :name
     end   
     g = Foo.new
-    col_spec = g.column_specs.detect_name :name1
+    col_spec = g.columns.detect_name :name1
     col_spec.name.should == :name1
      
     col = g.columns.detect_name :name1
