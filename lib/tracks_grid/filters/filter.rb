@@ -17,7 +17,7 @@ module TracksGrid
     end
 
     def input_tag
-      return '' unless input? 
+      return '' unless spec.input? 
 
       @input_tag ||= spec.input_tag || if col = collection 
         select_tag [''] + grid.eval(col)
@@ -27,11 +27,13 @@ module TracksGrid
     end
 
     def text_field_tag
-      @text_field_tag ||= grid.eval proc{ h.text_field_tag name, h.params[name], :class => 'grid'}
+      filter_name = name
+      @text_field_tag ||= grid.eval proc{ h.text_field_tag filter_name, h.params[filter_name], :class => 'grid'}
     end
 
     def select_tag( collection )
-      grid.eval proc{ h.select_tag name, context.options_for_select(collection, h.params[name]), :class => 'grid'}
+      filter_name = name
+      grid.eval proc{ h.select_tag filter_name, h.options_for_select(collection, h.params[filter_name]), :class => 'grid' }
     end
  
     private

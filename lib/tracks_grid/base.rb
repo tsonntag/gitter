@@ -23,8 +23,7 @@ module TracksGrid
         if scope
           @scope = scope
         else
-          raise ConfigurationError, 'scope undefined' unless @scope
-          Proc === @scope ? instance_exec(&@scope) : @scope
+          @scope or raise ConfigurationError
         end 
       end
 
@@ -188,24 +187,20 @@ module TracksGrid
         column = options.delete(:column){name}
 
         filter options.delete(:from){:"from_#{name}"}, options do |scope, value|
-          driver(scope).greater_or_equal(column, value).scope
+          create_driver(scope).greater_or_equal(column, value).scope
         end
 
         filter options.delete(:to){:"to_#{name}"}, options do |scope, value|
-          driver(scope).less_or_equal(column, value).scope
+          create_driver(scope).less_or_equal(column, value).scope
         end
 
         filter name, :column => column
       end
   
       def scope_filter( name, options = {} )
-        if driver.named_scope?(name) 
-          BlockFilterSpec.new(name, options){|scope| driver(scope).named_scope(name).scope}
-        else
-          raise ConfigurationError, "invalid scope #{name}"
-        end
+        BlockFilterSpec.new(name, options){|scope| create_driver(scope).named_scope(name).scope}
       end
-  
+
     end
 
     attr_reader :params
@@ -241,12 +236,12 @@ module TracksGrid
         @decorator = Decorator.new *args
         @params = @decorator.params || {}
   
-        @filters = {}
+        @selected_filters = {}
         @filters_values = {}
         @params.each do |name, value|
           if spec = self.class.filter_specs[name]
             filter = Filter.new self, spec
-            @filters[name] = filter
+            @selected_filters[name] = filter
             @filters_values[filter] = value
           end
         end
@@ -257,12 +252,12 @@ module TracksGrid
       @name ||= self.class.name.underscore
     end
   
-    def filters
-      @filters.values 
-    end
+    #def filters
+    #  @selected_filters.values 
+    #end
 
-    def driver( scope = self.class.scope )
-      self.class.driver(scope)
+    def driver
+      @driver ||= self.class.create_driver eval(self.class.scope) 
     end
 
     def filtered_driver
@@ -277,7 +272,7 @@ module TracksGrid
     end
     
     def scope( driver = self.filtered_driver )
-      filtered_driver.scope
+      driver.scope
     end
     
     # returns scope which default order
@@ -301,11 +296,11 @@ module TracksGrid
       "#{h.url_for({})}?#{query}"
     end
 
-    def inputs
-      @inputs ||= begin
+    def input_tags
+      @input_tags ||= begin
         res = {} 
-        @filters.each do |name, filter|
-          if i = filter.input
+        self.class.filter_specs.each do |name, spec|
+          if i = Filter.new(self,spec).input_tag
             res[name] = i
           end
         end 

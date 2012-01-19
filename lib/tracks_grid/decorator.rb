@@ -58,7 +58,9 @@ module TracksGrid
     def decorate( model, decorator_classes = nil)
       return nil if model.nil?
       decorator_classes ||= @decorator_classes || default_decorator_class(model)
-      decorator_classes.each{|dc| model.extend dc}
+      decorator_classes.each{|dc|model.extend dc}
+      h = view_context
+      model.define_singleton_method(:h){h}
       model
     end
     

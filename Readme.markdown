@@ -38,11 +38,10 @@ end
 and your views may use the decoratored model: 
 
 ```ruby
--# app/views/articles/show.html.haml
+# app/views/articles/show.html.haml
 %h1 
   Article
   = @article.image
-
 ```
 
 You may provide arbritary module classes:

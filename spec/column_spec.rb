@@ -23,6 +23,12 @@ describe Column do
     col.header.should == 'Full name'
   end
 
+  it 'should have a ColumnSpec' do
+    g = PersonGrid.new
+    col= g.columns.detect_name :name
+    col.spec.class.should == ColumnSpec
+  end
+
   it 'should have settable attribute' do
     class Foo < TracksGrid::Grid
       scope do Person.scoped end

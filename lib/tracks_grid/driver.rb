@@ -13,8 +13,8 @@ module TracksGrid
         end
       end
 
-      def driver( scope = self.scope )
-        self.driver_class.new(scope)
+      def create_driver( scope )
+        driver_class.new scope
       end
 
       private

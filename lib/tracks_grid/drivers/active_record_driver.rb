@@ -48,10 +48,6 @@ module TracksGrid
       new scope.send(name)
     end
     
-    def named_scope?( name )
-      scope.respond_to? name 
-    end
-    
     def distinct_values( attr )
       scope.select("DISTINCT #{attr}").map(&attr)
     end

@@ -23,8 +23,6 @@ module TracksGrid
 
     # named_scope( name )
 
-    # named_scope?( name )
-
     # distict_values( attr )
 
     def new(scope)

@@ -16,7 +16,21 @@ describe Grid do
       end
     end
 
-    Foo.scope.should == 'bla'
+    Foo.new.scope.should == 'bla'
+  end
+
+  it 'should handle scope with helpers' do
+    class Foo < Grid
+      scope do 
+        h.foo
+      end
+    end
+
+    vc = Struct.new(:foo).new('bar')
+
+    g = Foo.new(:view_context => vc)
+    g.scope.should == 'bar'
+
   end
   
   it 'should have a default driver' do
@@ -27,7 +41,7 @@ describe Grid do
     end
 
     Foo.driver_class.should == ActiveRecordDriver
-    Foo.driver.scope.should == 'bla'
+    Foo.new.scope.should == 'bla'
   end
   
   it 'should handle given driver' do
@@ -42,7 +56,7 @@ describe Grid do
     end
 
     Foo.driver_class.should == MyDriver
-    Foo.driver.scope.should == 'bla'
+    Foo.new.scope.should == 'bla'
   end
   
   it 'should complain for unset scope' do
@@ -52,7 +66,7 @@ describe Grid do
     expect {
       Bar.scope
     }.to raise_error(
-      ConfigurationError, /undefined/
+      ConfigurationError
     )
   end
 

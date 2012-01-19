@@ -60,13 +60,9 @@ module TracksGrid
     end
  
     def columns
-      @columns ||= self.column_specs.map{|spec| Column.new(self, spec) }
+      @columns ||= self.class.column_specs.map{|name, spec| Column.new(self,spec) }
     end
 
-    def column_specs
-      @column_specs ||= self.class.column_specs.values
-    end
- 
     private
 
     def initialize_columns

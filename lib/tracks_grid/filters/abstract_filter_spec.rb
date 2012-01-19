@@ -17,7 +17,7 @@ module TracksGrid
      end
 
      def input?
-       @input_options
+       @input_options || @input_tag
      end
 
      def counts( driver )
