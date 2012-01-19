@@ -2,7 +2,7 @@
 
 Ruby library for Rails which enables you to create
 
-* Decorators or presenters for your models
+* Decorators / presenters for your models
 * Data grids, i.e table like data with customizable
   * Filters
   * Sortables columns
@@ -11,12 +11,10 @@ Ruby library for Rails which enables you to create
 
 ## Decorators
 
-A Decorator
-
-* Extends an object with given classes (default is <object.class>Decorator, if it is defined)
+* Extend an object with given classes (default is \<object.class\>Decorator, if defined)
 * Makes helpers accessible in object via :h
 
-Example:
+### Example:
 
 Decorate a model in your controller:
 
@@ -27,7 +25,8 @@ Decorate a model in your controller:
   end
 ```
 
-Then @article will be extended by
+Then @article will be extended by module ArticleDecorator, which 
+may access your helpers via :h
 
 ```ruby
 module ArticleDecorator
@@ -38,7 +37,7 @@ end
 ```
 
 
-You may provide arbritary modules:
+You may provide arbritary module classes:
 
 ```ruby
 # in your controller

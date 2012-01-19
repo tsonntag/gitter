@@ -9,7 +9,8 @@ require 'tracks_grid'
 I18n.load_path = Dir[File.dirname(__FILE__) + '/locales/*.yml']
 I18n.default_locale = :en
 
-Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| puts f; require f}
+require 'support/database'
+Dir[File.dirname(__FILE__) + '/support/*.rb'].each{|f| require f}
 
 def check_include(*args)
   params = args.extract_options!
