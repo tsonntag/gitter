@@ -289,7 +289,7 @@ module TracksGrid
     def input_tags
       @input_tags ||= begin
         res = {} 
-        self.class.filters.each do |filter|
+        filters.each do |filter|
           if i = filter.input_tag
             res[filter.name] = i
           end
