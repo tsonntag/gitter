@@ -11,22 +11,22 @@ Ruby library for Rails which enables you to create
 
 ## Decorators
 
-* Extend an object with given classes (default is \<object.class\>Decorator, if defined)
-* Makes helpers accessible in object via :h
+* extend an object with given classes (default is \<object.class\>Decorator, if defined)
+* make helpers accessible in object via :h
 
-### Example:
+### Example
 
 Decorate a model in your controller:
 
 ```ruby
   def show
     article = Article.find(params[:id])
-    @article = Decorator.decorate(article, self)
+    @article = TracksGrid::Decorator.decorate(article, self)
   end
 ```
 
-Then @article will be extended by module ArticleDecorator, which 
-may access your helpers via :h
+Then @article will be extended by module ArticleDecorator
+and has access to your helpers via :h
 
 ```ruby
 module ArticleDecorator
@@ -35,7 +35,15 @@ module ArticleDecorator
   end
 end
 ```
+and your views may use the decoratored model: 
 
+```ruby
+-# app/views/articles/show.html.haml
+%h1 
+  Article
+  = @article.image
+
+```
 
 You may provide arbritary module classes:
 
@@ -46,7 +54,7 @@ def buy
   @buyer = Decorator.decorate(user, UserView, Buyer)
 end
 ```
-with
+extends user with the modules
 
 ```ruby
 module UserViews
