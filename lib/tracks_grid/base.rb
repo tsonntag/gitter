@@ -232,7 +232,6 @@ module TracksGrid
     # Args may be either the params hash of the request
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
-      puts "FFFFFFFFFFFFFFF initialize #{facets.inspect}"
       run_callbacks :initialize do
         @decorator = Decorator.new *args
         @params = @decorator.params || {}

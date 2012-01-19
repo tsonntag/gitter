@@ -60,12 +60,6 @@ module TracksGrid
       @data ||= begin
         value_to_count = filter_spec.counts(driver)
         values = opts[:include_zeros] ? filter_spec.distinct_values(driver) : value_to_count.keys
-
-        #puts "FFFFFFFFF facet #{name}, zero=#{opts[:include_zeros]}"
-        #puts "          distict: #{filter_spec.distinct_values(driver)}"
-        #puts "          value_to_count(#{value_to_count.class})=#{value_to_count.inspect}"
-        #puts "          values=#{values.inspect}"
-
         values.map do |value|
           FacetData.new self, value, (value_to_count[value]||0)
         end
