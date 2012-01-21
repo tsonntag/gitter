@@ -1,7 +1,7 @@
 module TracksGrid
 
   class Decorator
-    attr_reader :params, :view_context, :model
+    attr_reader :params, :view_context
     alias_method :h, :view_context
     
     class << self
@@ -40,21 +40,14 @@ module TracksGrid
     # evaluate data (string or proc)
     # if model is provided it will accessible in evaluated data
     def eval( data, model = nil )
-      @model = decorate model    
-      res = case data
-      when Proc 
-        self.instance_exec(&data)
-      else 
+      case data
+      when Proc
+        (model ? model : self).instance_exec(&data)
+      else
         data
       end
-      @model = nil
-      res
     end
 
-    def method_missing( *args )
-      @model ? @model.send(*args) : super
-    end
-    
     def decorate( model, decorator_classes = nil)
       return nil if model.nil?
       decorator_classes ||= @decorator_classes || default_decorator_class(model)

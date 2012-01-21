@@ -239,9 +239,7 @@ module TracksGrid
         @selected_filters = {}
         @filters_values = {}
         @params.each do |name, value|
-          puts "AAAAAAAAAAAAA#{name}"
           next if %w(per_page page).include? name.to_s
-          puts "AAAAAAAAAAAAA#{name}"
           if spec = self.class.filter_specs[name]
             filter = Filter.new self, spec
             @selected_filters[name] = filter
@@ -302,7 +300,7 @@ module TracksGrid
     end 
 
     def translate( prefix, key )
-      I18n.translate "#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
+      I18n.translate "tracks_grid.#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
     end
   end
 end

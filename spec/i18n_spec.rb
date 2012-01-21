@@ -29,6 +29,7 @@ describe 'I18n' do
     scope do Person.scoped end
     column :localname, :for => :name
   end
+  
   it 'should translate column headers' do
     check_local('en_header', 'de_header'){ __find__(HeaderGrid, :columns, :localname).header }
   end

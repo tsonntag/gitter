@@ -44,41 +44,13 @@ and your views may use the decoratored model:
   = @article.image
 ```
 
-You may provide arbritary module classes:
-
-```ruby
-# in your controller
-def buy
-  user = User.find(params[:id])
-  @buyer = Decorator.decorate(user, UserView, Buyer)
-end
-```
-extends user with the modules
-
-```ruby
-module UserViews
-  def view
-    "#{name} #{surname}"
-  end
-end
-```
-and
-
-```ruby
-module UserViews
-  def buy(item)
-    #.....
-  end
-end
-```
-
 [More about decorators](https://github.com/tracksun/tracksgrid/wiki/Decorators)
 
 ## Data Grids
 
 In order to define a grid you need to provide:
 
-* scope which returns the objects for the grid's rows
+* a scope which returns the objects for the grid's rows
 * filters that will be used to filter the rows
 * columns to be displayed
 
@@ -92,9 +64,8 @@ class ArticleGrid << TracksGrid::Grid
   scope do
     Article.where(:owner => h.current_user)
   end
-  
      
-  ### Then you may define filters 
+  ### Then you may define filters
 
   # filter by attribute
   filter :name
@@ -107,11 +78,11 @@ class ArticleGrid << TracksGrid::Grid
 
   # customized filter 
   filter :on_stock, do |scope|
-    scope.where(:stock > 0)
+    scope.where('stock > 0')
   end
 
- filter :out_of_stock do |scope|
-    scope.where(:stock = 0)
+  filter :out_of_stock do |scope|
+    scope.where(:stock => 0)
   end
   
   # select from given filters
@@ -132,10 +103,9 @@ class ArticleGrid << TracksGrid::Grid
   ### Define your data grid
 
   # show an attribute
-  # The header of this columns is looked in  from 'tracksgrid.article_grid.headers.acticle_no'
   column :article_no
   
-  # provide a hardcoded header
+  # provide a hardcoded header (i18n support also available)
   column :description, :header => 'Details'
 
   # make the column sortable
@@ -155,10 +125,11 @@ end
 ```
 
 [More about filters](https://github.com/tracksun/tracksgrid/wiki/Filters)
+
 [More about columns](https://github.com/tracksun/tracksgrid/wiki/Columns)
 
 
-#Using your grid
+#Rendering your grid
 
 For the most common use case -- your controller -- you simply do:
 
@@ -167,8 +138,6 @@ def index
   @grid = ArticleGrid.new(self)
 end
 ```
-
-In your views (haml for readabilty)
 
 Render you grid:
 
@@ -207,7 +176,7 @@ Render your facets:
 Render your breadcrumbs:
 
 ```haml
-@grid.breadcrumbs
+@grid.render_breadcrumbs
 ```
 
 
@@ -215,16 +184,16 @@ Render your breadcrumbs:
 
 
 
-### ORM Support
+# ORM Support
 
 * ActiveRecord
 * others: Help or suggestions are welcome
 
 
-### Credits
+# Credits
 
-[API inspired by datagrid](https://github.com/bogdan/datagrid)
+API inspired by [datagrid](https://github.com/bogdan/datagrid)
 
-### License
+# License
 
 TracksGrid is released under the MIT license
