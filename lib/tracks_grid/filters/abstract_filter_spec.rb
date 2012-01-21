@@ -9,6 +9,7 @@ module TracksGrid
        @label = opts[:label]
        @input_options = opts[:input]
        @input_tag = opts[:input_tag]
+       @include_blank = opts[:include_blank]
        
        # replace shortcut
        if coll = opts[:input_collection]

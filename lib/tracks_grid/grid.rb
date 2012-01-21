@@ -3,6 +3,7 @@ require 'tracks_grid/base'
 require 'tracks_grid/columns'
 require 'tracks_grid/breadcrumbs'
 require 'tracks_grid/decorator'
+require 'tracks_grid/csv'
 
 module TracksGrid
 
@@ -11,6 +12,7 @@ module TracksGrid
     include Driver
     include Columns
     include Breadcrumbs
+    include CSV
   end
 
 end

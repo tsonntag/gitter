@@ -9,7 +9,7 @@ module TracksGrid
     end
     
     def label
-      spec.label or grid.translate(:filters, name)
+      spec.label || grid.translate(:filters, name)
     end
 
     def counts
@@ -19,8 +19,10 @@ module TracksGrid
     def input_tag
       return '' unless spec.input? 
 
-      @input_tag ||= spec.input_tag || if col = collection 
-        select_tag [''] + grid.eval(col)
+      @input_tag ||= spec.input_tag || if col = collection
+        data = grid.eval(col)
+        data += [] if spec.include_blank?
+        select_tag data
       else
         text_field_tag
       end
