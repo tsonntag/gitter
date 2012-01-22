@@ -167,7 +167,7 @@ module TracksGrid
           filters = [select].flatten.map{|name| filter_specs[name] || scope_filter(name)}
           SelectFilterSpec.new name, filters, options
         when s = options.delete(:scope)
-          scope_filter( name || s, options )
+          scope_filter( s == true ? name : s, options )
         else 
           ColumnFilterSpec.new name, options
         end

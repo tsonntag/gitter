@@ -91,9 +91,6 @@ class ArticleGrid << TracksGrid::Grid
   # add to facets
   filter :category, :facet => true              
   
-  # select among named scopes
-  filter :price_range, :scopes => [:niceprice, :regular] 
-
   # you can provide 'search' like attributes
   filter :search, :ignore_case => true, :exact => false
   
