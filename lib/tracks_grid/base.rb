@@ -239,7 +239,6 @@ module TracksGrid
         @selected_filters = {}
         @filters_values = {}
         @params.each do |name, value|
-          next if %w(per_page page).include? name.to_s
           if spec = self.class.filter_specs[name]
             filter = Filter.new self, spec
             @selected_filters[name] = filter

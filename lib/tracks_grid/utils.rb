@@ -1,5 +1,5 @@
 module TracksGrid
-  module Helper
+  module Utils
     # dirty hack to avoid rails' sorted query in url
     def url_for( params )
       p = params.dup

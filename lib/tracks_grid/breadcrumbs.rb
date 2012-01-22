@@ -2,7 +2,7 @@ require 'active_support/concern'
   
 module TracksGrid
   module Breadcrumbs
-    include Helper
+    include Utils
 
     extend ActiveSupport::Concern
 

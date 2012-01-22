@@ -1,7 +1,7 @@
 module TracksGrid
 
   class FacetData
-    include Helper
+    include Utils
 
     attr_reader :facet, :value, :count
     delegate :grid, :name, :to => :facet
