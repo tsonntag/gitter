@@ -32,7 +32,7 @@ describe Column do
   it 'should have settable attribute' do
     class Foo < Gitter::Grid
       scope do Person.scoped end
-      column :name1, :for => :name
+      column :name1, :column => :name
     end   
     g = Foo.new
     col_spec = g.columns.detect_name :name1

@@ -7,7 +7,7 @@ module Gitter
     def initialize( name, opts = {}, &block )
       @name = name
       @header = opts[:header] 
-      @attr = opts[:for] 
+      @attr = opts[:column] 
       @order = case opts[:order] 
         when true then name
         when String, Symbol then opts[:order]

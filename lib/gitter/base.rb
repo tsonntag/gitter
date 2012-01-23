@@ -153,7 +153,7 @@ module Gitter
       #    
       #  filter :generation, :scopes => [:teen, :twen]
       # 
-      def filter *args, &block )
+      def filter( *args, &block )
         options = args.extract_options!
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
         name = args.first
