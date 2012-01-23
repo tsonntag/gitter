@@ -25,7 +25,7 @@ describe 'I18n' do
     check_local('en_label', 'de_label'){ __find__(PersonGrid, :facets, :localname).label }
   end
 
-  class HeaderGrid < TracksGrid::Grid
+  class HeaderGrid < Gitter::Grid
     scope do Person.scoped end
     column :localname, :for => :name
   end

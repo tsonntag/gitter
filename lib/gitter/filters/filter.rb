@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
   class Filter
     
     attr_reader :grid, :spec

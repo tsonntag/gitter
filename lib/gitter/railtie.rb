@@ -1,8 +1,8 @@
-module TracksGrid
+module Gitter
 
   class Railtie < Rails::Railtie
     config.after_initialize do 
-      #ApplicationController.send :include, TracksGrid::Controller
+      #ApplicationController.send :include, Gitter::Controller
     end
   end
 end

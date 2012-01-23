@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
   module CSV
     
     def to_csv(separator=',')

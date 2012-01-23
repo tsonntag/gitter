@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
 
   class AbstractFilterSpec
 

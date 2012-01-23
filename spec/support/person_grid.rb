@@ -1,4 +1,4 @@
-class PersonGrid < TracksGrid::Grid
+class PersonGrid < Gitter::Grid
 
   scope do
     Person.scoped
@@ -45,7 +45,7 @@ class PersonGrid < TracksGrid::Grid
 
   filter :age, :select => [:child, :teen, :twen, :other], :facet => true
 
-  filter :male_scope, :scope => :male_scope
+  filter :male_scope, :scope => true
   filter :female_scope, :scope => :female_scope
 
   filter :sex_scope, :select => [:male_scope, :female_scope]

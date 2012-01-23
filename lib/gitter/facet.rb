@@ -1,6 +1,6 @@
-require 'tracks_grid/utils'
+require 'gitter/utils'
 
-module TracksGrid
+module Gitter
 
   class FacetData
     include Utils

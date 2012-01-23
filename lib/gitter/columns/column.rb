@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
 
   class Column
     attr_reader :spec, :grid
@@ -72,7 +72,7 @@ module TracksGrid
     private
 
     def order_img
-      "#{TracksGrid::ASSETS}/images/sort_#{desc? ? 'asc' : 'desc'}.gif"
+      "#{Gitter::ASSETS}/images/sort_#{desc? ? 'asc' : 'desc'}.gif"
     end
 
     def order_img_tag

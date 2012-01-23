@@ -2,18 +2,18 @@ require 'spec_helper'
 
 include Persons
 
-describe TracksGrid do
+describe Gitter do
 
   context 'range filter' do
     it 'should complain for given block' do
       expect {
-        class RangeFilterErr < TracksGrid::Grid
+        class RangeFilterErr < Gitter::Grid
           filter :name, :range => true do
             # something
           end
         end
       }.to raise_error(
-        TracksGrid::ConfigurationError, /no block allowed/
+        Gitter::ConfigurationError, /no block allowed/
       )
     end
   end

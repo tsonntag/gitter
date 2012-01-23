@@ -1,5 +1,5 @@
-require 'tracks_grid/drivers/abstract_driver'
-module TracksGrid
+require 'gitter/drivers/abstract_driver'
+module Gitter
   
   class ActiveRecordDriver < AbstractDriver
     

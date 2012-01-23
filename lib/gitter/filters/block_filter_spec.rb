@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
 
   # scope = User.scoped
   #

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-include TracksGrid
+include Gitter
 
 describe Column do
   it 'should have name and header' do
@@ -30,7 +30,7 @@ describe Column do
   end
 
   it 'should have settable attribute' do
-    class Foo < TracksGrid::Grid
+    class Foo < Gitter::Grid
       scope do Person.scoped end
       column :name1, :for => :name
     end   

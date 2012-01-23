@@ -3,10 +3,10 @@ require 'active_support/core_ext/class/attribute'
 require 'active_model/callbacks'
 require 'artdeco'
 require 'i18n'
-require 'tracks_grid/filters.rb'
-require 'tracks_grid/facet.rb'
+require 'gitter/filters.rb'
+require 'gitter/facet.rb'
   
-module TracksGrid
+module Gitter
 
   module Base
     extend ActiveSupport::Concern
@@ -14,7 +14,7 @@ module TracksGrid
     included do 
       extend ActiveModel::Callbacks
       define_model_callbacks :initialize
-      mattr_accessor :filter_specs, :facets #, :instance_reader => false, :instance_writer => false
+      class_attribute :filter_specs, :facets, :instance_reader => false, :instance_writer => false
       self.filter_specs = {}
       self.facets = []
     end
@@ -36,7 +36,7 @@ module TracksGrid
       #
       # Simple column filter: 
       #
-      # class UserGrid << TracksGrid::Grid
+      # class UserGrid << Gitter::Grid
       #
       #   filter :name
       # end
@@ -153,7 +153,7 @@ module TracksGrid
       #    
       #  filter :generation, :scopes => [:teen, :twen]
       # 
-      def filter( *args, &block )
+      def filter *args, &block )
         options = args.extract_options!
         raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
         name = args.first
@@ -214,7 +214,7 @@ module TracksGrid
     # Select active users, order descending by name
     #
     # class UserGrid
-    #   include TracksGrid
+    #   include Gitter
     #
     #   filter :active
     # end
@@ -223,7 +223,7 @@ module TracksGrid
     # Select users born between 9.2.1980 and 3.10.1990 
     # 
     # class UserGrid
-    #   include TracksGrid
+    #   include Gitter
     #
     #   filter :birthday, :range => true
     # end
@@ -300,7 +300,7 @@ module TracksGrid
     end 
 
     def translate( prefix, key )
-      I18n.translate "tracks_grid.#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
+      I18n.translate "gitter.#{name}.#{prefix}.#{key}", :default => key.to_s.humanize
     end
   end
 end

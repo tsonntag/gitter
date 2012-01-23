@@ -1,11 +1,11 @@
 require 'active_support/concern'
-require 'tracks_grid/columns/column'
-require 'tracks_grid/columns/column_spec'
+require 'gitter/columns/column'
+require 'gitter/columns/column_spec'
 #require 'will_paginate'
 #require 'will_paginate/active_record'
 #require 'will_paginate/array'
   
-module TracksGrid
+module Gitter
   module Columns
     extend ActiveSupport::Concern
   

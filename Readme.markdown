@@ -1,50 +1,12 @@
 # gitter
 
 Ruby library for Rails which enables you to create
+data grids, i.e table like data with customizable
 
-* Decorators / presenters for your models
-* Data grids, i.e table like data with customizable
   * Filters
   * Sortables columns
   * Faceted search
   * Localization
-
-## Decorators
-
-* extend an object with given classes (default is \<object.class\>Decorator, if defined)
-* make helpers accessible in object via :h
-
-### Example
-
-Decorate a model in your controller:
-
-```ruby
-  def show
-    article = Article.find(params[:id])
-    @article = Gitter::Decorator.decorate(article, self)
-  end
-```
-
-Then @article will be extended by module ArticleDecorator
-and has access to your helpers via :h
-
-```ruby
-module ArticleDecorator
-  def image
-    h.image_tag('article')
-  end
-end
-```
-and your views may use the decoratored model: 
-
-```ruby
-# app/views/articles/show.html.haml
-%h1 
-  Article
-  = @article.image
-```
-
-[More about decorators](https://github.com/tracksun/gitter/wiki/Decorators)
 
 ## Data Grids
 

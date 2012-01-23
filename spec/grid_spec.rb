@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 include Persons
-include TracksGrid
+include Gitter
 
 describe Grid do
 

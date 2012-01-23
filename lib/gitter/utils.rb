@@ -1,4 +1,4 @@
-module TracksGrid
+module Gitter
   
   module Utils
     # dirty hack to avoid rails' sorted query in url

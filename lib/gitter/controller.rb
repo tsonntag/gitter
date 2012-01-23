@@ -1,6 +1,6 @@
 require 'artdeco'
 
-module TracksGrid
+module Gitter
   module Controller
     
     # todo

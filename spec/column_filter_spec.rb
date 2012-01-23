@@ -2,7 +2,7 @@ require 'spec_helper'
 
 include Persons
 
-describe TracksGrid do
+describe Gitter do
 
   context 'column filter' do 
     check_include Max,          :name => 'Max'

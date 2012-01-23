@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module TracksGrid
+module Gitter
   module Driver
     extend ActiveSupport::Concern
   
@@ -21,7 +21,7 @@ module TracksGrid
       def detect_driver_class
         case
         when Module.const_defined?(:ActiveRecord)
-          require 'tracks_grid/drivers/active_record_driver'
+          require 'gitter/drivers/active_record_driver'
           ActiveRecordDriver
         end
       end

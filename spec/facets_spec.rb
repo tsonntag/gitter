@@ -21,7 +21,7 @@ def check_facet_value( facet, value, count )
   v.params.should == { v.name => value }
 end
 
-describe TracksGrid do
+describe Gitter do
 
   context 'facets' do
     it 'should manage facets' do
@@ -30,7 +30,7 @@ describe TracksGrid do
     end
 
     it 'should handle facets ' do
-      class Bla < TracksGrid::Grid
+      class Bla < Gitter::Grid
         filter :foo, :facet => true
         filter :bar
       end

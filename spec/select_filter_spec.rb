@@ -2,7 +2,7 @@ require 'spec_helper'
 
 include Persons
 
-describe TracksGrid do
+describe Gitter do
 
   context 'filter with select' do
     check_include Joe, Dick,      :age => :teen

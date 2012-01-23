@@ -4,7 +4,7 @@
 
 require 'rspec'
 require 'i18n'
-require 'tracks_grid'
+require 'gitter'
 
 I18n.load_path = Dir[File.dirname(__FILE__) + '/locales/*.yml']
 I18n.default_locale = :en

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 include Persons
 
-describe TracksGrid do
+describe Gitter do
 
   context 'filter with scope' do
     check_include Tina, Dana, Lisa,     :female_scope => true 

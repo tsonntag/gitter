@@ -1,10 +1,10 @@
-require 'tracks_grid/driver'
-require 'tracks_grid/base'
-require 'tracks_grid/columns'
-require 'tracks_grid/breadcrumbs'
-require 'tracks_grid/csv'
+require 'gitter/driver'
+require 'gitter/base'
+require 'gitter/columns'
+require 'gitter/breadcrumbs'
+require 'gitter/csv'
 
-module TracksGrid
+module Gitter
 
   class Grid
     include Base

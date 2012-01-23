@@ -1,6 +1,6 @@
 require 'active_support/concern'
   
-module TracksGrid
+module Gitter
   module Breadcrumbs
     include Utils
 
