@@ -1,0 +1,10 @@
+en:
+  tracks_grid:
+    person_grid:
+      filters:
+        localname: 'en_name'
+      facets:
+        localname: 'en_label'
+    header_grid:
+      headers:
+        localname: 'en_header'

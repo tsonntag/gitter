@@ -1,0 +1,5 @@
+require 'tracks_grid/filters/filter'
+require 'tracks_grid/filters/abstract_filter_spec'
+require 'tracks_grid/filters/block_filter_spec'
+require 'tracks_grid/filters/select_filter_spec'
+require 'tracks_grid/filters/column_filter_spec'
