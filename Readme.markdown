@@ -1,4 +1,4 @@
-# Tracksgrid
+# gitter
 
 Ruby library for Rails which enables you to create
 
@@ -21,7 +21,7 @@ Decorate a model in your controller:
 ```ruby
   def show
     article = Article.find(params[:id])
-    @article = TracksGrid::Decorator.decorate(article, self)
+    @article = Gitter::Decorator.decorate(article, self)
   end
 ```
 
@@ -44,7 +44,7 @@ and your views may use the decoratored model:
   = @article.image
 ```
 
-[More about decorators](https://github.com/tracksun/tracksgrid/wiki/Decorators)
+[More about decorators](https://github.com/tracksun/gitter/wiki/Decorators)
 
 ## Data Grids
 
@@ -57,7 +57,7 @@ In order to define a grid you need to provide:
 Example:
 
 ```ruby
-class ArticleGrid << TracksGrid::Grid
+class ArticleGrid << Gitter::Grid
    
   ### First define the source for your data
   # helpers are accessible by #h
@@ -124,9 +124,9 @@ class ArticleGrid << TracksGrid::Grid
 end
 ```
 
-[More about filters](https://github.com/tracksun/tracksgrid/wiki/Filters)
+[More about filters](https://github.com/tracksun/gitter/wiki/Filters)
 
-[More about columns](https://github.com/tracksun/tracksgrid/wiki/Columns)
+[More about columns](https://github.com/tracksun/gitter/wiki/Columns)
 
 
 #Rendering your grid
@@ -152,7 +152,7 @@ Render you grid:
       - row.each do |cell|
       %th = cell 
 ```
-[More about grids](https://github.com/tracksun/tracksgrid/wiki/Grids)
+[More about grids](https://github.com/tracksun/gitter/wiki/Grids)
 
 # Facets
 
@@ -169,7 +169,7 @@ Render your facets:
           = link_to "(#{data.count})", data.link
 
 ```
-[More about facets](https://github.com/tracksun/tracksgrid/wiki/Facets)
+[More about facets](https://github.com/tracksun/gitter/wiki/Facets)
 
 # Breadcrumbs
 
@@ -180,7 +180,7 @@ Render your breadcrumbs:
 ```
 
 
-[More about inputs](https://github.com/tracksun/tracksgrid/wiki/Inputs)
+[More about inputs](https://github.com/tracksun/gitter/wiki/Inputs)
 
 
 
@@ -196,4 +196,4 @@ API inspired by [datagrid](https://github.com/bogdan/datagrid)
 
 # License
 
-TracksGrid is released under the MIT license
+Gitter is released under the MIT license
