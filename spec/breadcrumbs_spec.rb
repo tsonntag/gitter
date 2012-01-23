@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-include Persons
 include Gitter
 
 describe Grid do

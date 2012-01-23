@@ -141,9 +141,7 @@ Render your breadcrumbs:
 @grid.render_breadcrumbs
 ```
 
-
 [More about inputs](https://github.com/tracksun/gitter/wiki/Inputs)
-
 
 
 # ORM Support
