@@ -21,6 +21,10 @@ module Gitter
        @input_options || @input_tag
      end
 
+     def include_blank?
+       @include_blank
+     end
+
      def counts( driver )
        { true => driver.class.new(apply(driver)).count }
      end

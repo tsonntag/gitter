@@ -57,7 +57,10 @@ module Gitter
     end
  
     def rows( driver = self.scope )
-      driver.map{|model| row_for model}
+      driver.map do |model| 
+        decorator.decorate model
+        row_for model
+      end
     end
  
     def columns
