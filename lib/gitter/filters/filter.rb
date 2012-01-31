@@ -21,7 +21,7 @@ module Gitter
 
       @input_tag ||= spec.input_tag || if col = collection
         data = grid.eval(col)
-        data += [] if spec.include_blank?
+        data = data.unshift ''if spec.include_blank?
         select_tag data
       else
         text_field_tag

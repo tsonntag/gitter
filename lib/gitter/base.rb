@@ -151,7 +151,7 @@ module Gitter
       #   scope :twen, lambda{ where :birthday => (20.years.ago..29.years.ago)} 
       # end
       #    
-      #  filter :generation, :scopes => [:teen, :twen]
+      #  filter :generation, :select => [:teen, :twen]
       # 
       def filter( *args, &block )
         options = args.extract_options!
