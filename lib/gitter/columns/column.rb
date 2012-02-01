@@ -19,12 +19,27 @@ module Gitter
       if spec.block
         grid.eval spec.block, model
       else
-        model.send(spec.attr||name)
+        model.send spec.attr
       end
     end
 
     def ordered
-      spec.ordered grid.driver, params[:desc]
+      desc = case params[:desc]
+        when true, 'true' then spec.order_desc || true
+        when false, 'false' then false 
+        else params[:desc]
+      end
+
+      if ordered?
+        if Proc === spec.order
+          arr = grid.driver.scope.map{|model| [model.instance_eval(&spec.order),model]}
+          grid.driver.new arr.sort{|a,b| (desc ? -1 : 1)*(a<=>b) }.map{|a|a[1]}
+        else
+          grid.driver.order spec.order, desc
+        end
+      else
+        grid.driver
+      end
     end
 
     def header
