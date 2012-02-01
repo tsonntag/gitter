@@ -3,7 +3,6 @@ require 'artdeco'
 module Gitter
   module Controller
     
-    # todo
     def render_grid( grid_class, decorator_classes = nil )
       opts = {}
       opts[:decorators] = decorator_classes if decorator_classes

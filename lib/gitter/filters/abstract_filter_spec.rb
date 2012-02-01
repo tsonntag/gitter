@@ -26,7 +26,7 @@ module Gitter
      end
 
      def counts( driver )
-       { true => driver.class.new(apply(driver)).count }
+       { true => apply(driver.unordered).count }
      end
 
      def distinct_values( driver )

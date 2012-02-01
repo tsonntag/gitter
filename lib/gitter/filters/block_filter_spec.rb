@@ -17,7 +17,7 @@ module Gitter
      end
 
      def apply( driver, *args )
-       driver.new @block.call(driver.scope, *args)
+       driver.class.new @block.call(driver.scope, *args)
      end
      
   end

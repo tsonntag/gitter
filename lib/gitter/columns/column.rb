@@ -61,7 +61,7 @@ module Gitter
     end
 
     def link( opts = {} )
-      if ordered?
+      if spec.ordered?
         direction = ordered? ? (desc? ? '^' : 'v') : ''
         grid.h.link_to (direction + header), order_params.merge(opts)
       else

@@ -1,9 +1,6 @@
 require 'active_support/concern'
 require 'gitter/columns/column'
 require 'gitter/columns/column_spec'
-#require 'will_paginate'
-#require 'will_paginate/active_record'
-#require 'will_paginate/array'
   
 module Gitter
   module Columns
@@ -40,13 +37,13 @@ module Gitter
       end
     end
   
-    def scope_with_columns( ordered = nil )
-      @scope_with_columns ||= @order_column ? @order_column.ordered : scope_without_columns(ordered)
+    def scope_with_columns
+      @scope_with_columns ||= @order_column ? @order_column.ordered.scope : scope_without_columns
     end
  
-    #def paginate
-    #  @paginate ||= ordered.scope.paginate @paginate_hash
-    #end
+    def paginate( *args )
+      @paginate ||= scope.paginate *args
+    end
  
     def headers
       @headers ||= columns.map &:header

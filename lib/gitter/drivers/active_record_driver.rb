@@ -14,6 +14,10 @@ module Gitter
       new scope.order(what)
     end
    
+    def unordered
+      new scope.except(:order)
+    end
+
     def where( attr_values, exact = true, ignore_case = true)
       # has range?
       return new scope.where(attr_values) if Range === attr_values.values.first

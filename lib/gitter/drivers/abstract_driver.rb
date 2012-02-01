@@ -10,6 +10,8 @@ module Gitter
     end
 
     # methods to be implemented
+
+    # unordered
     
     # order( attr, desc = nil)
 

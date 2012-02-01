@@ -2,7 +2,7 @@ module Gitter
   class Filter
     
     attr_reader :grid, :spec
-    delegate :name, :to => :spec
+    delegate :name, :apply, :to => :spec
     
     def initialize( grid, spec )
       @grid, @spec = grid, spec
@@ -21,7 +21,7 @@ module Gitter
 
       @input_tag ||= spec.input_tag || if col = collection
         data = grid.eval(col)
-        data = data.unshift ''if spec.include_blank?
+        data = [''] + data if spec.include_blank?
         select_tag data
       else
         text_field_tag

@@ -28,10 +28,6 @@ module Gitter
         end 
       end
 
-      def order( order = nil )
-        order ? (@order = order) : @order
-      end
-
       # Examples:
       #
       # Simple column filter: 
@@ -264,14 +260,13 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @filters_values.each{|filter, value| d = filter.spec.apply(d, value, @params) }
+        @filters_values.each{|filter, value| d = filter.apply d, value, @params }
         d
       end
     end
     
-    # returns scope which default order
-    def scope( ordered = self.class.order )
-      @scope ||= (ordered ? filtered_driver.order(self.class.order) : filtered_driver).scope
+    def scope
+      @scope ||= filtered_driver.scope
     end
 
     def facets
