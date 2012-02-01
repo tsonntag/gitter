@@ -23,6 +23,7 @@ module Gitter
         when true then @order_desc || true
         else false
       end
+      puts "OOOOOOOOOO #{self.name}, order_desc=#{order_desc}, ordered?= #{ordered?}"
       if ordered?
         driver.order @order, order_desc
       else

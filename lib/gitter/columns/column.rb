@@ -61,9 +61,11 @@ module Gitter
     end
 
     def link( opts = {} )
+      img = order_img_tag(opts) 
       if spec.ordered?
-        direction = ordered? ? (desc? ? '^' : 'v') : ''
-        grid.h.link_to (direction + header), order_params.merge(opts)
+        label = header
+        label = h.content_tag :span, img + header if ordered?
+        h.link_to label, order_params.merge(opts)
       else
         header 
       end 
@@ -71,12 +73,14 @@ module Gitter
 
     private
 
-    def order_img
-      "#{Gitter::ASSETS}/images/sort_#{desc? ? 'asc' : 'desc'}.gif"
+    def h
+     grid.h
     end
 
-    def order_img_tag
-      ordered ? grid.h.image_tag(order_img) : ''
+    def order_img_tag( opts = {} )
+      desc_img = opts.delete(:desc_img){'sort_desc.gif'} 
+      asc_img  = opts.delete(:asc_img){'sort_asc.gif'} 
+      h.image_tag( desc? ? desc_img : asc_img)
     end
 
     def to_boolean(s)

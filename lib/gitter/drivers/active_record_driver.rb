@@ -7,11 +7,12 @@ module Gitter
     
     def order( attr, desc = nil)
       what = case desc
-        when true then "#{attr} DESC"
+        when true, 'true' then "#{attr} DESC"
+        when false, 'false' then attr
         when String then desc
-        else attr
+        else attr 
       end
-      new scope.order(what)
+      new scope.except(:order).order(what)
     end
    
     def unordered
