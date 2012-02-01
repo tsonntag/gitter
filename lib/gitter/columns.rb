@@ -70,6 +70,7 @@ module Gitter
       if order = @params[:order]
         if column_spec = self.class.column_specs[:"#{order}"] 
           @order_column = Column.new(self, column_spec)
+          puts "OOOOOOOOOOOO order_column=#{@order_column.name}"
         else
           raise ArgumentError, "invalid order column #{order}"
         end 
