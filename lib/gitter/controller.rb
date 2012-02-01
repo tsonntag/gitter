@@ -11,7 +11,7 @@ module Gitter
     
     # todo
     def decorate( model, decorator_classes = nil )
-      Artdeco::Decorator.new(self).decorator( model, decorator_classes )
+      Artdeco::Decorator.new(self).decorate model, decorator_classes
     end
     
   end
