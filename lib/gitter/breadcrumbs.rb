@@ -20,11 +20,15 @@ module Gitter
       @rendered_breadcrumbs ||= begin
         p = {}
         text = @filters_values.map do |filter, value|
-          s =  h.content_tag :span, "#{filter.label} : ", :class => 'breadcrumb_key'
-          s += h.content_tag :span, value,                :class => 'breadcrumb_value'            
-          p[filter.name] = value
-          h.link_to s, url_for(p)
-        end.join(join)
+          if value.present?
+            s =  h.content_tag :span, "#{filter.label} : ", :class => 'breadcrumb_key'
+            s += h.content_tag :span, value,                :class => 'breadcrumb_value'            
+            p[filter.name] = value
+            h.link_to s, url_for(p)
+          else
+            nil
+          end
+        end.compact.join(join)
         h.content_tag :span, text, {:class => 'breadcrumbs'}, false
       end
     end
