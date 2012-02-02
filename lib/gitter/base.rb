@@ -24,7 +24,7 @@ module Gitter
         if scope
           @scope = scope
         else
-          @scope or raise ConfigurationError
+          @scope or raise ConfigurationError, 'missing scope'
         end 
       end
 
@@ -180,6 +180,7 @@ module Gitter
       end
   
       private
+
       def range_filter( name, options )
         column = options.delete(:column){name}
 
@@ -230,11 +231,13 @@ module Gitter
     # or an object which responds to :params and optionaly to :view_context, e.g. a controller instance
     def initialize( *args )
       run_callbacks :initialize do
-        @decorator = Artdeco::Decorator.new *args
+        opts = args.extract_options!
+        @decorator = Artdeco::Decorator.new *args, opts
         @params = @decorator.params || {}
-  
-        @selected_filters = {}
-        @filters_values = {}
+
+        @scope = opts.delete(:scope){self.class.scope}
+
+        @selected_filters, @filters_values = {}, {}
         @params.each do |name, value|
           if spec = self.class.filter_specs[name]
             filter = Filter.new self, spec
@@ -254,7 +257,7 @@ module Gitter
     end
 
     def driver
-      @driver ||= self.class.create_driver eval(self.class.scope) 
+      @driver ||= self.class.create_driver eval(@scope) 
     end
 
     def filtered_driver
@@ -266,7 +269,7 @@ module Gitter
     end
     
     def scope
-      @scope ||= filtered_driver.scope
+      filtered_driver.scope
     end
 
     def facets

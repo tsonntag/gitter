@@ -3,13 +3,14 @@ require 'artdeco'
 module Gitter
   module Controller
     
-    def render_grid( grid_class, decorator_classes = nil )
-      opts = {}
-      opts[:decorators] = decorator_classes if decorator_classes
+    def self.included(base)
+      base.helper_method :render_grid, :decorate
+    end
+
+    def render_grid( grid_class, opts = {} )
       grid_class.new self, opts
     end
     
-    # todo
     def decorate( model, decorator_classes = nil )
       Artdeco::Decorator.new(self).decorate model, decorator_classes
     end

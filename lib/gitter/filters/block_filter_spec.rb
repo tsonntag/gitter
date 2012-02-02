@@ -19,12 +19,7 @@ module Gitter
      def apply( driver, *args )
        opts = args.extract_options!
 
-       raise ArgumentError, "too many arguments #{args.inspect}" unless args.size == 1
-       value = args.first
-
-       return driver if value.blank?
-
-       driver.new @block.call(driver.scope, value)
+       driver.new @block.call(driver.scope, *args)
      end
      
   end

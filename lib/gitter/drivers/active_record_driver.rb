@@ -31,15 +31,12 @@ module Gitter
         text = exact ? value : "%#{value}%"
         col, token = attr, ":q#{token_i}"
         col, token = upper(col), upper(token) if ignore_case
-        puts "AAAAAAAAAAAA before #{col}, #{token}"
         col = format.call(col) if format
-        puts "AAAAAAAAAAAA after #{col}, #{token}"
         tokens[:"q#{token_i}"] = text 
         token_i += 1
         "#{col} #{exact ? '=' : 'LIKE'} #{token}"
       end
 
-      puts "CCCCCCCCCCCC #{conditions.inspect},  tokens=#{tokens.inspect}"
       new scope.where("( #{conditions * ') OR ('} )", tokens)
     end
 
