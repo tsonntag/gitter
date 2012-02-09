@@ -2,7 +2,11 @@ module Gitter
 
   class Header
 
-    attr_reader :grid, :spec, :column
+    def self.blank
+      new nil, HeaderSpec.blank
+    end
+
+    attr_reader :spec, :column
     delegate :name, :span, :column_spec, :to => :spec
     
     def initialize grid, spec, opts = {}
@@ -13,17 +17,21 @@ module Gitter
     def label
       @label ||= case spec.content
 	when false then ''
-	when nil   then grid.translate(:headers, name)
-        else grid.eval(spec.content)
+	when nil   then @grid.translate(:headers, name)
+        else @grid.eval(spec.content)
       end
     end
 
     def link *args
-      column.link label, *args
+      if column
+        column.link label, *args
+      else
+	label
+      end
     end
 
     def to_s
-      "Header(#{name},#{span > 1 ? span+',' : ''}#{column_spec ? 'col,':''}label=#{label})"
+      "Header(#{name},#{span > 1 ? "#{span}," : ''}#{column_spec ? 'col,':''}label=#{label})"
     end
   end
 

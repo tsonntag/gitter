@@ -2,6 +2,10 @@ module Gitter
 
   class HeaderSpec
 
+    def self.blank
+      new :blank, false
+    end
+
     attr_reader :name, :content, :span, :column_spec
 
     def initialize name, content, opts = {}
@@ -11,7 +15,7 @@ module Gitter
     end
 
     def to_s
-      "HeaderSpec(#{name}),#{span > 1 ? ','+span : ''},#{column_spec ? ',col' : ''})"
+      "HeaderSpec(#{name})#{span > 1 ? ",#{span}": ""}#{column_spec ? ',col' : ''})"
     end
   end
 

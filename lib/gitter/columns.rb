@@ -22,12 +22,14 @@ module Gitter
     module ClassMethods
 
       def header_row
-        self.header_specs_rows << [self.current_header_specs_row = []]
+        self.current_header_specs_row = []
+	yield
+        self.header_specs_rows += [self.current_header_specs_row]
       end
 
-      def header opts = {}, &block 
-	name = opts.delete(:name){nil}
-	self.current_header_specs_row << HeaderSpec.new(name, block, opts)
+      def header *args, &block 
+        opts = args.extract_options!
+	self.current_header_specs_row += [HeaderSpec.new(args.first, block, opts)]
       end
 
       # adds a column to be displayed
@@ -66,7 +68,6 @@ module Gitter
           header_specs_row.map{|header_spec| Header.new self, header_spec}
 	end
 
-    	puts "RRRRRR #{rows.size}"
 	rows.each do |row|
     	  puts "RRRRRR #{row.inspect}"
 	end
@@ -77,7 +78,7 @@ module Gitter
           puts "CCCCCCC col=#{col}, #{col.headers.size} headers=#{col.headers.map{|h|h.label}.join(' | ')}"
 	end
 
-	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] }}
+	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] || Header.blank }}
 
 	columns_headers.each do |col|
     	  puts "DDDDDD #{col.inspect}"
