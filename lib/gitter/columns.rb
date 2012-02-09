@@ -25,7 +25,8 @@ module Gitter
         self.header_specs_rows << [self.current_header_specs_row = []]
       end
 
-      def header name = nil, opts = {}, &block 
+      def header opts = {}, &block 
+	name = opts.delete(:name){nil}
 	self.current_header_specs_row << HeaderSpec.new(name, block, opts)
       end
 
@@ -62,7 +63,7 @@ module Gitter
     def header_rows
       @header_rows ||= begin
         rows = self.class.header_specs_rows.map do |header_specs_row|
-          header_specs_row.map{|header_spec| Header.new grid, header_spec}
+          header_specs_row.map{|header_spec| Header.new self, header_spec}
 	end
 
     	puts "RRRRRR #{rows.size}"
