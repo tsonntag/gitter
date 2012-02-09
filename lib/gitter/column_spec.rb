@@ -23,6 +23,9 @@ module Gitter
       !!@order
     end
 
+    def to_s
+      "ColumnSpec(#{name},ordered=#{ordered?},#{header_specs.size} headers)"
+    end
   end
 
 end

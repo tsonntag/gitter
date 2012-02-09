@@ -43,14 +43,7 @@ module Gitter
     end
 
     def headers
-      header_specs.map do |header_spec|
-        Header.new grid, header_spec, :column => self
-      end
-      case spec.headers
-      when false then [] 
-      when nil   then [grid.translate(:headers, name)]
-      else [grid.eval(spec.headers)].flatten
-      end
+      @headers ||= spec.header_specs.map{|spec| Header.new grid, spec, :column => self}
     end
 
     # if current params contain order for this column then revert direction 
@@ -84,6 +77,10 @@ module Gitter
       else
         label
       end
+    end
+
+    def to_s
+      "Column(#{name},ordered=#{ordered?})"
     end
 
     private

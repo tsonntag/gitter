@@ -1,6 +1,8 @@
 require 'active_support/concern'
-require 'gitter/columns/column'
-require 'gitter/columns/column_spec'
+require 'gitter/column'
+require 'gitter/column_spec'
+require 'gitter/header'
+require 'gitter/header_spec'
   
 module Gitter
   module Columns
@@ -8,13 +10,25 @@ module Gitter
   
     included do
       self.class_attribute :column_specs, :instance_reader => false, :instance_writer => false
+      self.class_attribute :header_specs_rows, :instance_reader => false, :instance_writer => false
+      self.class_attribute :current_header_specs_row, :instance_reader => false, :instance_writer => false
       self.column_specs = {}
+      self.header_specs_rows = [] 
 
       after_initialize :initialize_columns
       alias_method_chain :scope, :columns
     end
   
     module ClassMethods
+
+      def header_row
+        self.header_specs_rows << [self.current_header_specs_row = []]
+      end
+
+      def header name = nil, opts = {}, &block 
+	self.current_header_specs_row << HeaderSpec.new(name, block, opts)
+      end
+
       # adds a column to be displayed
       #
       # Example:
@@ -41,28 +55,46 @@ module Gitter
       @scope_with_columns ||= @order_column ? @order_column.ordered.scope : scope_without_columns
     end
  
-    def paginate( *args )
+    def paginate *args 
       @paginate ||= scope.paginate *args
     end
  
     def header_rows
       @header_rows ||= begin
+        rows = self.class.header_specs_rows.map do |header_specs_row|
+          header_specs_row.map{|header_spec| Header.new grid, header_spec}
+	end
+
+    	puts "RRRRRR #{rows.size}"
+	rows.each do |row|
+    	  puts "RRRRRR #{row.inspect}"
+	end
+
         max = columns.map{|col|col.headers.size}.max
-	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] || ''}}
+	puts "MMMMMMMMM max=#{max}"
+	columns.each do |col|
+          puts "CCCCCCC col=#{col}, #{col.headers.size} headers=#{col.headers.map{|h|h.label}.join(' | ')}"
+	end
+
+	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] }}
+
 	columns_headers.each do |col|
-    	  puts "CCCCCC #{col.inspect}"
+    	  puts "DDDDDD #{col.inspect}"
 	end
-	columns_headers.transpose.each do |h|
-    	  puts "HHHHH #{h.inspect}"
+
+	columns_headers.transpose.each do |headers|
+    	  puts "HHHHH #{headers.map{|h|"%10s" % h.label}.join(' | ')}"
 	end
+
+	rows += columns_headers.transpose
       end
     end
  
-    def row_for(model)
+    def row_for model
       columns.map{|c| c.cell model }
     end
  
-    def rows( driver = self.scope )
+    def rows driver = self.scope 
       driver.map do |model| 
         @decorator.decorate model
         row_for model
@@ -78,7 +110,7 @@ module Gitter
     def initialize_columns
       if order = @params[:order]
         if column_spec = self.class.column_specs[:"#{order}"] 
-          @order_column = Column.new(self, column_spec)
+          @order_column = Column.new self, column_spec 
         else
           raise ArgumentError, "invalid order column #{order}"
         end 

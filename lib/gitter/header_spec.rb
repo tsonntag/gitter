@@ -2,14 +2,17 @@ module Gitter
 
   class HeaderSpec
 
-    attr_readet :name, :content, :span, :column_spec
+    attr_reader :name, :content, :span, :column_spec
 
     def initialize name, content, opts = {}
-      @name, @content = content, name
+      @name, @content = name, content
       @span = opts[:span] || 1
       @column_spec = opts[:column_spec]
     end
 
+    def to_s
+      "HeaderSpec(#{name}),#{span > 1 ? ','+span : ''},#{column_spec ? ',col' : ''})"
+    end
   end
 
 end
