@@ -42,11 +42,14 @@ module Gitter
       end
     end
 
-    def header
-      case spec.header
-      when false then ''
-      when nil   then grid.translate(:headers, name)
-      else grid.eval(spec.header)
+    def headers
+      header_specs.map do |header_spec|
+        Header.new grid, header_spec, :column => self
+      end
+      case spec.headers
+      when false then [] 
+      when nil   then [grid.translate(:headers, name)]
+      else [grid.eval(spec.headers)].flatten
       end
     end
 
@@ -72,27 +75,27 @@ module Gitter
       @ordered ||= params[:order] == name.to_s
     end
 
-    def link params = {}, opts = {} 
-      img = order_img_tag(opts) 
+    def link label = nil, params = {}, opts = {}
+      label ||= headers.first.label
       if spec.ordered?
-        label = header
-        label = h.content_tag :span, img + header if ordered?
+        img = order_img_tag(opts)
+        label = h.content_tag :span, img + label if ordered?
         h.link_to label, order_params.merge(params), opts
       else
-        header 
-      end 
+        label
+      end
     end
 
     private
 
-    def h
-     grid.h
+    def order_img_tag opts = {}
+      desc_img = opts.delete(:desc_img){'sort_desc.gif'}
+      asc_img  = opts.delete(:asc_img){'sort_asc.gif'}
+      h.image_tag( desc? ? desc_img : asc_img)
     end
 
-    def order_img_tag opts = {} 
-      desc_img = opts.delete(:desc_img){'sort_desc.gif'} 
-      asc_img  = opts.delete(:asc_img){'sort_asc.gif'} 
-      h.image_tag( desc? ? desc_img : asc_img)
+    def h
+     grid.h
     end
 
     def to_boolean s

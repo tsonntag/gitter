@@ -45,8 +45,17 @@ module Gitter
       @paginate ||= scope.paginate *args
     end
  
-    def headers
-      @headers ||= columns.map &:header
+    def header_rows
+      @header_rows ||= begin
+        max = columns.map{|col|col.headers.size}.max
+	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] || ''}}
+	columns_headers.each do |col|
+    	  puts "CCCCCC #{col.inspect}"
+	end
+	columns_headers.transpose.each do |h|
+    	  puts "HHHHH #{h.inspect}"
+	end
+      end
     end
  
     def row_for(model)

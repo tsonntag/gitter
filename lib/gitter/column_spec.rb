@@ -2,11 +2,13 @@ module Gitter
 
   class ColumnSpec
 
-    attr_reader :name, :header, :attr, :block, :order, :order_desc
+    attr_reader :name, :header_specs, :attr, :block, :order, :order_desc
 
     def initialize( name, opts = {}, &block )
       @name = name
-      @header = opts[:header] 
+      @header_specs = [opts[:header] || opts[:headers]].flatten.compact.map do |content|
+        HeaderSpec.new name, content, :column_spec => self
+      end
       @attr = opts[:column] || name
       @order = case opts[:order] 
         when true then attr

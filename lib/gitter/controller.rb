@@ -11,8 +11,8 @@ module Gitter
       grid_class.new self, opts
     end
     
-    def decorate( model, decorator_classes = nil )
-      Artdeco::Decorator.new(self).decorate model, decorator_classes
+    def decorate( model, *decorator_classes )
+      Artdeco::Decorator.new(self).decorate model, *decorator_classes
     end
     
   end
