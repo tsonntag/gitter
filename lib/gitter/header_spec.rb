@@ -6,17 +6,16 @@ module Gitter
       new :blank, false
     end
 
-    attr_reader :name, :content, :colspan, :rowspan, :column_spec
+    attr_reader :name, :content, :html_options, :column_spec
 
     def initialize name, content, opts = {}
       @name, @content = name, content
-      @colspan = opts[:colspan] || 1
-      @rowspan = opts[:rowspan] || 1
-      @column_spec = opts[:column_spec]
+      @column_spec = opts.delete(:column_spec){nil}
+      @html_options = opts
     end
 
     def to_s
-      "HeaderSpec(#{name},colspan=#{colspan},rowspan=#{rowspan}#{column_spec ? ',col' : ''})"
+      "HeaderSpec(#{name},html_options=#{html_options}#{column_spec ? ',col' : ''})"
     end
   end
 

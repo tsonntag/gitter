@@ -7,7 +7,7 @@ module Gitter
     end
 
     attr_reader :spec, :column
-    delegate :name, :colspan, :rowspan, :column_spec, :to => :spec
+    delegate :name, :html_options, :column_spec, :to => :spec
     
     def initialize grid, spec, opts = {}
       @grid, @spec = grid, spec
@@ -31,7 +31,7 @@ module Gitter
     end
 
     def to_s
-      "Header(#{name},colspan=#{colspan},rowspan=#{rowspan}#{column_spec ? ',col':''},label=#{label})"
+      "Header(#{name},html_options=#{html_options},#{column_spec ? ',col':''},label=#{label})"
     end
   end
 
