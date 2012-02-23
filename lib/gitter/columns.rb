@@ -49,8 +49,8 @@ module Gitter
       #   model.birthday.strftime("%Y")
       # end
       #
-      def column( name, opts = {}, &block )
-        self.column_specs = self.column_specs.merge name => ColumnSpec.new(name, opts, &block)
+      def column name, opts = {}, &block
+        self.column_specs = self.column_specs.merge(name => ColumnSpec.new(name, opts, &block))
       end
     end
   
