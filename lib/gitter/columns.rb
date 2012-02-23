@@ -68,25 +68,9 @@ module Gitter
           header_specs_row.map{|header_spec| Header.new self, header_spec}
 	end
 
-	rows.each do |row|
-    	  puts "RRRRRR #{row.inspect}"
-	end
-
         max = columns.map{|col|col.headers.size}.max
-	puts "MMMMMMMMM max=#{max}"
-	columns.each do |col|
-          puts "CCCCCCC col=#{col}, #{col.headers.size} headers=#{col.headers.map{|h|h.label}.join(' | ')}"
-	end
 
 	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] || Header.blank }}
-
-	columns_headers.each do |col|
-    	  puts "DDDDDD #{col.inspect}"
-	end
-
-	columns_headers.transpose.each do |headers|
-    	  puts "HHHHH #{headers.map{|h|"%10s" % h.label}.join(' | ')}"
-	end
 
 	rows += columns_headers.transpose
       end

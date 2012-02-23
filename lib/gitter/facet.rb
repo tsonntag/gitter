@@ -18,7 +18,7 @@ module Gitter
 
     def link
       h = grid.h
-      p = h.request.query_parameters
+      p = h.request.query_parameters.dup
       p.delete(:show)
       p[name] = value.nil? ? '' : value
       p[:page] = 1
