@@ -77,7 +77,7 @@ module Gitter
     end
  
     def row_for model
-      columns.map{|c| c.cell model }
+      columns.map{|c| c.cell model }.compact
     end
  
     def rows driver = self.scope 

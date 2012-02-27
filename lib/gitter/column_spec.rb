@@ -6,7 +6,8 @@ module Gitter
 
     def initialize name, opts = {}, &block
       @name = name
-      if header_opts = opts[:header] || opts[:headers]
+      if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
+         header_opts = opts.fetch(:header){opts.fetch(:headers)}
          @header_specs = [header_opts].flatten.map do |header_spec|
            case header_spec
            when Hash
@@ -15,8 +16,8 @@ module Gitter
            else
              content = header_spec
              h_opts = {}
-            end
-          HeaderSpec.new name, content, h_opts.merge(:column_spec => self)
+           end
+           HeaderSpec.new name, content, h_opts.merge(:column_spec => self)
         end
       else
         @header_specs = [HeaderSpec.new(name, nil, opts.merge(:column_spec => self))]

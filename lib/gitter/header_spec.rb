@@ -9,6 +9,7 @@ module Gitter
     attr_reader :name, :content, :html_options, :column_spec
 
     def initialize name, content, opts = {}
+	    puts "HHHHHHHHHHHH #{name}, >>>#{content}<<< #{content.class}"
       @name, @content = name, content
       @column_spec = opts.delete(:column_spec){nil}
       @html_options = opts
