@@ -4,7 +4,7 @@ module Gitter
     attr_reader :grid, :spec
     delegate :name, :apply, :to => :spec
     
-    def initialize( grid, spec )
+    def initialize  grid, spec
       @grid, @spec = grid, spec
     end
     
@@ -22,7 +22,7 @@ module Gitter
       @input_tag ||= spec.input_tag || if col = collection
         data = grid.eval(col)
         data = [''] + data if spec.include_blank?
-        select_tag data
+        select_tag
       else
         text_field_tag
       end
@@ -30,15 +30,21 @@ module Gitter
 
     def text_field_tag
       filter_name = name
-      @text_field_tag ||= grid.eval proc{ h.text_field_tag filter_name, h.params[filter_name], :class => 'grid'}
+      tag_name = scoped_name
+      @text_field_tag ||= grid.eval proc{ h.text_field_tag tag_name, h.params[filter_name], :class => 'grid'}
     end
 
     def select_tag( collection )
       filter_name = name
-      grid.eval proc{ h.select_tag filter_name, h.options_for_select(collection, h.params[filter_name]), :class => 'grid' }
+      tag_name = scoped_name
+      grid.eval proc{ h.select_tag tag_name, h.options_for_select(collection, h.params[filter_name]), :class => 'grid' }
     end
  
     private
+    def scoped_name 
+      "#{grid.key}[#{name}]"
+    end
+
     def collection
       spec.input_options.respond_to?(:[]) && spec.input_options[:collection]
     end

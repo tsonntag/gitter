@@ -201,6 +201,7 @@ module Gitter
 
     end
 
+
     attr_reader :params
 
     # attrs: <filter_name> => <value>, ...
@@ -233,7 +234,10 @@ module Gitter
       run_callbacks :initialize do
         opts = args.extract_options!
         @decorator = Artdeco::Decorator.new *args, opts
-        @params = @decorator.params || {}
+	puts "PPPPPPPPPPPPP params=#{@decorator.params.inspect}, key=#{key}"
+        @params = @decorator.params.fetch(key){{}}.symbolize_keys
+	puts "PPPPPPPPPPPPP @params=#{@params.inspect}"
+        #@params = @decorator.params || {}
 
         @scope = opts.delete(:scope){self.class.scope}
 
@@ -250,6 +254,14 @@ module Gitter
     
     def name
       @name ||= self.class.name.underscore
+    end
+
+    def key
+      @key ||= name.intern
+    end 
+
+    def scoped_params params
+      { key => params }
     end
   
     def filters

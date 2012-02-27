@@ -73,7 +73,7 @@ module Gitter
       if spec.ordered?
         img = order_img_tag(opts)
         label = h.content_tag :span, img + label if ordered?
-        h.link_to label, order_params.merge(params), opts
+        h.link_to label, grid.scoped_params(order_params.merge(params)), opts
       else
         label
       end

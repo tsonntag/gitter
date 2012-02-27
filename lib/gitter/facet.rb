@@ -18,9 +18,10 @@ module Gitter
 
     def link
       h = grid.h
-      p = h.request.query_parameters.dup
-      p.delete(:show)
+      p = grid.params.dup #h.request.query_parameters.dup
+      #p.delete(:show)
       p[name] = value.nil? ? '' : value
+      p = grid.scoped_params p
       p[:page] = 1
 
       option_tag = h.content_tag :span, (value.nil? ? '-' : value), :class => 'facet_value'
