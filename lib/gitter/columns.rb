@@ -1,42 +1,32 @@
 require 'active_support/concern'
 require 'gitter/column'
-require 'gitter/column_spec'
 require 'gitter/header'
-require 'gitter/header_spec'
   
 module Gitter
   module Columns
     extend ActiveSupport::Concern
   
     included do
-      self.class_attribute :column_specs, :instance_reader => false, :instance_writer => false
-      self.class_attribute :header_specs_rows, :instance_reader => false, :instance_writer => false
-      self.class_attribute :current_header_specs_row, :instance_reader => false, :instance_writer => false
-      self.column_specs = {}
-      self.header_specs_rows = [] 
-
-      after_initialize :initialize_columns
       alias_method_chain :scope, :columns
     end
   
     def header_row
       @current_header_row = []
       yield
-      (@header_rows||=[])+= [@current_header_row]
+      (@header_rows||=[]) << @current_header_row
     end
 
     def header *args, &block 
       opts = args.extract_options!
-      @current_header_row += [Header.new(self,args.first, block, opts)]
+      @current_header_row << Header.new(self,args.first, block, opts)
     end
 
     def column name, opts = {}, &block
-      (@columns||= {})[name] = ColumnSpec.new self, name, opts, &block
-      end
+      (@columns||= {})[name] = Column.new self, name, opts, &block
     end
   
     def scope_with_columns
-      @scope_with_columns ||= @order_column ? @order_column.ordered.scope : scope_without_columns
+      @scope_with_columns ||= order_column ? order_column.ordered.scope : scope_without_columns
     end
  
     def paginate *args 
@@ -70,19 +60,17 @@ module Gitter
       @columns.values
     end
 
-    private
-
-    def initialize_columns
-      if order = @params[:order]
-        unless @order_column = @columns[:"#{order}"] 
-          raise ArgumentError, "invalid order column #{order}"
-        end 
-      else
-        @order_column = nil
-        raise ArgumentError, ':desc given but no :order' if @params[:desc] 
+    def order_column
+      @order_column ||= begin
+	if order = @params[:order]
+          @columns[:"#{order}"] or raise ArgumentError, "invalid order column #{order}"
+        else
+          raise ArgumentError, ':desc given but no :order' if @params[:desc] 
+          nil
+        end
       end
     end
- 
+
    end
  
 end

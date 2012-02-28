@@ -11,7 +11,6 @@ module Gitter
     extend ActiveSupport::Concern
 
     included do
-      define_model_callbacks :initialize
       self.class_attribute :grid, :instance_reader => false, :instance_writer => false
     end
 
@@ -24,23 +23,21 @@ module Gitter
     attr_reader :params, :facets
 
     def initialize *args
-      run_callbacks :initialize do
-        opts = args.extract_options!
-        @decorator = Artdeco::Decorator.new *args, opts
-        @params = @decorator.params.fetch(key){{}}.symbolize_keys
+      opts = args.extract_options!
+      @decorator = Artdeco::Decorator.new *args, opts
+      @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-	@filters = {}
-	@facets = [] 
-	self.class.grid.call
+      filters = {}
+      @facets = [] 
+      self.class.grid.call
 
-        @scope = opts.delete(:scope){@scope}
+      @scope = opts.delete(:scope){@scope}
 
-        @selected_filters, @filters_values = {}, {}
-        @params.each do |name, value|
-          if filter = @filters[name]
-            @selected_filters[name] = filter
-            @filters_values[filter] = value
-          end
+      @selected_filters, @filters_values = {}, {}
+      params.each do |name, value|
+        if filter = @filters[name]
+          @selected_filters[name] = filter
+          @filters_values[filter] = value
         end
       end
     end
@@ -56,7 +53,7 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @filters_values.each{|filter, value| d = filter.apply d, value, @params }
+        @filters_values.each{|filter, value| d = filter.apply d, value, params }
         d
       end
     end
