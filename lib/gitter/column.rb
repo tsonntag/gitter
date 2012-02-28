@@ -8,13 +8,13 @@ module Gitter
       @grid, @name = grid, name
       if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
          header_opts = opts.fetch(:header){opts.fetch(:headers)}
-         @headers = [header_opts].flatten.map do |header_spec|
-           case header_spec
+         @headers = [header_opts].flatten.map do |header_opt|
+           case header_opt
            when Hash
-             content = header_spec.delete(:content)
-             h_opts = header_spec
+             content = header_opt.delete(:content)
+             h_opts = header_opt
            else
-             content = header_spec
+             content = header_opt
              h_opts = {}
            end
            Header.new grid, name, content, h_opts.merge(:column => self)
@@ -32,10 +32,6 @@ module Gitter
       @block = block 
     end
 
-    def ordered?
-      !!@order
-    end
-
     def cell model
       if block
         grid.eval block, model
@@ -47,7 +43,7 @@ module Gitter
     def ordered
       d = grid.filtered_driver
 
-      return d unless ordered?
+      return d unless ordered? 
 
       desc = case params[:desc]
         when true, 'true' then order_desc || true
@@ -87,7 +83,7 @@ module Gitter
 
     def link label = nil, params = {}, opts = {}
       label ||= headers.first.label
-      if spec.ordered?
+      if @order
         img = order_img_tag(opts)
         label = h.content_tag :span, img + label if ordered?
         h.link_to label, grid.scoped_params(order_params.merge(params)), opts
@@ -97,7 +93,7 @@ module Gitter
     end
 
     def to_s
-      "Column(#{name},ordered=#{ordered?},#{header_specs.size} headers)"
+      "Column(#{name},ordered=#{ordered?},#{headers.size} headers)"
     end
 
     private

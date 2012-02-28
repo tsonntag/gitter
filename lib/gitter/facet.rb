@@ -8,7 +8,7 @@ module Gitter
     attr_reader :facet, :value, :count
     delegate :grid, :name, :to => :facet
 
-    def initialize( facet, value, count )
+    def initialize facet, value, count 
       @facet, @value, @count = facet, value, count 
     end
 
@@ -45,24 +45,21 @@ module Gitter
   end
 
   class Facet
-    attr_reader :grid, :filter_spec
-    delegate :name, :to => :filter_spec
+    attr_reader :filter
+    delegate :grid, :name, :to => :filter
 
-    def initialize( grid, filter_spec )
-      @grid, @filter_spec = grid, filter_spec
+    def initialize filter
+      @filter = filter
     end
 
     def label
-      filter_spec.label or grid.translate(:facets, name)
+      filter.label or grid.translate(:facets, name)
     end
 
-    def data( *args )
-      opts = args.extract_options!
-      raise ArgumentError, 'too many arguments' if args.size > 1
-      driver = args.first || grid.filtered_driver
+    def data opts = {}
       @data ||= begin
-        value_to_count = filter_spec.counts(driver)
-        values = opts[:include_zeros] ? filter_spec.distinct_values(driver) : value_to_count.keys
+        value_to_count = filter.counts
+        values = opts[:include_zeros] ? filter.distinct_values : value_to_count.keys
         values.map do |value|
           FacetData.new self, value, (value_to_count[value]||0)
         end

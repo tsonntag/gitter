@@ -17,7 +17,7 @@ module Gitter
       @label ||= case content
 	when false then ''
 	when nil   then @grid.translate(:headers, name)
-        else grid.eval(content)
+        else content
       end
     end
 

@@ -23,7 +23,7 @@ module Gitter
 
     def counts
       @filters.values.inject({}) do |memo,filter|
-        count = filter.counts(grid.driver)[true]
+        count = filter.counts[true]
         memo[filter.name] = count if count > 0
         memo
       end

@@ -25,8 +25,12 @@ module Gitter
       (@columns||= {})[name] = Column.new self, name, opts, &block
     end
   
-    def scope_with_columns
-      @scope_with_columns ||= order_column ? order_column.ordered.scope : scope_without_columns
+    def scope_with_columns &scope
+      if scope
+        scope_without_columns &scope
+      else
+        @scope_with_columns ||= order_column ? order_column.ordered.scope : scope_without_columns
+      end
     end
  
     def paginate *args 
@@ -34,8 +38,8 @@ module Gitter
     end
  
     def header_rows
-      @header_rows ||= begin
-        rows = @header_rows
+      @all_header_rows ||= begin
+        rows = @header_rows || []
 
         max = columns.map{|col|col.headers.size}.max
 

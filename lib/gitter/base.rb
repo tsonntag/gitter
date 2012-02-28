@@ -1,6 +1,4 @@
 require 'active_support/concern'
-require 'active_support/core_ext/class/attribute'
-require 'active_model/callbacks'
 require 'artdeco'
 require 'gitter/filters.rb'
 require 'gitter/facet.rb'
@@ -10,13 +8,13 @@ module Gitter
   module Base
     extend ActiveSupport::Concern
 
-    included do
-      self.class_attribute :grid, :instance_reader => false, :instance_writer => false
-    end
-
     module ClassMethods
       def grid &grid
-        @grid = grid
+        if grid
+          @grid = grid
+        else
+          @grid or raise ArgumentError, 'undefined grid'
+        end
       end
     end
   
@@ -27,9 +25,9 @@ module Gitter
       @decorator = Artdeco::Decorator.new *args, opts
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-      filters = {}
+      @filters = {}
       @facets = [] 
-      self.class.grid.call
+      instance_eval &self.class.grid
 
       @scope = opts.delete(:scope){@scope}
 
@@ -47,7 +45,7 @@ module Gitter
     end
 
     def driver
-      @driver ||= create_driver eval(@scope) 
+      @driver ||= create_driver instance_eval(&@scope) 
     end
 
     def filtered_driver
@@ -60,7 +58,10 @@ module Gitter
     
     # evaluate data (string or proc) in context of grid
     def eval data, model = nil 
-      @decorator.eval data, model
+      instance_variable_set :"@model", model 
+      instance_eval data
+      remove_instance_variable :"@model"
+      #@decorator.eval data, model
     end
 
     def scope &scope
@@ -81,17 +82,17 @@ module Gitter
         raise ConfigurationError, "no block allowed for range filter #{name}" if block
         return range_filter name, options # return is required
       when block 
-        BlockFilterSpec.new self, name, options, &block
+        BlockFilter.new self, name, options, &block
       when select = options.delete(:select)
-        filters = [select].flatten.map{|name| filter_specs[name] || scope_filter(name)}
-        SelectFilterSpec.new self, name, filters, options
+        filters = [select].flatten.map{|name| @filters[name] || scope_filter(name)}
+        SelectFilter.new self, name, filters, options
       when s = options.delete(:scope)
         scope_filter( s == true ? name : s, options )
       else 
-        ColumnFilterSpec.new self, name, options
+        ColumnFilter.new self, name, options
       end
 
-      @facets << Facet.new(self, filter) if options.delete(:facet)
+      @facets << Facet.new(filter) if options.delete(:facet)
       @filters[name] = filter 
     end
 
@@ -117,7 +118,7 @@ module Gitter
     end
 
     def scope_filter name, options = {}
-      BlockFilterSpec.new(self,name, options){|scope| create_driver(scope).named_scope(name).scope}
+      BlockFilter.new(self,name, options){|scope| create_driver(scope).named_scope(name).scope}
     end
 
   end

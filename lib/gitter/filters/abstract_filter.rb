@@ -3,7 +3,7 @@
     attr_reader :grid, :name, :input_options, :input_tag, :format
 
     def initialize grid, name, opts ={}
-       @name = name
+       @grid, @name = grid, name
        @label = opts[:label]
        @input_options = opts[:input]
        @input_tag = opts[:input_tag]
