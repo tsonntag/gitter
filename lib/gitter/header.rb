@@ -1,24 +1,23 @@
 module Gitter
 
   class Header
-
     def self.blank
-      new nil, HeaderSpec.blank
+      new :blank, false
     end
 
-    attr_reader :spec, :column
-    delegate :name, :html_options, :column_spec, :to => :spec
-    
-    def initialize grid, spec, opts = {}
-      @grid, @spec = grid, spec
-      @column = opts[:column]
+    attr_reader :grid, :name, :content, :html_options, :column
+
+    def initialize grid, name, content, opts = {}
+      @grid, @name, @content = grid, name, content
+      @column = opts.delete(:column){nil}
+      @html_options = opts
     end
 
     def label
-      @label ||= case spec.content
+      @label ||= case content
 	when false then ''
 	when nil   then @grid.translate(:headers, name)
-        else @grid.eval(spec.content)
+        else grid.eval(content)
       end
     end
 

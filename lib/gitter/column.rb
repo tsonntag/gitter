@@ -1,25 +1,46 @@
 module Gitter
 
   class Column
-    attr_reader :spec, :grid
 
-    def initialize grid, spec 
-      @grid, @spec = grid, spec
+    attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc
+
+    def initialize grid, name, opts = {}, &block
+      @grid, @name = grid, name
+      if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
+         header_opts = opts.fetch(:header){opts.fetch(:headers)}
+         @headers = [header_opts].flatten.map do |header_spec|
+           case header_spec
+           when Hash
+             content = header_spec.delete(:content)
+             h_opts = header_spec
+           else
+             content = header_spec
+             h_opts = {}
+           end
+           Header.new grid, name, content, h_opts.merge(:column => self)
+        end
+      else
+        @headers = [Header.new(grid, name, nil, opts.merge(:column => self))]
+      end
+      @attr = opts[:column] || name
+      @order = case opts[:order] 
+        when true then attr
+        when false, nil then nil
+        else opts[:order]
+      end
+      @order_desc = opts[:order_desc]
+      @block = block 
     end
 
-    def name
-      spec.name
-    end
-
-    def params
-      grid.params
+    def ordered?
+      !!@order
     end
 
     def cell model
-      if spec.block
-        grid.eval spec.block, model
+      if block
+        grid.eval block, model
       else
-        model.send spec.attr
+        model.send attr
       end
     end
 
@@ -29,21 +50,17 @@ module Gitter
       return d unless ordered?
 
       desc = case params[:desc]
-        when true, 'true' then spec.order_desc || true
+        when true, 'true' then order_desc || true
         when false, 'false' then false 
         else params[:desc]
       end
 
-      if Proc === spec.order
-        arr = d.scope.map{|model| [model.instance_eval(&spec.order),model]}
+      if Proc === order
+        arr = d.scope.map{|model| [model.instance_eval(&order),model]}
         d.new arr.sort{|a,b| (desc ? -1 : 1)*(a<=>b) }.map{|a|a[1]}
       else
-        d.order spec.order, desc
+        d.order order, desc
       end
-    end
-
-    def headers
-      @headers ||= spec.header_specs.map{|spec| Header.new grid, spec, :column => self}
     end
 
     # if current params contain order for this column then revert direction 
@@ -80,7 +97,7 @@ module Gitter
     end
 
     def to_s
-      "Column(#{name},ordered=#{ordered?})"
+      "Column(#{name},ordered=#{ordered?},#{header_specs.size} headers)"
     end
 
     private
@@ -98,6 +115,11 @@ module Gitter
     def to_boolean s
       not (s && s.match(/true|t|1$/i)).nil?
     end
+
+    def params
+      grid.params
+    end
+
   end
 
 end

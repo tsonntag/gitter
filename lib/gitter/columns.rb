@@ -19,38 +19,19 @@ module Gitter
       alias_method_chain :scope, :columns
     end
   
-    module ClassMethods
+    def header_row
+      @current_header_row = []
+      yield
+      (@header_rows||=[])+= [@current_header_row]
+    end
 
-      def header_row
-        self.current_header_specs_row = []
-	yield
-        self.header_specs_rows += [self.current_header_specs_row]
-      end
+    def header *args, &block 
+      opts = args.extract_options!
+      @current_header_row += [Header.new(self,args.first, block, opts)]
+    end
 
-      def header *args, &block 
-        opts = args.extract_options!
-	self.current_header_specs_row += [HeaderSpec.new(args.first, block, opts)]
-      end
-
-      # adds a column to be displayed
-      #
-      # Example:
-      #
-      # column :birthday 
-      # displays :birthday of the model
-      #
-      # A header may be specified by :header:
-      #
-      # column :birthday, :header => 'Birthday'
-      #
-      # Supply a block to computed the column's data
-      #
-      # column(:year, :header => 'Year') do |model|
-      #   model.birthday.strftime("%Y")
-      # end
-      #
-      def column name, opts = {}, &block
-        self.column_specs = self.column_specs.merge(name => ColumnSpec.new(name, opts, &block))
+    def column name, opts = {}, &block
+      (@columns||= {})[name] = ColumnSpec.new self, name, opts, &block
       end
     end
   
@@ -64,9 +45,7 @@ module Gitter
  
     def header_rows
       @header_rows ||= begin
-        rows = self.class.header_specs_rows.map do |header_specs_row|
-          header_specs_row.map{|header_spec| Header.new self, header_spec}
-	end
+        rows = @header_rows
 
         max = columns.map{|col|col.headers.size}.max
 
@@ -88,16 +67,14 @@ module Gitter
     end
  
     def columns
-      @columns ||= self.class.column_specs.map{|name, spec| Column.new(self,spec) }
+      @columns.values
     end
 
     private
 
     def initialize_columns
       if order = @params[:order]
-        if column_spec = self.class.column_specs[:"#{order}"] 
-          @order_column = Column.new self, column_spec 
-        else
+        unless @order_column = @columns[:"#{order}"] 
           raise ArgumentError, "invalid order column #{order}"
         end 
       else
