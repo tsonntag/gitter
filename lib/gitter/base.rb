@@ -18,7 +18,7 @@ module Gitter
       end
     end
   
-    attr_reader :params, :facets, :model
+    attr_reader :params, :facets
 
     def initialize *args
       opts = args.extract_options!
@@ -48,7 +48,10 @@ module Gitter
     end
 
     def driver
-      @driver ||= create_driver instance_eval(&@scope) 
+      @driver ||= begin
+        scope = Proc === @scope ? instance_eval(&@scope) : @scope
+        create_driver scope
+      end
     end
 
     def filtered_driver
@@ -59,18 +62,6 @@ module Gitter
       end
     end
     
-    # evaluate data (string or proc) in context of grid
-    def eval data, model = nil 
-      instance_variable_set :"@model", model 
-      res = instance_eval &data
-      remove_instance_variable :"@model"
-      res
-    end
-
-    def decorate *args
-      @decorator.decorate *args
-    end
-
     def scope &scope
       if scope
         @scope = scope

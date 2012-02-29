@@ -40,11 +40,8 @@ module Gitter
     def header_rows
       @all_header_rows ||= begin
         rows = @header_rows || []
-
         max = columns.map{|col|col.headers.size}.max
-
 	columns_headers = columns.map{|col| Array.new(max){|i| col.headers[i] || Header.blank }}
-
 	rows += columns_headers.transpose
       end
     end

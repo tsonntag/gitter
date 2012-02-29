@@ -5,7 +5,7 @@ module Gitter
     
     delegate :group, :count, :to => :scope
     
-    def order( attr, desc = nil)
+    def order attr, desc = nil
       what = case desc
         when true, 'true' then "#{attr} DESC"
         when false, 'false' then attr
@@ -40,24 +40,25 @@ module Gitter
       new scope.where("( #{conditions * ') OR ('} )", tokens)
     end
 
-    def greater_or_equal( attr, value )
+    def greater_or_equal attr, value
       new scope.where("#{attr} >= ?", value)
     end
 
-    def less_or_equal( attr, value)
+    def less_or_equal attr, value
       new scope.where("#{attr} <= ?", value)
     end
 
-    def each( &block )
+    def each &block
       new scope.each(&block)
     end
     
-    def named_scope( name )
+    def named_scope name
       new scope.send(name)
     end
     
-    def distinct_values( attr )
-      scope.select("DISTINCT #{attr}").map(&attr)
+    def distinct_values attr
+      attribute = attr.to_s.split(/\./).last || attr
+      scope.select("DISTINCT #{attr}").map(&:"#{attribute}")
     end
 
     private 

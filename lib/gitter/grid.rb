@@ -5,6 +5,7 @@ require 'gitter/breadcrumbs'
 require 'gitter/csv'
 require 'gitter/i18n'
 require 'gitter/helpers'
+require 'gitter/model'
 
 module Gitter
 
@@ -16,6 +17,7 @@ module Gitter
     include CSV
     include I18n
     include Helpers
+    include Model
   end
 
 end
