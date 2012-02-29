@@ -32,7 +32,7 @@
     end
 
     def counts 
-      { true => apply(grid.driver.unordered).count }
+      { true => apply(grid.filtered_driver.unordered).count }
     end
 
     def distinct_values 
@@ -43,24 +43,19 @@
       return '' unless input?
 
       @input_tag ||= if col = collection
-        data = grid.eval(col)
-        data = [''] + data if include_blank?
-        select_tag
+        col = [''] + col if include_blank?
+        select_tag col
       else
         text_field_tag
       end
     end
 
     def text_field_tag
-      filter_name = name
-      tag_name = scoped_name
-      @text_field_tag ||= h.text_field_tag tag_name, h.params[filter_name], :class => 'grid'
+      @text_field_tag ||= h.text_field_tag scoped_name, grid.params[name.intern], :class => 'grid'
     end
 
     def select_tag collection 
-      filter_name = name
-      tag_name = scoped_name
-      h.select_tag tag_name, h.options_for_select(collection, h.params[filter_name]), :class => 'grid'
+      h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), :class => 'grid'
     end
 
     private

@@ -18,7 +18,7 @@ module Gitter
       end
     end
   
-    attr_reader :params, :facets
+    attr_reader :params, :facets, :model
 
     def initialize *args
       opts = args.extract_options!
@@ -59,9 +59,13 @@ module Gitter
     # evaluate data (string or proc) in context of grid
     def eval data, model = nil 
       instance_variable_set :"@model", model 
-      instance_eval data
+      res = instance_eval &data
       remove_instance_variable :"@model"
-      #@decorator.eval data, model
+      res
+    end
+
+    def decorate *args
+      @decorator.decorate *args
     end
 
     def scope &scope

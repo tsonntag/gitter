@@ -34,7 +34,7 @@ module Gitter
     end
  
     def paginate *args 
-      @paginate ||= scope.paginate *args
+      scope.paginate *args
     end
  
     def header_rows

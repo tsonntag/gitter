@@ -15,7 +15,13 @@ module Gitter
     end
 
     def highlight text, *keys
-      h.highlight text.to_s||'', keys.map{|k|params[k]}.compact
+      matches = keys.map{|k|params[k]}.select{|v|v.present?}
+      text = "#{text||''}"
+      if matches.empty?
+        text
+      else
+        h.highlight text, matches
+      end
     end
 
     def h

@@ -7,6 +7,7 @@ module Gitter
 
     attr_reader :facet, :value, :count
     delegate :grid, :name, :to => :facet
+    delegate :h, :to => :grid
 
     def initialize facet, value, count 
       @facet, @value, @count = facet, value, count 
@@ -18,8 +19,7 @@ module Gitter
 
     def link
       h = grid.h
-      p = grid.params.dup #h.request.query_parameters.dup
-      #p.delete(:show)
+      p = grid.params.dup 
       p[name] = value.nil? ? '' : value
       p = grid.scoped_params p
       p[:page] = 1
@@ -35,11 +35,6 @@ module Gitter
 
     def to_s
       "#{name}:#{value}=#{count}"
-    end
-
-    private
-    def h
-      grid.h
     end
 
   end

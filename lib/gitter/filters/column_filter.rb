@@ -23,7 +23,7 @@ module Gitter
 
     def counts
       if columns.size == 1
-        grid.driver.unordered.group(columns.first).count
+        grid.filtered_driver.unordered.group(columns.first).count
       else
         super
       end
@@ -31,7 +31,7 @@ module Gitter
 
     def distinct_values
       if columns.size == 1
-        grid.driver.unordered.distinct_values(columns.first)
+        grid.filtered_driver.unordered.distinct_values(columns.first)
       else
         super
       end

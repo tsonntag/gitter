@@ -30,7 +30,7 @@ module Gitter
     end
 
     def to_s
-      "Header(#{name},html_options=#{html_options},#{column_spec ? ',col':''},label=#{label})"
+      "Header(#{name},html_options=#{html_options},#{column ? ',col':''},label=#{label})"
     end
   end
 
