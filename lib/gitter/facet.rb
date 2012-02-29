@@ -68,12 +68,15 @@ module Gitter
       !!selected_value
     end
 
+    def params_for_any
+      grid.scoped_params grid.params.reject{|k,v| k == name}
+    end
+
     def data opts = {}
-      value_to_count = filter.counts
-      puts "FFFFFFFF #{self}. value_to_count=#{value_to_count.inspect}"
-      values = opts[:include_zeros] ? filter.distinct_values(grid.driver) : value_to_count.keys
+      values_to_counts = filter.counts
+      values = opts[:include_zeros] ? filter.distinct_values(grid.driver) : values_to_counts.keys
       values.map do |value|
-        FacetData.new self, value, (value_to_count[value]||0)
+        FacetData.new self, value, (values_to_counts[value]||0)
       end
     end
 
