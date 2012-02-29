@@ -31,15 +31,18 @@ module Gitter
 
       @scope = opts.delete(:scope){@scope}
 
-      @selected_filters, @filters_values = {}, {}
+      @filters_values = {}
       params.each do |name, value|
         if filter = @filters[name]
-          @selected_filters[name] = filter
           @filters_values[filter] = value
         end
       end
     end
     
+    def selected_value filter
+      @filters_values[filter] 
+    end
+
     def filters
       @filters.values 
     end

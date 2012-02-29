@@ -21,7 +21,7 @@ module Gitter
       end
     end
 
-    def counts
+    def counts driver = nil
       @filters.values.inject({}) do |memo,filter|
         count = filter.counts[true]
         memo[filter.name] = count if count > 0
@@ -29,8 +29,8 @@ module Gitter
       end
     end
 
-    def distinct_values
-      @distinct_values ||= @filters.keys
+    def distinct_values driver = nil
+      @distinct_values ||= @filters.keys.map
     end
   end
 

@@ -31,12 +31,12 @@
       @include_blank
     end
 
-    def counts 
-      { true => apply(grid.filtered_driver.unordered).count }
+    def counts driver = grid.filtered_driver
+      { true => apply(driver.unordered).count }
     end
 
-    def distinct_values 
-      [ true, false ]       
+    def distinct_values driver = nil
+      [ true, false ]
     end
 
     def input_tag

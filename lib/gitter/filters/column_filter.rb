@@ -21,17 +21,17 @@ module Gitter
       driver.where attr_values, exact(opts), ignore_case(opts), format
     end
 
-    def counts
+    def counts driver = grid.filtered_driver
       if columns.size == 1
-        grid.filtered_driver.unordered.group(columns.first).count
+        driver.unordered.group(columns.first).count
       else
         super
       end
     end
 
-    def distinct_values
+    def distinct_values driver = grid.filtered_driver
       if columns.size == 1
-        grid.filtered_driver.unordered.distinct_values(columns.first)
+        driver.unordered.distinct_values(columns.first)
       else
         super
       end
