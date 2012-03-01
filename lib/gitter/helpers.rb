@@ -14,14 +14,8 @@ module Gitter
       { key => params }
     end
 
-    def highlight text, *keys
-      matches = keys.map{|k|params[k]}.select{|v|v.present?}
-      text = "#{text||''}"
-      if matches.empty?
-        text
-      else
-        h.highlight text, matches
-      end
+    def mark *keys
+      { mark: keys.map{|k|filter_value k}.select{|v|v.present?} }
     end
 
     def h
@@ -32,9 +26,7 @@ module Gitter
       @input_tags ||= begin
         res = {}
         filters.each do |filter|
-          if i = filter.input_tag
-            res[filter.name] = i
-          end
+          res[filter.name] = filter.input_tag if filter.input?
         end
         res
       end

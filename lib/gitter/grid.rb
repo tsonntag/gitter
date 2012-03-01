@@ -10,14 +10,14 @@ require 'gitter/model'
 module Gitter
 
   class Grid
-    include Base
-    include Driver
-    include Columns
-    include Breadcrumbs
-    include CSV
-    include I18n
-    include Helpers
-    include Model
+    include Gitter::Base
+    include Gitter::Driver
+    include Gitter::Columns
+    include Gitter::Breadcrumbs
+    include Gitter::CSV
+    include Gitter::I18n
+    include Gitter::Helpers
+    include Gitter::Model
   end
 
 end

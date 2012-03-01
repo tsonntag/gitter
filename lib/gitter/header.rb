@@ -7,7 +7,7 @@ module Gitter
 
     attr_reader :grid, :name, :content, :html_options, :column
 
-    def initialize grid, name, content, opts = {}
+    def initialize grid, name = nil, content = nil, opts = {}
       @grid, @name, @content = grid, name, content
       @column = opts.delete(:column){nil}
       @html_options = opts
@@ -16,7 +16,7 @@ module Gitter
     def label
       @label ||= case content
 	when false then ''
-	when nil   then @grid.translate(:headers, name)
+	when nil then grid.translate(:headers, name)
         else content
       end
     end

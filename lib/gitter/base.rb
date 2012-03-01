@@ -25,22 +25,26 @@ module Gitter
       @decorator = Artdeco::Decorator.new *args, opts
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-      @filters = {}
-      @facets = [] 
+      @filters, @facets = {}, [] 
       instance_eval &self.class.grid
 
       @scope = opts.delete(:scope){@scope}
 
-      @filters_values = {}
-      params.each do |name, value|
+      @values = {}
+      @decorator.params.symbolize_keys.each do |name, value|
+        if (name != key) and (filter = @filters[name]) and not filter.param_scoped?
+          @values[name] = value
+        end
+      end
+      @params.each do |name, value|
         if filter = @filters[name]
-          @filters_values[filter] = value
+          @values[filter] = value
         end
       end
     end
     
-    def selected_value filter
-      @filters_values[filter] 
+    def filter_value filter_name
+      @values[filter_name] 
     end
 
     def filters
@@ -57,7 +61,7 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @filters_values.each{|filter, value| d = filter.apply d, value, params }
+        @values.each{|name, value| d = @filters[name].apply d, value, params }
         d
       end
     end
@@ -71,52 +75,52 @@ module Gitter
     end
 
     def filter *args, &block
-      options = args.extract_options!
+      opts = args.extract_options!
       raise ConfigurationError, 'only zero or one argument allowed' if args.size > 1
       name = args.first
 
       filter = case
-      when options.delete(:range)
+      when opts.delete(:range)
         raise ConfigurationError, "no block allowed for range filter #{name}" if block
-        return range_filter name, options # return is required
+        return range_filter name, opts # return is required
       when block 
-        BlockFilter.new self, name, options, &block
-      when select = options.delete(:select)
+        BlockFilter.new self, name, opts, &block
+      when select = opts.delete(:select)
         filters = [select].flatten.map{|name| @filters[name] || scope_filter(name)}
-        SelectFilter.new self, name, filters, options
-      when s = options.delete(:scope)
-        scope_filter( s == true ? name : s, options )
+        SelectFilter.new self, name, filters, opts
+      when s = opts.delete(:scope)
+        scope_filter( s == true ? name : s, opts )
       else 
-        ColumnFilter.new self, name, options
+        ColumnFilter.new self, name, opts
       end
 
-      @facets << Facet.new(filter) if options.delete(:facet)
+      @facets << Facet.new(filter) if opts.delete(:facet)
       @filters[name] = filter 
     end
 
     # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
-    def search name, options = {} 
-      filter name, { :exact => false, :ignore_case => true }.merge(options)
+    def search name, opts = {} 
+      filter name, { :exact => false, :ignore_case => true }.merge(opts)
     end
 
     private
 
-    def range_filter name, options
-      column = options.delete(:column){name}
+    def range_filter name, opts
+      column = opts.delete(:column){name}
 
-      filter options.delete(:from){:"from_#{name}"}, options do |scope, value|
+      filter opts.delete(:from){:"from_#{name}"}, opts do |scope, value|
         create_driver(scope).greater_or_equal(column, value).scope
       end
 
-      filter options.delete(:to){:"to_#{name}"}, options do |scope, value|
+      filter opts.delete(:to){:"to_#{name}"}, opts do |scope, value|
         create_driver(scope).less_or_equal(column, value).scope
       end
 
       filter name, :column => column
     end
 
-    def scope_filter name, options = {}
-      BlockFilter.new(self,name, options){|scope| create_driver(scope).named_scope(name).scope}
+    def scope_filter name, opts = {}
+      BlockFilter.new(self,name, opts){|scope| create_driver(scope).named_scope(name).scope}
     end
 
   end

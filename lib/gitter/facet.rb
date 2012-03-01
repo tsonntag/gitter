@@ -61,7 +61,7 @@ module Gitter
     end
 
     def selected_value
-      @selected_value ||= grid.selected_value filter
+      @selected_value ||= grid.filter_value filter.name
     end
 
     def selected?

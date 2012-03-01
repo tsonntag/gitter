@@ -12,6 +12,7 @@
        @exact = opts.fetch(:exact){true}
        @ignore_case = opts.fetch(:ignore_case){false}
        @format = opts[:format]
+       @param_scoped = opts.fetch(:param_scoped){true}
 
        # replace shortcut
        if coll = opts[:input_collection]
@@ -29,6 +30,10 @@
 
     def include_blank?
       @include_blank
+    end
+
+    def param_scoped?
+      @param_scoped
     end
 
     def counts driver = grid.filtered_driver

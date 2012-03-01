@@ -18,7 +18,7 @@ module Gitter
       case
       when Module.const_defined?(:ActiveRecord)
         require 'gitter/drivers/active_record_driver'
-        ActiveRecordDriver
+        Gitter::ActiveRecordDriver
       end
     end
 

@@ -16,9 +16,8 @@ module Gitter
       (@header_rows||=[]) << @current_header_row
     end
 
-    def header *args, &block 
-      opts = args.extract_options!
-      @current_header_row << Header.new(self,args.first, block, opts)
+    def header *args
+      @current_header_row << Header.new(self,*args)
     end
 
     def column name, opts = {}, &block
