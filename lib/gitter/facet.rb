@@ -32,6 +32,7 @@ module Gitter
       value_tag = h.content_tag :span, (value.nil? ? '-' : value), class: value_class
       value_tag = h.link_to value_tag, url_for(p)
 
+      puts "FFFFFFFFFF #{self}, selected=#{selected?}, f=#{facet.selected?}"
       if selected? or not facet.selected?
         count_tag = h.content_tag :span, "(#{count})", :class => 'facet_count'
         count_tag = h.link_to count_tag,  url_for(p.merge(:show=>true))
@@ -65,7 +66,7 @@ module Gitter
     end
 
     def selected?
-      !!selected_value
+      selected_value.present?
     end
 
     def params_for_any

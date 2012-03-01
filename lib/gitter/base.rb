@@ -38,9 +38,10 @@ module Gitter
       end
       @params.each do |name, value|
         if filter = @filters[name]
-          @values[filter] = value
+          @values[name] = value
         end
       end
+      puts "IIIIIIIIIIIII #{@values}"
     end
     
     def filter_value filter_name
