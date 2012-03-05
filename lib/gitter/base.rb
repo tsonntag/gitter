@@ -41,7 +41,6 @@ module Gitter
           @values[name] = value
         end
       end
-      puts "IIIIIIIIIIIII #{@values}"
     end
     
     def filter_value filter_name

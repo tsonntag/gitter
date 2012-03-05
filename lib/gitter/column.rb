@@ -36,8 +36,8 @@ module Gitter
       if block
         grid.eval block, model
       else
-        model.send attr
-      end
+        model.send(attr) 
+      end 
     end
 
     def ordered

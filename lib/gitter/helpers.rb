@@ -18,6 +18,10 @@ module Gitter
       { mark: keys.map{|k|filter_value k}.select{|v|v.present?} }
     end
 
+    def highlight text, *keys
+      h.highlight "#{text}", mark(*keys)[:mark] 
+    end
+
     def h
       @decorator.h
     end

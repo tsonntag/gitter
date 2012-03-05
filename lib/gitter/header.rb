@@ -7,8 +7,10 @@ module Gitter
 
     attr_reader :grid, :name, :content, :html_options, :column
 
-    def initialize grid, name = nil, content = nil, opts = {}
-      @grid, @name, @content = grid, name, content
+    def initialize grid, *args
+      opts = args.extract_options!
+      @grid = grid
+      @name, @content = *args
       @column = opts.delete(:column){nil}
       @html_options = opts
     end

@@ -6,8 +6,8 @@ module Gitter
     include Utils
 
     attr_reader :facet, :value, :count
-    delegate :grid, :name, :to => :facet
-    delegate :h, :to => :grid
+    delegate :grid, :name, to: :facet
+    delegate :h, to: :grid
 
     def initialize facet, value, count 
       @facet, @value, @count = facet, value, count 
@@ -22,25 +22,26 @@ module Gitter
     end
 
     def link
-      h = grid.h
-      p = grid.params.dup 
-      p[name] = value.nil? ? '' : value
-      p = grid.scoped_params p
-      p[:page] = 1
+      @link ||= begin
+        p = grid.params.dup 
+        p.delete name
+        p[name] = value if value.present?
+        p = grid.scoped_params p
+        p[:page] = 1
 
-      value_class = selected? ? 'facet_value_selected' : 'selected' 
-      value_tag = h.content_tag :span, (value.nil? ? '-' : value), class: value_class
-      value_tag = h.link_to value_tag, url_for(p)
+        value_class = selected? ? 'facet_value_selected' : 'selected' 
+        value_tag = h.content_tag :span, (value.nil? ? '-' : value), class: value_class
+        value_tag = h.link_to value_tag, url_for(p)
 
-      puts "FFFFFFFFFF #{self}, selected=#{selected?}, f=#{facet.selected?}"
-      if selected? or not facet.selected?
-        count_tag = h.content_tag :span, "(#{count})", :class => 'facet_count'
-        count_tag = h.link_to count_tag,  url_for(p.merge(:show=>true))
-      else
-        count_tag = ''
+        if selected? or not facet.selected?
+          count_tag = h.content_tag :span, "(#{count})", class: 'facet_count'
+          count_tag = h.link_to count_tag,  url_for(p.merge(show: true))
+        else
+          count_tag = ''
+        end
+
+        h.content_tag :span, (value_tag + count_tag), {class: 'facet_entry'}, false
       end
-
-      h.content_tag :span, (value_tag + count_tag), {:class => 'facet_entry'}, false
     end
 
     def to_s
@@ -51,7 +52,7 @@ module Gitter
 
   class Facet
     attr_reader :filter
-    delegate :grid, :name, :to => :filter
+    delegate :grid, :name, to: :filter
 
     def initialize filter
       @filter = filter
