@@ -5,9 +5,15 @@ module Gitter
     attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc
 
     def initialize grid, name, opts = {}, &block
-      @grid, @name = grid, name
+      @grid, @name, @block = grid, name, block
+      @attr = opts.delete(:column){name}
+      @order = begin
+         order = opts.delete :order 
+	 order = attr if order == true
+      end
+      @order_desc = opts.delete :order_desc
       if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
-         header_opts = opts.fetch(:header){opts.fetch(:headers)}
+         header_opts = opts.delete(:header){opts.delete(:headers)}
          @headers = [header_opts].flatten.map do |header_opt|
            case header_opt
            when Hash
@@ -22,14 +28,6 @@ module Gitter
       else
         @headers = [Header.new(grid, name, nil, opts.merge(:column => self))]
       end
-      @attr = opts[:column] || name
-      @order = case opts[:order] 
-        when true then attr
-        when false, nil then nil
-        else opts[:order]
-      end
-      @order_desc = opts[:order_desc]
-      @block = block 
     end
 
     def cell model
@@ -81,12 +79,12 @@ module Gitter
       @ordered ||= params[:order] == name.to_s
     end
 
-    def link label = nil, params = {}, opts = {}
+    def link label = nil, params = {}, options = {}
       label ||= headers.first.label
       if @order
-        img = order_img_tag(opts)
+        img = order_img_tag(options)
         label = h.content_tag :span, img + label if ordered?
-        h.link_to label, grid.scoped_params(order_params.merge(params)), opts
+        h.link_to label, grid.scoped_params(order_params.merge(params)), options
       else
         label
       end
