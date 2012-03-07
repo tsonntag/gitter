@@ -7,10 +7,8 @@ module Gitter
     def initialize grid, name, opts = {}, &block
       @grid, @name, @block = grid, name, block
       @attr = opts.delete(:column){name}
-      @order = begin
-         order = opts.delete :order 
-	 order = attr if order == true
-      end
+      @order = opts.delete :order
+      @order = attr if @order == true
       @order_desc = opts.delete :order_desc
       if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
          header_opts = opts.delete(:header){opts.delete(:headers)}

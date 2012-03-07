@@ -10,6 +10,16 @@ module Gitter
       alias_method_chain :scope, :columns
     end
   
+    module ClassMethods
+      def transform &transform
+	if transform
+          @transform = transform
+	else
+          @transform
+	end
+      end
+    end
+
     def header_row
       @current_header_row = []
       yield
@@ -46,14 +56,36 @@ module Gitter
     end
  
     def row_for model
-      columns.map{|c| c.cell model }
+      cols = columns.map{|c| [c.cell(model)].flatten }
+      max = col.map{|col|col.size}.max
+      cols = cols.map do |col| 
+        cells = []
+	current = 0
+	#raise ArgumentError "invalid first nil cell in column #{col} of #{model}" unless col[0]
+        (1..max).each do |i|
+           if col[i] 
+             cells << Cell.new(col[current]||''), rowspan: i-current)
+	     current = i
+	   end
+	end
+        cells << Cell.new(col[current]||''), rowspan: max-current)
+	cells
+      end
     end
  
     def rows driver = self.scope 
-      driver.map do |model| 
+      rows = []
+      models(driver).each do |model| 
         @decorator.decorate model
-        row_for model
+        rows += row_for(model)
       end
+      rows
+    end
+
+    def models driver = self.scope
+       all = driver.all
+       all = eval(self.class.transform, all) if self.class.transform
+       all
     end
  
     def columns
