@@ -57,20 +57,20 @@ module Gitter
  
     def row_for model
       cols = columns.map{|c| [c.cell(model)].flatten }
-      max = col.map{|col|col.size}.max
-      cols = cols.map do |col| 
-        cells = []
-	current = 0
-	#raise ArgumentError "invalid first nil cell in column #{col} of #{model}" unless col[0]
-        (1..max).each do |i|
-           if col[i] 
-             cells << Cell.new(col[current]||''), rowspan: i-current)
-	     current = i
+      max = cols.map{|col|col.size}.max
+      cols.map do |col| 
+        nil_padded_cells = Array.new(max){|i| col[i]}
+	cells = []
+	nil_padded_cells.each_with_index do |c,i|
+           if c
+             height = nil_padded_cells.slice(i+1..-1).count{|x|x.nil?} + 1
+             cells << Cell.new(c, rowspan: height) 
+	   else
+             cells << nil
 	   end
 	end
-        cells << Cell.new(col[current]||''), rowspan: max-current)
 	cells
-      end
+      end.transpose
     end
  
     def rows driver = self.scope 
