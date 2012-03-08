@@ -75,14 +75,15 @@ module Gitter
     end
  
     def rows scope = self.scope 
+	    puts "AAAAAAAAAA scope=#{scope.to_sql}"
       res = []
       models(scope).each{|model| res += rows_for(model)}
       res
     end
 
-    def models _scope = self.scope
+    def models scope = self.scope
       if t = self.class.transform
-        t.arity == 2 ? t.call(_scope,self) : t.call(_scope)
+        t.arity == 2 ? t.call(scope,self) : t.call(scope)
       else
         scope
       end
