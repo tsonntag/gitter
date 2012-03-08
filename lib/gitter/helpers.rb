@@ -26,6 +26,10 @@ module Gitter
       @decorator.h
     end
 
+    def decorate *args
+      @decorator.decorate
+    end
+
     def input_tags
       @input_tags ||= begin
         res = {}

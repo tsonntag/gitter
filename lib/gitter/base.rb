@@ -18,7 +18,7 @@ module Gitter
       end
     end
   
-    attr_reader :params, :facets
+    attr_reader :params, :facets, :decorator
 
     def initialize *args
       opts = args.extract_options!

@@ -2,7 +2,7 @@ module Gitter
 
   class Column
 
-    attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc
+    attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc, :uniq, :map
 
     def initialize grid, name, opts = {}, &block
       @grid, @name, @block = grid, name, block
@@ -10,6 +10,8 @@ module Gitter
       @order = opts.delete :order
       @order = attr if @order == true
       @order_desc = opts.delete :order_desc
+      @uniq = opts.delete :uniq
+      @map = opts.delete(:map){true}
       if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
          header_opts = opts.delete(:header){opts.delete(:headers)}
          @headers = [header_opts].flatten.map do |header_opt|
@@ -28,12 +30,23 @@ module Gitter
       end
     end
 
-    def cell model
-      if block
-        grid.eval block, model
+    def cells model
+      res = if map && Array === model
+        model.map{|m| cells m}
       else
-        model.send(attr) 
+        grid.decorate model
+        if block
+          content = grid.eval block, model
+        else
+          model.send(attr) || ''
+	end
       end 
+
+      if uniq && Array === res && Set.new(res).size == 1 
+        res.first
+      else
+        res
+      end
     end
 
     def ordered

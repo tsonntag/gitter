@@ -1,6 +1,7 @@
 require 'active_support/concern'
 require 'gitter/column'
 require 'gitter/header'
+require 'gitter/cell'
   
 module Gitter
   module Columns
@@ -55,8 +56,8 @@ module Gitter
       end
     end
  
-    def row_for model
-      cols = columns.map{|c| [c.cell(model)].flatten }
+    def rows_for model
+      cols = columns.map{|c| [c.cells(model)].flatten }
       max = cols.map{|col|col.size}.max
       cols.map do |col| 
         nil_padded_cells = Array.new(max){|i| col[i]}
@@ -73,19 +74,18 @@ module Gitter
       end.transpose
     end
  
-    def rows driver = self.scope 
-      rows = []
-      models(driver).each do |model| 
-        @decorator.decorate model
-        rows += row_for(model)
-      end
-      rows
+    def rows scope = self.scope 
+      res = []
+      models(scope).each{|model| res += rows_for(model)}
+      res
     end
 
-    def models driver = self.scope
-       all = driver.all
-       all = eval(self.class.transform, all) if self.class.transform
-       all
+    def models _scope = self.scope
+      if t = self.class.transform
+        t.arity == 2 ? t.call(_scope,self) : t.call(_scope)
+      else
+        scope
+      end
     end
  
     def columns
