@@ -34,16 +34,19 @@ module Gitter
       res = if map && Array === model
         model.map{|m| cells m}
       else
-        grid.decorate model
-        if block
-          content = grid.eval block, model
-        else
-          model.send(attr) || ''
-	end
+        cell model
       end 
 
-      if uniq && Array === res && Set.new(res).size == 1 
-        res.first
+      if uniq && Array === res
+        current = nil 
+        r = res.map do |el|
+          if el != current || current.nil?
+            current = el
+	  else
+            nil
+	  end 
+	end
+	r
       else
         res
       end
@@ -125,6 +128,14 @@ module Gitter
       grid.params
     end
 
+    def cell model
+      grid.decorate model
+      if block
+        content = grid.eval block, model
+      else
+        model.send(attr) || ''
+      end
+    end
   end
 
 end

@@ -64,9 +64,9 @@ module Gitter
 	cells = []
 	nil_padded_cells.each_with_index do |c,i|
            if c
-             height = nil_padded_cells.slice(i+1..-1).count{|x|x.nil?} + 1
+             height = consecutive_count(nil_padded_cells.slice(i+1..-1), nil) + 1
              cells << Cell.new(c, rowspan: height) 
-	   else
+	   else  # required for transpose
              cells << nil
 	   end
 	end
@@ -75,7 +75,6 @@ module Gitter
     end
  
     def rows scope = self.scope 
-	    puts "AAAAAAAAAA scope=#{scope.to_sql}"
       res = []
       models(scope).each{|model| res += rows_for(model)}
       res
@@ -102,6 +101,18 @@ module Gitter
           nil
         end
       end
+    end
+
+    def consecutive_count arr, what
+      count = 0
+      arr.each do |el|
+        if el == what
+          count +=1 
+	else
+          break
+	end
+      end
+      count
     end
 
    end
