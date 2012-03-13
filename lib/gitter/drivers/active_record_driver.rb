@@ -12,7 +12,7 @@ module Gitter
         when String then desc
         else attr 
       end
-      new scope.except(:order).order(what)
+      new scope.except(:order).order(what.to_s)
     end
    
     def unordered
