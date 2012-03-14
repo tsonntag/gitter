@@ -23,10 +23,10 @@ module Gitter
              content = header_opt
              h_opts = {}
            end
-           Header.new grid, name, content, h_opts.merge(:column => self)
+           Header.new grid, content, h_opts.merge(:column => self)
         end
       else
-        @headers = [Header.new(grid, name, nil, opts.merge(:column => self))]
+        @headers = [Header.new(grid, name, opts.merge(:column => self))]
       end
     end
 

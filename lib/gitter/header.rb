@@ -5,12 +5,13 @@ module Gitter
       new :blank, false
     end
 
-    attr_reader :grid, :name, :content, :html_options, :column
+    attr_reader :grid, :content, :html_options, :column
 
     def initialize grid, *args
       opts = args.extract_options!
+      raise ArgumentError, 'too many arguments' if args.size > 1
       @grid = grid
-      @name, @content = *args
+      @content = args.first
       @column = opts.delete(:column){nil}
       @html_options = opts
     end
@@ -18,7 +19,7 @@ module Gitter
     def label
       @label ||= case content
 	when false then ''
-	when nil then grid.translate(:headers, name)
+	when Symbol then grid.translate(:headers, name)
         else content
       end
     end
@@ -29,6 +30,10 @@ module Gitter
       else
 	label
       end
+    end
+
+    def name
+      @name ||= Symbol === content ? content : 'n/a'
     end
 
     def to_s
