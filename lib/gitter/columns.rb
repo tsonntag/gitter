@@ -81,7 +81,6 @@ module Gitter
     end
 
     def models scope = self.scope
-	    puts "MMMMMMMMMMMMMMMMMMMM #{scope.to_sql}"
       if t = self.class.transform
         t.arity == 2 ? t.call(scope,self) : t.call(scope)
       else

@@ -37,6 +37,7 @@ module Gitter
         cell model
       end 
 
+      # set consecutively equal cells to nil
       if uniq && Array === res
         current = nil 
         r = res.map do |el|
@@ -63,9 +64,11 @@ module Gitter
         else params[:desc]
       end
 
-      if Proc === order
-        arr = d.scope.map{|model| [model.instance_eval(&order),model]}
-        d.new arr.sort{|a,b| (desc ? -1 : 1)*(a<=>b) }.map{|a|a[1]}
+      case order
+      when :cell
+        array_sort(d,desc){|model|cell model}
+      when Proc
+        array_sort(d,desc){|model|grid.eval(order,model)}
       else
         d.order order, desc
       end
@@ -135,6 +138,11 @@ module Gitter
       else
         model.send(attr) || ''
       end
+    end
+
+    def array_sort driver, desc
+      arr = driver.scope.map{|model| [yield(model),model]}
+      driver.new arr.sort{|a,b| (desc ? -1 : 1)*(a<=>b) }.map{|a|a[1]}
     end
   end
 
