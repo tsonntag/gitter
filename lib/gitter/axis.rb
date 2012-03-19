@@ -26,7 +26,7 @@ module Gitter
         attr
       end
 
-      data = (data & @only_data) if @only_data
+      data = ((data + @only_data) & @only_data).uniq if @only_data
       data = data - @except
     end
 

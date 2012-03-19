@@ -1,6 +1,6 @@
   class AbstractFilter
 
-    attr_reader :grid, :name, :input_options, :input_tag, :format
+    attr_reader :grid, :name, :input_options, :input_tag, :formatter, :find_format, :order
 
     def initialize grid, name, opts ={}
        @grid, @name = grid, name
@@ -11,8 +11,10 @@
        
        @exact = opts.fetch(:exact){true}
        @ignore_case = opts.fetch(:ignore_case){false}
-       @format = opts[:format]
+       @formatter = opts[:formatter]
+       @find_format = opts[:find_format]
        @param_scoped = opts.fetch(:param_scoped){true}
+       @order = opts.fetch(:order)
 
        # replace shortcut
        if coll = opts[:input_collection]
@@ -34,6 +36,14 @@
 
     def param_scoped?
       @param_scoped
+    end
+
+    def selected_value
+      @selected_value ||= grid.filter_value name
+    end
+
+    def selected?
+      selected_value.present?
     end
 
     def counts driver = grid.filtered_driver
@@ -61,6 +71,14 @@
 
     def select_tag collection 
       h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), :class => 'grid'
+    end
+
+    def format value
+      case formatter
+      when Hash then formatter[value]
+      when Proc then formatter.call value
+      else value;
+      end
     end
 
     private

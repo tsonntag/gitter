@@ -18,14 +18,14 @@ module Gitter
       end
     end
   
-    attr_reader :params, :facets, :decorator
+    attr_reader :params, :decorator
 
     def initialize *args
       opts = args.extract_options!
       @decorator = Artdeco::Decorator.new *args, opts
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-      @filters, @values, @facets = {}, {}, [] 
+      @filters, @values, @facets = {}, {}, {} 
       instance_eval &self.class.grid
 
       @scope = opts.delete(:scope){@scope}
@@ -93,13 +93,21 @@ module Gitter
         ColumnFilter.new self, name, opts
       end
 
-      @facets << Facet.new(filter) if opts.delete(:facet)
+      @facets[name] = Facet.new(filter) if opts.delete(:facet)
       @filters[name] = filter 
     end
 
     # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
     def search name, opts = {} 
       filter name, { :exact => false, :ignore_case => true }.merge(opts)
+    end
+
+    def facets
+      @_facets_ ||= @facets.keys
+    end
+
+    def facet name
+      @facets[name]
     end
 
     private

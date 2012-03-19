@@ -3,7 +3,7 @@ module Gitter
   
   class ActiveRecordDriver < AbstractDriver
     
-    delegate :group, :count, :to => :scope
+    delegate :count, :to => :scope
     
     def order attr, desc = nil
       what = case desc
@@ -19,7 +19,11 @@ module Gitter
       new scope.except(:order)
     end
 
-    def where( attr_values, exact = true, ignore_case = true, format = nil)
+    def group arg
+      new scope.group(arg)
+    end
+
+    def where  attr_values, exact = true, ignore_case = true, find_format = nil
       # has range?
       return new scope.where(attr_values) if Range === attr_values.values.first
 
@@ -31,7 +35,7 @@ module Gitter
         text = exact ? value : "%#{value}%"
         col, token = attr, ":q#{token_i}"
         col, token = upper(col), upper(token) if ignore_case
-        col = format.call(col) if format
+        col = find_format.call(col) if find_format
         tokens[:"q#{token_i}"] = text 
         token_i += 1
         "#{col} #{exact ? '=' : 'LIKE'} #{token}"

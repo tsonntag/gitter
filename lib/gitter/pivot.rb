@@ -28,9 +28,12 @@ module Gitter
   
     def drill_down *names
       if names.present?
-        @drill_down ||= [names].flatten.map{|name| @filters[name] or raise ConfigurationError, "unknown filter #{name}"}
+        @drill_down ||= [names].flatten.map do |name| 
+          filter = @filters[name] or raise ConfigurationError, "unknown filter #{name}"
+          Facet.new filter
+	end
       else
-        @drill_down ||= @filters
+        @drill_down ||= @filters.map{|f|Facet.new f}
       end
     end
 

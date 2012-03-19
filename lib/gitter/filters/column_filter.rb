@@ -18,12 +18,12 @@ module Gitter
       return driver if value.blank?
 
       attr_values = columns.inject({}){|memo,column| memo[column] = value; memo}
-      driver.where attr_values, exact(opts), ignore_case(opts), format
+      driver.where attr_values, exact(opts), ignore_case(opts), find_format
     end
 
     def counts driver = grid.filtered_driver
       if columns.size == 1
-        driver.unordered.group(columns.first).count
+	ordered(driver).group(columns.first).count
       else
         super
       end
@@ -31,12 +31,23 @@ module Gitter
 
     def distinct_values driver = grid.filtered_driver
       if columns.size == 1
-        driver.unordered.distinct_values(columns.first)
+        ordered(driver).distinct_values(columns.first)
       else
         super
       end
     end
 
+    private
+    def ordered driver
+      order_attr = case order
+          when true then columns.first
+	  when String, Symbol then order
+	  else nil;
+          end
+      s = driver.unordered
+      s = s.order(order_attr) if order_attr
+      s
+    end
   end
 
 end 

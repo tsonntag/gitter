@@ -5,32 +5,36 @@ module Gitter
   class FacetData
     include Utils
 
-    attr_reader :facet, :value, :count
+    attr_reader :facet, :raw_value, :count
     delegate :grid, :name, to: :facet
     delegate :h, to: :grid
 
-    def initialize facet, value, count 
-      @facet, @value, @count = facet, value, count 
+    def initialize facet, raw_value, count 
+      @facet, @raw_value, @count = facet, raw_value, count 
+    end
+
+    def value
+      @value ||= facet.format raw_value
     end
 
     def params
-      { name => value }
+      @params ||= grid.scoped_params name => raw_value
     end
 
     def selected?
-      @selected ||= facet.selected_value == value.to_s
+      @selected ||= facet.selected_value == raw_value.to_s
     end
 
     def link
       @link ||= begin
         p = grid.params.dup 
         p.delete name
-        p[name] = value if value.present?
+        p[name] = raw_value if raw_value.present?
         p = grid.scoped_params p
         p[:page] = 1
 
         value_class = selected? ? 'facet_value_selected' : 'selected' 
-        value_tag = h.content_tag :span, (value.nil? ? '-' : value), class: value_class
+        value_tag = h.content_tag :span, (raw_value.nil? ? '-' : raw_value), class: value_class
         value_tag = h.link_to value_tag, url_for(p)
 
         if selected? or not facet.selected?
@@ -45,14 +49,14 @@ module Gitter
     end
 
     def to_s
-      "#{name}:#{value}=#{count}"
+      "#{name}:#{value}(#{raw_value})=#{count}"
     end
 
   end
 
   class Facet
     attr_reader :filter
-    delegate :grid, :name, to: :filter
+    delegate :grid, :name, :selected_value, :selected?, :format, to: :filter
 
     def initialize filter
       @filter = filter
@@ -62,16 +66,12 @@ module Gitter
       filter.label or grid.translate(:facets, name)
     end
 
-    def selected_value
-      @selected_value ||= grid.filter_value filter.name
-    end
-
-    def selected?
-      selected_value.present?
-    end
-
     def params_for_any
       grid.scoped_params grid.params.reject{|k,v| k == name}
+    end
+
+    def selected_data opts = {}
+      data(opts).detect{|d|d.selected?}
     end
 
     def data opts = {}
