@@ -25,12 +25,11 @@ module Gitter
       @decorator = Artdeco::Decorator.new *args, opts
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-      @filters, @facets = {}, [] 
+      @filters, @values, @facets = {}, {}, [] 
       instance_eval &self.class.grid
 
       @scope = opts.delete(:scope){@scope}
 
-      @values = {}
       @decorator.params.symbolize_keys.each do |name, value|
         if (name != key) and (filter = @filters[name]) and not filter.param_scoped?
           @values[name] = value

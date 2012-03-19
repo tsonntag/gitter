@@ -48,7 +48,7 @@
       return '' unless input?
 
       @input_tag ||= if col = collection
-        col = [''] + col if include_blank?
+        col = [''] + col if include_blank? && col.size > 1
         select_tag col
       else
         text_field_tag

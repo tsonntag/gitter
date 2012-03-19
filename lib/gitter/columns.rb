@@ -74,9 +74,9 @@ module Gitter
       end.transpose
     end
  
-    def rows scope = self.scope 
+    def rows scope = nil
       res = []
-      models(scope).each{|model| res += rows_for(model)}
+      models(scope||self.scope).each{|model| res += rows_for(model)}
       res
     end
 
@@ -89,7 +89,7 @@ module Gitter
     end
  
     def columns
-      @columns.values
+      (@columns||={}).values
     end
 
     def order_column

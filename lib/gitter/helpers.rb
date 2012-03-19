@@ -7,7 +7,7 @@ module Gitter
 
     # used to scope params of requests 
     def key
-      @key ||= name.intern
+      @key ||= :grid#name.intern
     end
 
     def scoped_params params

@@ -7,7 +7,7 @@ module Gitter
     def initialize grid, name, filters, opts = {} 
       super grid, name, opts
       @filters = filters.inject({}){|memo,filter| memo[filter.name] = filter; memo}
-      if @input_options 
+      if @input_options == true
         @input_options = {}
         @input_options[:collection] = @filters.keys
       end
