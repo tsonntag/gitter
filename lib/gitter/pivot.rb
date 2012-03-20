@@ -28,12 +28,9 @@ module Gitter
   
     def drill_down *names
       if names.present?
-        @drill_down ||= [names].flatten.map do |name| 
-          filter = @filters[name] or raise ConfigurationError, "unknown filter #{name}"
-          Facet.new filter
-	end
+        @drill_down ||= facet_for names
       else
-        @drill_down ||= @filters.map{|f|Facet.new f}
+        @drill_down ||= @filters.keys
       end
     end
 
@@ -63,10 +60,33 @@ module Gitter
         end
       end
     end
-  
+
+    # returns [ down, current, ups ]
+    def drill_down_facets
+      drill = drill_down.reverse
+      i = drill.find_index{|f|f.selected?}
+      if i == 0
+        down = nil
+	current, *ups = drill[0..-1]
+      else
+        down, current, *ups = drill[i-1..-1]
+      end
+
+      [ down, current, ups ]
+    end
+
     private
     def data_scope
       @data_scope ||= scope.group(x_axis.attr).group(y_axis.attr)
+    end
+
+    def facet_for arg
+      if arg.respond_to? :map
+         arg.map{|a|facet_for a}
+      else
+        filter = @filters[arg] or raise ConfigurationError, "unknown filter #{arg}"
+	Facet.new filter
+      end
     end
   
   end

@@ -31,7 +31,6 @@ module Gitter
     end
 
     def cells model
-      puts "BBBBBBBBBBB cells #{name}, model=#{model.inspect}"
       res = if map && Array === model
         model.map{|m| cells m}
       else
@@ -133,7 +132,6 @@ module Gitter
     end
 
     def cell model
-      puts "AAAAAAAAAA #{name}, model=#{model.inspect}"
       grid.decorate model
       if block
         content = grid.eval block, model

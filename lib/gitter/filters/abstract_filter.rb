@@ -14,7 +14,7 @@
        @formatter = opts[:formatter]
        @find_format = opts[:find_format]
        @param_scoped = opts.fetch(:param_scoped){true}
-       @order = opts.fetch(:order)
+       @order = opts[:order]
 
        # replace shortcut
        if coll = opts[:input_collection]

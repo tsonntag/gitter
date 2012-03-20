@@ -103,7 +103,7 @@ module Gitter
     end
 
     def facets
-      @_facets_ ||= @facets.keys
+      @_facets_ ||= @facets.values
     end
 
     def facet name
