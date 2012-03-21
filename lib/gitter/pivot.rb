@@ -2,6 +2,20 @@ module Gitter
   
   module Pivot
 
+    def pivot_cells *groups
+      opts = groups.extract_options!
+      sum = opts[:sum]
+      count = opts[:count]; count = :id if count == true
+
+      groups = [groups].flatten
+
+      cells = self.scope
+      groups.each{ |g| cells = cells.group(g)}
+      cells = cells.sum(sum) if sum
+      cells = cells.count(:id) if count
+      cells
+    end
+
     def x_axis *args
       if args.present?
         @x_axis = Axis.new self, *args 
@@ -88,6 +102,6 @@ module Gitter
 	Facet.new filter
       end
     end
-  
+
   end
 end
