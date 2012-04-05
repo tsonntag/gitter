@@ -3,6 +3,8 @@ require 'action_view'
 module Gitter
 
   class TableCell 
+    include ActionView::Helpers::NumberHelper
+
 
     attr_reader :x, :y, :content
 
@@ -11,11 +13,15 @@ module Gitter
     end
 
     def html opts = {}
-      Table.tag :td, content, opts.merge(class: "#{x} #{y}")
+      Table.tag :td, formatted_content, opts.merge(class: "#{x} #{y}")
     end
 
     def header?
       false
+    end
+
+    def formatted_content
+      number_with_delimiter content, delimiter: '.'
     end
   end
 
@@ -27,7 +33,7 @@ module Gitter
     end
 
     def html opts = {}
-      Table.tag :th, content, opts
+      Table.tag :th, formatted_content, opts
     end
 
     def header?
@@ -50,11 +56,16 @@ module Gitter
     #   # data: hash from [x_key,y_key] to cell_array 
     def initialize title, x_axis, y_axis, data, opts = {}
       @title, @x_axis, @y_axis, @data, @opts = title, x_axis, y_axis, data, opts
+      @cells = data.dup
       if label = opts[:show_sums]
-        add_sums_to_cells data
-        @x_axis = add_sums_to_axis @x_axis, label
-        @y_axis = add_sums_to_axis @y_axis, label
+        add_sums
+        @x_axis = add_sum_label_to_axis @x_axis, label
+        @y_axis = add_sum_label_to_axis @y_axis, label
       end
+    end
+
+    def empty?
+      data.empty?
     end
 
     def rows
@@ -64,7 +75,7 @@ module Gitter
 
         rows + (y_axis||[nil]).map do |y,y_title|
            row = (x_axis||[nil]).map do |x,x_title|
-             cell = data[pivot_key(x,y)]
+             cell = @cells[cell_key(x,y)]
              cell = yield cell, x, y if block_given?
              TableCell.new x, y, cell
 	   end
@@ -97,7 +108,7 @@ module Gitter
       end
     end
 
-    def pivot_key x, y
+    def cell_key x, y
       if x.nil? || y.nil?
         x.nil? ? y : x
       else
@@ -105,22 +116,22 @@ module Gitter
       end
     end
 
-    def add_sums_to_cells cells
-      xcells, ycells = {}, {}
+    def add_sums
+      xsums, ysums = {}, {}
       sum = 0
-      cells.each do |key,value|
+      @cells.each do |key,value|
         x, y = *key
-        xcells[y] = (xcells[y]||0) + value
-        ycells[x] = (ycells[x]||0) + value
+        xsums[y] = (xsums[y]||0) + value
+        ysums[x] = (ysums[x]||0) + value
         sum += value
       end
-      xcells.each{|y,sum| cells[pivot_key(:sum,y)] = sum}
-      ycells.each{|x,sum| cells[pivot_key(x,:sum)] = sum}
-      cells[[:sum,:sum]] = sum
-      cells
+      xsums.each{|y,sum| @cells[cell_key(:sum,y)] = sum}
+      ysums.each{|x,sum| @cells[cell_key(x,:sum)] = sum}
+      @cells[[:sum,:sum]] = sum
+      @cells
     end
 
-    def add_sums_to_axis axis, label = nil
+    def add_sum_label_to_axis axis, label = nil
       label = 'Sum' unless String === label
       case axis
       when Array then axis + [[:sum, label]]
