@@ -18,7 +18,7 @@ module Gitter
       end
     end
   
-    attr_reader :params, :decorator
+    attr_reader :params, :decorator, :options
 
     def initialize *args
       opts = args.extract_options!
@@ -26,9 +26,12 @@ module Gitter
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
       @filters, @values, @facets = {}, {}, {} 
+      scope = opts.delete(:scope){nil}
+      @options = opts.dup
+
       instance_eval &self.class.grid
 
-      @scope = opts.delete(:scope){@scope}
+      @scope = scope || @scope
 
       @decorator.params.symbolize_keys.each do |name, value|
         if (name != key) and (filter = @filters[name]) and not filter.param_scoped?

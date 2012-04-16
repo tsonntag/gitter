@@ -11,16 +11,6 @@ module Gitter
       alias_method_chain :scope, :columns
     end
   
-    module ClassMethods
-      def transform &transform
-	if transform
-          @transform = transform
-	else
-          @transform
-	end
-      end
-    end
-
     def header_row
       @current_header_row = []
       yield
@@ -81,8 +71,8 @@ module Gitter
     end
 
     def models scope = self.scope
-      if t = self.class.transform
-        t.arity == 2 ? t.call(scope,self) : t.call(scope)
+      if respond_to? :transform
+        transform scope
       else
         scope
       end
