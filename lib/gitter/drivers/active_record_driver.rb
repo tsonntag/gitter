@@ -16,6 +16,8 @@ module Gitter
     end
    
     def unordered
+      puts "AAAAAAAAA scope: #{scope.to_sql}"
+      puts "AAAAAAAAA scope.except(:order): #{scope.except(:order).to_sql}"
       new scope.except(:order)
     end
 

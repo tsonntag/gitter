@@ -9,17 +9,20 @@ module Gitter
     def breadcrumbs
       @breadcrumbs ||= begin
         p = {}
-        text = @filters_values.map do |filter, value|
-          p[filter.label] = value
+        text = filters.map do |filter|
+          p[filter.label] = filter_value(filter.name)
         end
         p
       end
     end
 
-    def render_breadcrumbs( join = '>' )
+    def render_breadcrumbs delim = '>'
+      delim_tag = h.content_tag :span, delim, {:class => 'breadcrumb_delim'}
+
       @rendered_breadcrumbs ||= begin
         p = {}
-        text = @filters_values.map do |filter, value|
+        text = filters.map do |filter|
+          value = filter_value filter.name
           if value.present?
             s =  h.content_tag :span, "#{filter.label} : ", :class => 'breadcrumb_key'
             s += h.content_tag :span, value,                :class => 'breadcrumb_value'            
@@ -28,7 +31,7 @@ module Gitter
           else
             nil
           end
-        end.compact.join(join)
+        end.compact.join(delim_tag)
         h.content_tag :span, text, {:class => 'breadcrumbs'}, false
       end
     end
