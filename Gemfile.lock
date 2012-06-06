@@ -43,9 +43,9 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   activesupport
-  artdeco
+  artdeco (~> 1.0.0)
   bundler
   guard-rspec
-  rake (= 0.8.7)
+  rake
   rspec
   sqlite3

@@ -39,6 +39,11 @@ module Gitter
     def header?
       true
     end
+
+    def formatted_content
+      content
+    end
+
   end
 
   class Table

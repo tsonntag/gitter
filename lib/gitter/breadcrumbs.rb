@@ -19,20 +19,23 @@ module Gitter
     def render_breadcrumbs delim = '>', params = {}
       delim_tag = h.content_tag :span, delim, {:class => 'breadcrumb_delim'}
 
-      @rendered_breadcrumbs ||= begin
-        p = {}
-        text = filters.map do |filter|
-          value = filter_value filter.name
-          if value.present?
-            s =  h.content_tag :span, "#{filter.label}:", :class => 'breadcrumb_key'
-            s += h.content_tag :span, value,              :class => 'breadcrumb_value'            
-            p[filter.name] = value
-            h.link_to s, url_for(scoped_params(p).merge(params))
-          else
-            nil
-          end
-        end.compact.join(delim_tag)
-        h.content_tag :span, text, {:class => 'breadcrumbs'}, false
+      p = {}
+      breadcrumbs = filters.map do |filter|
+        value = filter_value filter.name
+        if value.present?
+          s =  h.content_tag :span, "#{filter.label}:", :class => 'breadcrumb_key'
+          s += h.content_tag :span, value,              :class => 'breadcrumb_value'            
+          p[filter.name] = value
+          h.link_to s, url_for(scoped_params(p).merge(params))
+        else
+          nil
+        end
+      end.compact
+
+      if breadcrumbs.present? 
+        h.content_tag :span, breadcrumbs.join(delim_tag), {:class => 'breadcrumbs'}, false
+      else
+        nil
       end
     end
 

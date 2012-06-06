@@ -2,13 +2,11 @@ source 'http://rubygems.org'
 
 gem 'activesupport'
 gem 'activerecord'
-gem 'artdeco'
+gem 'artdeco', '~>1.0.0'
 
 group :development, :test do
-  gem 'rake', '= 0.8.7'
+  gem 'rake'
   gem 'bundler'
-  #gem 'ruby-debug', :platform => 'mri_18'
-  #gem 'ruby-debug19', :platform => 'mri_19'
 end
 
 group :test do

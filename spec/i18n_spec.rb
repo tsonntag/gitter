@@ -26,8 +26,10 @@ describe 'I18n' do
   end
 
   class HeaderGrid < Gitter::Grid
-    scope do Person.scoped end
-    column :localname, :column => :name
+    grid do 
+      scope do Person.scoped end
+      column :localname, :column => :name
+    end
   end
   
   it 'should translate column headers' do

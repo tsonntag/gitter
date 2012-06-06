@@ -18,7 +18,7 @@ module Gitter
       end
     end
   
-    attr_reader :params, :decorator, :options
+    attr_reader :params, :decorator, :options, :values
 
     def initialize *args
       opts = args.extract_options!
@@ -51,6 +51,14 @@ module Gitter
 
     def filters
       @filters.values 
+    end
+
+    def filter_for name
+      @filters[name]     
+    end
+
+    def label name
+      filter_for(name).label
     end
 
     def driver
