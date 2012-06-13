@@ -1,26 +1,23 @@
   class AbstractFilter
 
-    attr_reader :grid, :name, :input_options, :input_tag, :formatter, :order
+    attr_reader :grid, :name, :input_options, :input_tag, :formatter, :order, :label
 
-    def initialize grid, name, opts ={}
+    def initialize grid, name, opts = {}
        @grid, @name = grid, name
-       @label = opts[:label]
-       @input_options = opts[:input]
-       @input_tag = opts[:input_tag]
-       @include_blank = opts[:include_blank]
+       @label = opts.delete(:label){grid.translate(:filters, name)}
+       @input_options = opts.delete(:input){nil}
+       @input_tag = opts.delete(:input_tag){nil}
+       @include_blank = opts.delete(:include_blank){false}
        
-       @formatter = opts[:formatter]
-       @param_scoped = opts.fetch(:param_scoped){true}
-       @order = opts[:order]
+       @formatter = opts.delete(:formatter){nil}
+       @param_scoped = opts.delete(:param_scoped){true}
+       @order = opts.delete(:order){nil}
 
        # replace shortcut
-       if coll = opts[:input_collection]
+       if coll = opts.delete(:input_collection){nil}
          (@input_options||={})[:collection] = coll
        end
-    end
-
-    def label
-      @label ||= grid.translate(:filters, name)
+       @opts = opts
     end
 
     def input?
