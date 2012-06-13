@@ -24,13 +24,14 @@ module Gitter
     def counts driver = nil
       @filters.values.inject({}) do |memo,filter|
         count = filter.counts[true]
-        memo[filter.name] = count if count > 0
+        memo[filter.label] = count if count > 0
         memo
       end
     end
 
     def distinct_values driver = nil
-      @distinct_values ||= @filters.keys.map
+      #@distinct_values ||= @filters.keys
+      @distinct_values ||= @filters.values.map(&:label)
     end
   end
 
