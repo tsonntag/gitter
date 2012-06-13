@@ -25,7 +25,7 @@ module Gitter
 
     def where attr_values, opts = {}
       exact = opts.fetch(:exact){true}
-      ignore_case = opts.fetch(:ignore_case){true}
+      ignore_case = opts.fetch(:ignore_case){false}
       find_format = opts.fetch(:find_format){nil}
       strip_blank = opts.fetch(:strip_blank){false}
 
