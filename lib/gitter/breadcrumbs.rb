@@ -17,14 +17,14 @@ module Gitter
     end
 
     def render_breadcrumbs delim = '>', params = {}
-      delim_tag = h.content_tag :span, delim, {:class => 'breadcrumb_delim'}
+      delim_tag = h.content_tag :span, delim, {class: 'breadcrumb_delim'}
 
       p = {}
       breadcrumbs = filters.map do |filter|
         value = filter_value filter.name
         if value.present?
-          s =  h.content_tag :span, "#{filter.label}:", :class => 'breadcrumb_key'
-          s += h.content_tag :span, value,              :class => 'breadcrumb_value'            
+          s =  h.content_tag :span, "#{filter.label}:", class: 'breadcrumb_key'
+          s += h.content_tag :span, value,              class: 'breadcrumb_value'            
           p[filter.name] = value
           h.link_to s, url_for(scoped_params(p).merge(params))
         else
@@ -33,7 +33,7 @@ module Gitter
       end.compact
 
       if breadcrumbs.present? 
-        h.content_tag :span, breadcrumbs.join(delim_tag), {:class => 'breadcrumbs'}, false
+        h.content_tag :span, breadcrumbs.join(delim_tag), {class: 'breadcrumbs'}, false
       else
         nil
       end

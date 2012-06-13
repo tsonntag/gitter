@@ -23,6 +23,7 @@ module Gitter
     def initialize *args
       opts = args.extract_options!
       @decorator = Artdeco::Decorator.new *args, opts
+
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
       @filters, @values, @facets = {}, {}, {} 
@@ -33,13 +34,8 @@ module Gitter
 
       @scope = scope || @scope
 
-      @decorator.params.symbolize_keys.each do |name, value|
-        if (name != key) and (filter = @filters[name]) and not filter.param_scoped?
-          @values[name] = value
-        end
-      end
       @params.each do |name, value|
-        if filter = @filters[name]
+        if filter = @filters[name] 
           @values[name] = value
         end
       end
@@ -71,7 +67,7 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @values.each{|name, value| d = @filters[name].apply d, value, params }
+        @values.each{|name, value| d = @filters[name].apply d, value }
         d
       end
     end

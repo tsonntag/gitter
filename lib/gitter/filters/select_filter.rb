@@ -13,8 +13,8 @@ module Gitter
       end
     end
 
-    def apply driver, *args
-      if filter = @filters[:"#{args.first}"]
+    def apply driver, value 
+      if filter = @filters[:"#{value}"]
         filter.apply driver
       else
         driver

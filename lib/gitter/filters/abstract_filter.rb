@@ -88,4 +88,7 @@
       @h ||= grid.h
     end
 
+    def sort_hash hash
+      hash.keys.sort.inject({}){|memo,k|memo[k] = hash[k]; memo}
+    end
 end

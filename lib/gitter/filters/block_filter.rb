@@ -8,10 +8,8 @@ module Gitter
        super grid, name, options
      end
 
-     def apply driver, *args
-       opts = args.extract_options!
-
-       driver.new @block.call(driver.scope, *args)
+     def apply driver, value = nil 
+       driver.new @block.call(driver.scope, value)
      end
      
   end
