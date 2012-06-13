@@ -28,7 +28,6 @@ module Gitter
     def link
       @link ||= begin
         p = grid.params.dup 
-        puts "BBBBBBBBBB #{self}, p=#{p.inspect}"
         p.delete name
         p[name] = raw_value if raw_value.present?
         p = grid.scoped_params p
