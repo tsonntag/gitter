@@ -5,7 +5,7 @@ module Gitter
     
     attr_reader :scope
     
-    def initialize(scope)
+    def initialize scope
       @scope = scope
     end
 
@@ -15,7 +15,8 @@ module Gitter
     
     # order( attr, desc = nil)
 
-    # where( attr_values, exact = true, ignore_case = true)
+    # where( attr_values, opts = {} )
+    # where opts may be :exact, :ignore_case, :strip_blank, :find_format
 
     # where_greater_or_equal( attr, value )
 

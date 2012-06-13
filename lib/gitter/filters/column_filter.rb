@@ -18,7 +18,7 @@ module Gitter
       return driver if value.blank?
 
       attr_values = columns.inject({}){|memo,column| memo[column] = value; memo}
-      driver.where attr_values, exact(opts), ignore_case(opts), find_format
+      driver.where attr_values, @opts.merge(opts)
     end
 
     def counts driver = grid.filtered_driver

@@ -108,9 +108,9 @@ module Gitter
       @filters[name] = filter 
     end
 
-    # shortcut for filter name, { :exact => false, :ignore_case => true }.merge(options)
+    # shortcut for filter name, { exact: false, ignore_case: true, strip_blank: true }.merge(options)
     def search name, opts = {} 
-      filter name, { :exact => false, :ignore_case => true }.merge(opts)
+      filter name, { exact: false, ignore_case: true, strip_blank: true }.merge(opts)
     end
 
     def facets

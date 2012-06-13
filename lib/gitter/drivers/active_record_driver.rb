@@ -3,7 +3,7 @@ module Gitter
   
   class ActiveRecordDriver < AbstractDriver
     
-    delegate :count, :to => :scope
+    delegate :count, to: :scope
     
     def order attr, desc = nil
       what = case desc
@@ -23,7 +23,12 @@ module Gitter
       new scope.group(arg)
     end
 
-    def where  attr_values, exact = true, ignore_case = true, find_format = nil
+    def where attr_values, opts = {}
+      exact = opts.fetch(:exact){true}
+      ignore_case = opts.fetch(:ignore_case){true}
+      find_format = opts.fetch(:find_format){nil}
+      strip_blank = opts.fetch(:strip_blank){false}
+
       # has range?
       return new scope.where(attr_values) if Range === attr_values.values.first
 
@@ -32,6 +37,7 @@ module Gitter
 
       conditions = attr_values.map do |attr,value| 
         raise ArgumentError, "invalid range #{value} for #{attr}" if Range === value
+        value = value.strip if strip_blank
         text = exact ? value : "%#{value}%"
         col, token = attr, ":q#{token_i}"
         col, token = upper(col), upper(token) if ignore_case
