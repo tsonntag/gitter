@@ -30,7 +30,6 @@ module Gitter
     end
 
     def distinct_values driver = nil
-      #@distinct_values ||= @filters.keys
       @distinct_values ||= @filters.values.map(&:label)
     end
   end
