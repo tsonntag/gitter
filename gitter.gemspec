@@ -22,4 +22,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = %w(lib assets) 
+  s.add_dependency 'activesupport', '>=3.2'
+  s.add_dependency 'activerecord', '>=3.2'
+  s.add_dependency 'artdeco',      '>=1.2'
 end

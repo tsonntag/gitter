@@ -1,9 +1,5 @@
 source 'http://rubygems.org'
 
-gem 'activesupport'
-gem 'activerecord'
-gem 'artdeco', '~>1.0.0'
-
 group :development, :test do
   gem 'rake'
   gem 'bundler'
@@ -14,3 +10,5 @@ group :test do
   gem 'rspec'
   gem 'guard-rspec'
 end
+
+gemspec

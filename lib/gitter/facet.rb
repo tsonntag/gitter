@@ -9,8 +9,8 @@ module Gitter
     delegate :grid, :name, to: :facet
     delegate :h, to: :grid
 
-    def initialize facet, raw_value, count 
-      @facet, @raw_value, @count = facet, raw_value, count 
+    def initialize facet, raw_value, label, count 
+      @facet, @raw_value, @label, @count = facet, raw_value, label, count 
     end
 
     def value
@@ -25,6 +25,11 @@ module Gitter
       @selected ||= facet.selected_value == raw_value.to_s
     end
 
+    def label
+      #@label || grid.translate(:facets, raw_value) || '-'
+      @label || raw_value || '-'
+    end
+
     def link
       @link ||= begin
         p = grid.params.dup 
@@ -34,7 +39,7 @@ module Gitter
         p[:page] = 1
 
         value_class = selected? ? 'facet_value_selected' : 'selected' 
-        value_tag = h.content_tag :span, (raw_value.nil? ? '-' : raw_value), class: value_class
+        value_tag = h.content_tag :span, label, class: value_class
         value_tag = h.link_to value_tag, url_for(p)
 
         if selected? or not facet.selected?
@@ -63,7 +68,7 @@ module Gitter
     end
 
     def label
-      filter.label or grid.translate(:facets, name)
+      filter.label || grid.translate(:facets, name)
     end
 
     def params_for_any
@@ -77,8 +82,8 @@ module Gitter
     def data opts = {}
       values_to_counts = filter.counts
       values = opts[:include_zeros] ? filter.distinct_values(grid.driver) : values_to_counts.keys
-      values.map do |value|
-        FacetData.new self, value, (values_to_counts[value]||0)
+      values.map do |value,label|
+        FacetData.new self, value, label, (values_to_counts[value]||0)
       end
     end
 
