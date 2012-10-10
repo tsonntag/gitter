@@ -2,7 +2,7 @@ module Gitter
 
   class Column
 
-    attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc, :uniq, :map
+    attr_reader :grid, :name, :headers, :attr, :block, :order, :order_desc, :uniq, :map, :html_options
 
     def initialize grid, name, opts = {}, &block
       @grid, @name, @block = grid, name, block
@@ -12,6 +12,7 @@ module Gitter
       @order_desc = opts.delete :order_desc
       @uniq = opts.delete :uniq
       @map = opts.delete(:map){true}
+      @html_options = opts.delete(:html_options){{}}
       if opts.has_key?(:header) || opts.has_key?(:headers)  # handle :header => false correctly
          header_opts = opts.delete(:header){opts.delete(:headers)}
          @headers = [header_opts].flatten.map do |header_opt|

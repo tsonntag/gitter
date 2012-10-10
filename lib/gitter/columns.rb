@@ -53,7 +53,7 @@ module Gitter
         nil_padded_cells = Array.new(max){|i| col[i]}
 	cells = []
 	nil_padded_cells.each_with_index do |c,i|
-           if c
+           unless c.nil?
              height = consecutive_count(nil_padded_cells.slice(i+1..-1), nil) + 1
              cells << Cell.new(c, rowspan: height) 
 	   else  # required for transpose
