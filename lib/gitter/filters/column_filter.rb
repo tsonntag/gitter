@@ -2,10 +2,11 @@ module Gitter
 
   class ColumnFilter < AbstractFilter
 
-    attr_reader :columns
+    attr_reader :columns, :values
 
     def initialize grid, name, opts = {}
       @columns = [opts[:column]||opts[:columns]||name].flatten
+      @values = opts[:values]
       super
     end
 
@@ -18,7 +19,8 @@ module Gitter
 
     def counts driver = grid.filtered_driver
       if columns.size == 1
-	sort_hash ordered(driver).group(columns.first).count
+	#sort_hash ordered(driver).group(columns.first).count
+	sort_hash driver.unordered.group(columns.first).count
       else
         super
       end
@@ -26,7 +28,8 @@ module Gitter
 
     def distinct_values driver = grid.filtered_driver
       if columns.size == 1
-        ordered(driver).distinct_values(columns.first).sort
+        #ordered(driver).distinct_values(columns.first).sort
+        values || driver.unordered.distinct_values(columns.first).sort
       else
         super
       end
