@@ -28,7 +28,6 @@ module Gitter
 
     def distinct_values driver = grid.filtered_driver
       if columns.size == 1
-        #ordered(driver).distinct_values(columns.first).sort
         values || driver.unordered.distinct_values(columns.first).sort
       else
         super

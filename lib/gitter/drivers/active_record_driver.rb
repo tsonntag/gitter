@@ -71,6 +71,10 @@ module Gitter
       scope.select(attr).uniq.map(&:"#{attribute}").uniq
     end
 
+    def to_s
+      scope.to_sql
+    end
+
     private 
 
     def upper(text)

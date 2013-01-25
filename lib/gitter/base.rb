@@ -67,7 +67,9 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @values.each{|name, value| d = @filters[name].apply d, value }
+        @values.each do |name, value| 
+          d = @filters[name].apply d, value
+        end
         d
       end
     end
@@ -92,15 +94,21 @@ module Gitter
       when block 
         BlockFilter.new self, name, opts, &block
       when select = opts.delete(:select)
+        if opts[:facet] && opts[:facet] != true
+          opts.merge! values: opts[:facet]
+        end
         filters = [select].flatten.map{|name| @filters[name] || scope_filter(name)}
         SelectFilter.new self, name, filters, opts
       when s = opts.delete(:scope)
         scope_filter( s == true ? name : s, opts )
       else 
+        if opts[:facet] && opts[:facet] != true
+          opts.merge! values: opts[:facet]
+        end
         ColumnFilter.new self, name, opts
       end
 
-      @facets[name] = Facet.new(filter) if opts.delete(:facet)
+      @facets[name] = Facet.new(filter) if opts[:facet]
       @filters[name] = filter 
     end
 
