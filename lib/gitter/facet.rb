@@ -44,7 +44,7 @@ module Gitter
 
         if selected? or not facet.selected?
           count_tag = h.content_tag :span, "(#{count})", class: 'facet_count'
-          count_tag = h.link_to count_tag,  url_for(p.merge(show: true))
+          #count_tag = h.link_to count_tag,  url_for(p.merge(show: true))
         else
           count_tag = ''
         end
