@@ -68,7 +68,9 @@ module Gitter
     
     def distinct_values attr
       attribute = attr.to_s.split(/\./).last || attr
-      scope.select(attr).uniq.map(&:"#{attribute}").uniq
+      #dv = scope.select(attr).uniq.map(&:"#{attribute}").uniq
+      dv = scope.map(&:"#{attribute}").uniq
+      dv
     end
 
     def to_s
