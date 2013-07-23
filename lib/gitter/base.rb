@@ -1,4 +1,5 @@
 require 'active_support/concern'
+require 'active_support/hash_with_indifferent_access'
 require 'artdeco'
 require 'gitter/filters.rb'
 require 'gitter/facet.rb'
@@ -26,7 +27,7 @@ module Gitter
 
       @params = @decorator.params.fetch(key){{}}.symbolize_keys
 
-      @filters, @values, @facets = {}, {}, {} 
+      @filters, @values, @facets = {}.with_indifferent_access, {}.with_indifferent_access, {}.with_indifferent_access 
       scope = opts.delete(:scope){nil}
       @options = opts.dup
 
@@ -77,7 +78,7 @@ module Gitter
     def scope &scope
       if scope
         @scope = scope
-       else
+      else
         filtered_driver.scope
       end 
     end
@@ -138,11 +139,11 @@ module Gitter
         create_driver(scope).less_or_equal(column, value).scope
       end
 
-      filter name, :column => column
+      filter name, column: column
     end
 
     def scope_filter name, opts = {}
-      BlockFilter.new(self,name, opts){|scope| create_driver(scope).named_scope(name).scope}
+      BlockFilter.new(self, name, opts){|scope| create_driver(scope).named_scope(name).scope}
     end
 
   end

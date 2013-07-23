@@ -6,7 +6,7 @@ module Gitter
 
     def initialize grid, name, filters, opts = {} 
       super grid, name, opts
-      @filters = filters.inject({}){|memo,filter| memo[filter.name] = filter; memo}
+      @filters = filters.inject({}.with_indifferent_access){|memo,filter| memo[filter.name] = filter; memo}
       @values = opts[:values]
       if @input_options == true
         @input_options = {}
