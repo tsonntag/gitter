@@ -60,11 +60,13 @@
     end
 
     def text_field_tag
-      @text_field_tag ||= h.text_field_tag scoped_name, grid.params[name.intern], :class => 'grid'
+      @text_field_tag ||= h.text_field_tag scoped_name, grid.params[name.intern], 
+        class: "grid grid-#{name}"
     end
 
     def select_tag collection 
-      h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), :class => 'grid'
+      h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), 
+        class: "grid grid-#{name}"
     end
 
     def format value
