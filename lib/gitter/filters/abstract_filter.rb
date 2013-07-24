@@ -1,12 +1,15 @@
+module Gitter
+
   class AbstractFilter
 
-    attr_reader :grid, :name, :input_options, :input_tag, :formatter, :order, :label
+    attr_reader :grid, :name, :input_options, :input_tag, :input_class, :formatter, :order, :label
 
     def initialize grid, name, opts = {}
        @grid, @name = grid, name
        @label = opts.delete(:label){grid.translate(:filters, name)}
        @input_options = opts.delete(:input){nil}
        @input_tag = opts.delete(:input_tag){nil}
+       @input_class = opts.delete(:input_class){''}
        @include_blank = opts.delete(:include_blank){false}
        
        @formatter = opts.delete(:formatter){nil}
@@ -61,12 +64,12 @@
 
     def text_field_tag
       @text_field_tag ||= h.text_field_tag scoped_name, grid.params[name.intern], 
-        class: "grid grid-#{name}"
+        class: input_classes 
     end
 
     def select_tag collection 
       h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), 
-        class: "grid grid-#{name}"
+        class: input_classes
     end
 
     def format value
@@ -93,4 +96,9 @@
     def sort_hash hash
       hash.keys.sort.inject({}){|memo,k|memo[k] = hash[k]; memo}
     end
+
+    def input_classes
+      class: "grid grid-#{name} #{input_class}"
+    end
+  end
 end
