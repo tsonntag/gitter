@@ -16,6 +16,20 @@ module Gitter
       end
     end
 
+    def breadcrumbs_info
+      @breadcrumbs_info ||= begin
+        p = {}
+        filters.inject({}) do |memo,filter|
+          value = filter_value filter.name
+          if value.present?
+            p[filter.name] = value
+            memo[filter.name] = { label: filter.label, value: value, url: url_for(scoped_params(p).merge(params)) }
+          end 
+          memo
+        end
+      end
+    end
+
     def render_breadcrumbs delim = '>', params = {}
       delim_tag = h.content_tag :span, delim, {class: 'breadcrumb_delim'}
 
