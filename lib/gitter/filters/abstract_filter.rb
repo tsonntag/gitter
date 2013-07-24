@@ -98,7 +98,7 @@ module Gitter
     end
 
     def input_classes
-      class: "grid grid-#{name} #{input_class}"
+      "grid grid-#{name} #{input_class}"
     end
   end
 end
