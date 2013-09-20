@@ -90,12 +90,12 @@ module Gitter
       end 
     end
 
-    def html
+    def html opts = {}
       @html ||= begin
         h = rows.map do |row|
-          Table.tag :tr, (row.map{|cell| cell.html} * "\n")
+          Table.tag :tr, (row.map{|cell| cell.html} * "\n"), (opts[:tr_html]||{})
         end * "\n"
-	Table.tag :table, h
+	Table.tag :table, h, (opts[:table_html]||{})
       end
     end
 
