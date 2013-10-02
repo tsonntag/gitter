@@ -41,7 +41,7 @@ module Gitter
     end
 
     def input_tag name
-      inputs_tags[name]
+      input_tags[name]
     end
 
   end
