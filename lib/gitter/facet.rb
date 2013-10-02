@@ -30,13 +30,15 @@ module Gitter
       @label || raw_value || '-'
     end
 
-    def link
+    def link opts = {}
       @link ||= begin
         p = grid.params.dup 
         p.delete name
         p[name] = raw_value if raw_value.present?
         p = grid.scoped_params p
         p[:page] = 1
+        p[:show] = true
+        p = p.merge(opts)
 
         value_class = selected? ? 'facet_value_selected' : 'selected' 
         value_tag = h.content_tag :span, label, class: value_class
@@ -44,7 +46,6 @@ module Gitter
 
         if selected? or not facet.selected?
           count_tag = h.content_tag :span, "(#{count})", class: 'facet_count'
-          #count_tag = h.link_to count_tag,  url_for(p.merge(show: true))
         else
           count_tag = ''
         end

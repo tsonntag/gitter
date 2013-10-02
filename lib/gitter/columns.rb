@@ -2,13 +2,20 @@ require 'active_support/concern'
 require 'gitter/column'
 require 'gitter/header'
 require 'gitter/cell'
+require 'active_support/benchmarkable'
+require 'logger'
   
 module Gitter
   module Columns
+    include ActiveSupport::Benchmarkable
     extend ActiveSupport::Concern
   
     included do
       alias_method_chain :scope, :columns
+    end
+
+    def logger
+      @logger ||= Logger.new(STDOUT)
     end
   
     def header_row
@@ -47,8 +54,15 @@ module Gitter
     end
  
     def rows_for model
-      cols = columns.map{|c| [c.cells(model)].flatten }
+#benchmark "---------rows_for #{model}" do
+      cols = nil
+      cols = columns.map do |c| 
+#  benchmark "cells for #{c.name}" do
+        [c.cells(model)].flatten
+#  end
+      end
       max = cols.map{|col|col.size}.max
+
       cols.map do |col| 
         nil_padded_cells = Array.new(max){|i| col[i]}
 	cells = []
@@ -62,6 +76,7 @@ module Gitter
 	end
 	cells
       end.transpose
+#end
     end
  
     def rows scope = nil

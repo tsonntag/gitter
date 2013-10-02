@@ -40,5 +40,9 @@ module Gitter
       end
     end
 
+    def input_tag name
+      inputs_tags[name]
+    end
+
   end
 end
