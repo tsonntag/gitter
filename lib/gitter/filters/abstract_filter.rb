@@ -55,7 +55,7 @@ module Gitter
       return '' unless input?
 
       @input_tag ||= if col = collection
-        col = [''] + col if include_blank? && col.size > 1
+        #col = [''] + col if include_blank? && col.size > 1
         select_tag col
       else
         text_field_tag
@@ -68,8 +68,7 @@ module Gitter
     end
 
     def select_tag collection 
-      h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), 
-        class: input_classes
+      h.select_tag scoped_name, h.options_for_select(collection, grid.params[name.intern]), include_blank: include_blank?, class: input_classes
     end
 
     def format value
