@@ -98,10 +98,15 @@ module Gitter
         if opts[:facet] && opts[:facet] != true
           opts.merge! values: opts[:facet]
         end
-        filters = [select].flatten.map{|name| @filters[name] || scope_filter(name)}
+        select = [select] unless select.respond_to?(:each)
+        filters = select.map do |label,filter_name| 
+          filter_name ||= label
+          @filters[filter_name] || scope_filter(label,filter_name,label: label)
+        end
         SelectFilter.new self, name, filters, opts
-      when s = opts.delete(:scope)
-        scope_filter( s == true ? name : s, opts )
+      when scope_name = opts.delete(:scope)
+        scope_name = name if scope_name == true
+        scope_filter name, scope_name
       else 
         if opts[:facet] && opts[:facet] != true
           opts.merge! values: opts[:facet]
@@ -142,8 +147,8 @@ module Gitter
       filter name, column: column
     end
 
-    def scope_filter name, opts = {}
-      BlockFilter.new(self, name, opts){|scope| create_driver(scope).named_scope(name).scope}
+    def scope_filter name, scope_name, opts = {}
+      BlockFilter.new(self, name, opts){|scope| create_driver(scope).named_scope(scope_name).scope}
     end
 
   end
