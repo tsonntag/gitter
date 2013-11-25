@@ -86,9 +86,18 @@ module Gitter
     def link label = nil, params = {}, options = {}
       label ||= headers.first.label
       if @order
-        img = order_img_tag(options)
-        label = grid.h.content_tag :span, img + label if ordered?
-        grid.h.link_to label, order_params.deep_merge(params), options
+        #img = order_img_tag(options)
+        #label = grid.h.content_tag :span, img + label if ordered?
+        #grid.h.link_to label, order_params.deep_merge(params), options
+        s = ''
+        if !ordered? || !desc?
+          s += grid.h.link_to order_img_tag(false), order_params( true).deep_merge(params), options
+        end
+        if !ordered? ||  desc?
+          s += grid.h.link_to order_img_tag(true), order_params(false).deep_merge(params), options
+        end
+        s += " #{label}"
+        grid.h.raw s
       else
         label
       end
@@ -100,10 +109,12 @@ module Gitter
 
     private
 
-    def order_img_tag opts = {}
-      desc_img = opts.delete(:desc_img){'sort_desc.gif'}
-      asc_img  = opts.delete(:asc_img){'sort_asc.gif'}
-      grid.h.image_tag( desc? ? desc_img : asc_img)
+    def order_img_tag desc = desc?, opts = {}
+      #desc_img = opts.delete(:desc_img){grid.h.image_tag 'sort_desc.gif'}
+      #asc_img  = opts.delete(:asc_img ){grid.h.image_tag 'sort_asc.gif' }
+      desc_img = opts.delete(:desc_img){grid.h.fa_icon 'sort-down'}
+      asc_img  = opts.delete(:asc_img ){grid.h.fa_icon 'sort-up' }
+      desc ? desc_img : asc_img
     end
 
     def to_boolean s
@@ -112,16 +123,14 @@ module Gitter
 
     # if current params contain order for this column then revert direction 
     # else add order_params for this column to current params
-    def order_params
-      @order_params ||= begin
-        p = grid.params.dup
-        if ordered?
-          p[:desc] = !desc?
-        else
-          p = p.merge order: name, desc: false 
-        end
-        grid.scoped_params p
+    def order_params desc = !desc?
+      p = grid.params.dup
+      if ordered?
+        p[:desc] = desc
+      else
+        p = p.merge order: name, desc: desc 
       end
+      grid.scoped_params p
     end
 
     def cell model
