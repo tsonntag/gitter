@@ -23,7 +23,7 @@ module Gitter
           value = filter_value filter.name
           if value.present?
             p[filter.name] = value
-            memo[filter.name] = { label: filter.label, value: value, url: url_for(scoped_params(p).merge(params)) }
+            memo[filter.name] = { label: filter.label, value: value, url: url_for(scoped_params(p)) }
           end 
           memo
         end
