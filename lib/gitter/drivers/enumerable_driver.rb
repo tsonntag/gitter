@@ -13,7 +13,7 @@ module Gitter
         when false, 'false' then -1
         else -1 
       end
-      new scope.sort{|a,b| sign * (a.send(attr) <=> b.send(attr)) }
+      new scope.sort{|a,b| sign * (a.send(attr).try(:to_s) <=> b.send(attr).try(:to_s)) }
     end
    
     def unordered
@@ -37,8 +37,9 @@ module Gitter
       end
 
       s = scope.find_all do |item|
-        attr_text.all? do |attr,text| 
-          item.send(attr) === text
+        attr_texts.all? do |attr,text| 
+          data = item.send(attr).try(:to_s)
+          text === data
         end
       end
 
