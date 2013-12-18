@@ -6,7 +6,7 @@ module Gitter
   autoload :Helper,      'gitter/helper'
   autoload :Controller,  'gitter/controller'
   autoload :Table,       'gitter/table'
-  autoload :EnumerableDriver, 'gitter/drivers/EnumerableDriver'
+  autoload :EnumerableDriver, 'gitter/drivers/enumerable_driver'
 
   class ConfigurationError < StandardError
   end
