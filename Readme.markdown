@@ -39,7 +39,7 @@ class ArticleGrid << Gitter::Grid
   filter :topsellers, :scope => :topsellers
 
   # customized filter 
-  filter :on_stock, do |scope|
+  filter :on_stock do |scope|
     scope.where('stock > 0')
   end
 
@@ -73,9 +73,10 @@ class ArticleGrid << Gitter::Grid
   # make the column sortable
   column :name, :sort => true     
 
-  # customize your data cell
+  # Customize your data cell
+  # Access your model through variable 'model'
   column :price, :sort => true do
-    "#{price/100.floor},#{price%100} USD"
+    "#{model.price/100.floor},#{model.price%100} USD"
   end
   
   # helpers are accessible via #h
@@ -107,12 +108,12 @@ Render you grid:
 %table
   %tr
     - @grid.headers.each do |header|
-    %th = header
+      %th = header
 
   - @grid.rows.each do |row|
     %tr
       - row.each do |cell|
-      %th = cell 
+        %th = cell 
 ```
 [More about grids](https://github.com/tracksun/gitter/wiki/Grids)
 
@@ -157,3 +158,5 @@ API inspired by [datagrid](https://github.com/bogdan/datagrid)
 # License
 
 Gitter is released under the MIT license
+
+Copyright © 2013 Thomas Sonntag
