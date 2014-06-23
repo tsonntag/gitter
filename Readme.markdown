@@ -159,4 +159,4 @@ API inspired by [datagrid](https://github.com/bogdan/datagrid)
 
 Gitter is released under the MIT license
 
-Copyright Thomas Sonntag 2013
+Copyright © 2013 Thomas Sonntag
