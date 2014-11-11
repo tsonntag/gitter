@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "gitter"
   s.version     = Gitter::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Thomas Sommtag"]
+  s.authors     = ["Thomas Sonntag"]
   s.email       = ["git@sonntagsbox.de"]
   s.homepage    = "http://github.com/tracksun/gitter"
   s.summary     = %q{Ruby gem to define searches, facets and data grids for Rails applications}
