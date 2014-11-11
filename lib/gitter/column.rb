@@ -114,7 +114,7 @@ module Gitter
       #asc_img  = opts.delete(:asc_img ){grid.h.image_tag 'sort_asc.gif' }
       desc_img = opts.delete(:desc_img){grid.h.fa_icon 'sort-down'}
       asc_img  = opts.delete(:asc_img ){grid.h.fa_icon 'sort-up' }
-      desc ? desc_img : asc_img
+      desc ? asc_img : desc_img
     end
 
     def to_boolean s
