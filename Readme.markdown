@@ -20,25 +20,25 @@ Example:
 
 ```ruby
 class ArticleGrid << Gitter::Grid
-   
+
   ### First define the source for your data
   # helpers are accessible by #h
   scope do
     Article.where(:owner => h.current_user)
   end
-     
+
   ### Then you may define filters
 
   # filter by attribute
   filter :name
-  
+
   # filter by multiple columns: filters by :name OR :description
   filter :search, :columns => [:name, :description]
 
   # filter by named scope
   filter :topsellers, :scope => :topsellers
 
-  # customized filter 
+  # customized filter
   filter :on_stock do |scope|
     scope.where('stock > 0')
   end
@@ -46,19 +46,19 @@ class ArticleGrid << Gitter::Grid
   filter :out_of_stock do |scope|
     scope.where(:stock => 0)
   end
-  
+
   # select from given filters
   filter :availability, :select => [:on_stock, :out_of_stock]
-    
+
   # add to facets
-  filter :category, :facet => true              
-  
+  filter :category, :facet => true
+
   # select among named scopes
-  filter :price_range, :scopes => [:niceprice, :regular] 
+  filter :price_range, :scopes => [:niceprice, :regular]
 
   # you can provide 'search' like attributes
   filter :search, :ignore_case => true, :exact => false
-  
+
   # The former can be abbreviated by
   search :search
 
@@ -66,30 +66,30 @@ class ArticleGrid << Gitter::Grid
 
   # show an attribute
   column :article_no
-  
+
   # provide a hardcoded header (i18n support also available)
   column :description, :header => 'Details'
 
   # make the column sortable
-  column :name, :sort => true     
+  column :name, :sort => true
 
   # Customize your data cell
   # Access your model through variable 'model'
   column :price, :sort => true do
     "#{model.price/100.floor},#{model.price%100} USD"
   end
-  
+
   # helpers are accessible via #h
   column :details, :header => false do
     h.link_to 'details', h.edit_article_path(self)
   end
-  
+
 end
 ```
 
-[More about filters](https://github.com/tracksun/gitter/wiki/Filters)
+[More about filters](https://github.com/tsonntag/gitter/wiki/Filters)
 
-[More about columns](https://github.com/tracksun/gitter/wiki/Columns)
+[More about columns](https://github.com/tsonntag/gitter/wiki/Columns)
 
 
 #Rendering your grid
@@ -113,9 +113,9 @@ Render you grid:
   - @grid.rows.each do |row|
     %tr
       - row.each do |cell|
-        %th = cell 
+        %th = cell
 ```
-[More about grids](https://github.com/tracksun/gitter/wiki/Grids)
+[More about grids](https://github.com/tsonntag/gitter/wiki/Grids)
 
 # Facets
 
@@ -132,7 +132,7 @@ Render your facets:
           = link_to "(#{data.count})", data.link
 
 ```
-[More about facets](https://github.com/tracksun/gitter/wiki/Facets)
+[More about facets](https://github.com/tsonntag/gitter/wiki/Facets)
 
 # Breadcrumbs
 
@@ -142,7 +142,7 @@ Render your breadcrumbs:
 @grid.render_breadcrumbs
 ```
 
-[More about inputs](https://github.com/tracksun/gitter/wiki/Inputs)
+[More about inputs](https://github.com/tsonntag/gitter/wiki/Inputs)
 
 
 # ORM Support
