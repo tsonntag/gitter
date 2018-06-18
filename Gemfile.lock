@@ -4,7 +4,6 @@ PATH
     gitter (1.1.0)
       activerecord (>= 3.2)
       activesupport (>= 3.2)
-      artdeco (>= 1.2)
 
 GEM
   remote: http://rubygems.org/
@@ -21,8 +20,6 @@ GEM
       i18n (~> 0.6)
       multi_json (~> 1.0)
     arel (3.0.2)
-    artdeco (1.2.1)
-      activesupport (>= 3.2)
     builder (3.0.0)
     diff-lcs (1.1.3)
     ffi (1.0.11)

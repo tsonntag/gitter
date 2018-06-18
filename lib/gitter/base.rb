@@ -1,9 +1,8 @@
 require 'active_support/concern'
 require 'active_support/hash_with_indifferent_access'
-require 'artdeco'
 require 'gitter/filters.rb'
 require 'gitter/facet.rb'
-  
+
 module Gitter
 
   module Base
@@ -18,16 +17,13 @@ module Gitter
         end
       end
     end
-  
-    attr_reader :params, :decorator, :options, :values
+
+    attr_reader :params, :options, :values
 
     def initialize *args
       opts = args.extract_options!
-      @decorator = Artdeco::Decorator.new *args, opts
-
-      @params = @decorator.params.fetch(key){{}}.symbolize_keys
-
-      @filters, @values, @facets = {}.with_indifferent_access, {}.with_indifferent_access, {}.with_indifferent_access 
+      @params = opts.delete(:params){opts}
+      @filters, @values, @facets = {}.with_indifferent_access, {}.with_indifferent_access, {}.with_indifferent_access
       scope = opts.delete(:scope){nil}
       @options = opts.dup
 
@@ -36,22 +32,22 @@ module Gitter
       @scope = scope || @scope
 
       @params.each do |name, value|
-        if filter = @filters[name] 
+        if filter = @filters[name]
           @values[name] = value
         end
       end
     end
-    
+
     def filter_value filter_name
-      @values[filter_name] 
+      @values[filter_name]
     end
 
     def filters
-      @filters.values 
+      @filters.values
     end
 
     def filter_for name
-      @filters[name]     
+      @filters[name]
     end
 
     def label name
@@ -68,19 +64,19 @@ module Gitter
     def filtered_driver
       @filter_driver ||= begin
         d = driver
-        @values.each do |name, value| 
+        @values.each do |name, value|
           d = @filters[name].apply d, value
         end
         d
       end
     end
-    
+
     def scope &scope
       if scope
         @scope = scope
       else
         filtered_driver.scope
-      end 
+      end
     end
 
     def filter *args, &block
@@ -92,14 +88,14 @@ module Gitter
       when opts.delete(:range)
         raise ConfigurationError, "no block allowed for range filter #{name}" if block
         return range_filter name, opts # return is required
-      when block 
+      when block
         BlockFilter.new self, name, opts, &block
       when select = opts.delete(:select)
         if opts[:facet] && opts[:facet] != true
           opts.merge! values: opts[:facet]
         end
         select = [select] unless select.respond_to?(:each)
-        filters = select.map do |label,filter_name| 
+        filters = select.map do |label,filter_name|
           filter_name ||= label
           @filters[filter_name] || scope_filter(label,filter_name,label: label)
         end
@@ -107,7 +103,7 @@ module Gitter
       when scope_name = opts.delete(:scope)
         scope_name = name if scope_name == true
         scope_filter name, scope_name
-      else 
+      else
         if opts[:facet] && opts[:facet] != true
           opts.merge! values: opts[:facet]
         end
@@ -115,11 +111,11 @@ module Gitter
       end
 
       @facets[name] = Facet.new(filter) if opts[:facet]
-      @filters[name] = filter 
+      @filters[name] = filter
     end
 
     # shortcut for filter name, { exact: false, ignore_case: true, strip_blank: true }.merge(options)
-    def search name, opts = {} 
+    def search name, opts = {}
       filter name, { exact: false, ignore_case: true, strip_blank: true }.merge(opts)
     end
 

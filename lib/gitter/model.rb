@@ -22,10 +22,6 @@ module Gitter
       res
     end
 
-    def decorate *args
-      @decorator.decorate *args
-    end
-
     def attribute name, &block
       self.class.send :attr_reader, name
       attributes[name] = block or raise ArgumentError, "missing block for model #{model}"

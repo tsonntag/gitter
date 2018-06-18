@@ -5,7 +5,7 @@ module Gitter
       @name ||= self.class.name.underscore
     end
 
-    # used to scope params of requests 
+    # used to scope params of requests
     def key
       @key ||= :grid#name.intern
     end
@@ -19,15 +19,7 @@ module Gitter
     end
 
     def highlight text, *keys
-      h.highlight "#{text}", mark(*keys)[:mark] 
-    end
-
-    def h
-      @decorator.h
-    end
-
-    def decorate *args
-      @decorator.decorate
+      h.highlight "#{text}", mark(*keys)[:mark]
     end
 
     def input_tags

@@ -36,17 +36,17 @@ module Gitter
         model.map{|m| cells m}
       else
         cell model
-      end 
+      end
 
       # set consecutively equal cells to nil
       if uniq && Array === res
-        current = nil 
+        current = nil
         r = res.map do |el|
           if el != current || current.nil?
             current = el
 	  else
             nil
-	  end 
+	  end
 	end
 	r
       else
@@ -57,12 +57,12 @@ module Gitter
     def ordered
       d = grid.filtered_driver
 
-      return d unless ordered? 
+      return d unless ordered?
 
       desc = case (p = grid.params[:desc])
         when true, 'true' then order_desc || true
-        when false, 'false' then false 
-        else p 
+        when false, 'false' then false
+        else p
       end
 
       case order
@@ -121,20 +121,19 @@ module Gitter
       not (s && s.match(/true|t|1$/i)).nil?
     end
 
-    # if current params contain order for this column then revert direction 
+    # if current params contain order for this column then revert direction
     # else add order_params for this column to current params
     def order_params desc = !desc?
       p = grid.params.dup
       if ordered?
         p[:desc] = desc
       else
-        p = p.merge order: name, desc: desc 
+        p = p.merge order: name, desc: desc
       end
       grid.scoped_params p
     end
 
     def cell model
-      grid.decorate model
       if block
         content = grid.eval block, model
       else
