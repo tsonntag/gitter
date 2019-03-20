@@ -38,7 +38,7 @@ module Gitter
       conditions = attr_values.map do |attr,value| 
         raise ArgumentError, "invalid range #{value} for #{attr}" if Range === value
         value = value.strip if strip_blank
-        text = exact ? value : "%#{value}%"
+        text = exact ? value : "%#{sanitize_sql_like(value)}%"
         col, token = attr, ":q#{token_i}"
         col, token = upper(col), upper(token) if ignore_case
         col = find_format.call(col) if find_format
@@ -81,5 +81,10 @@ module Gitter
     def upper(text)
       "upper(#{text})"
     end
+  end
+
+  def sanitize_sql_like(string, escape_character = "\\")
+    pattern = Regexp.union(escape_character, "%", "_")
+    string.gsub(pattern) { |x| [escape_character, x].join }
   end
 end
