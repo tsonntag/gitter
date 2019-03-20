@@ -81,10 +81,11 @@ module Gitter
     def upper(text)
       "upper(#{text})"
     end
+
+    def sanitize_sql_like(string, escape_character = "\\")
+      pattern = Regexp.union(escape_character, "%", "_")
+      string.gsub(pattern) { |x| [escape_character, x].join }
+    end
   end
 
-  def sanitize_sql_like(string, escape_character = "\\")
-    pattern = Regexp.union(escape_character, "%", "_")
-    string.gsub(pattern) { |x| [escape_character, x].join }
-  end
 end
